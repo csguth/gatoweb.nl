@@ -21,10 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate secret
+      - name: Validate variable
         run: |
-          if [ -z "${{ secrets.WHATSAPP_NUMBER }}" ]; then
-            echo "Missing repository secret: WHATSAPP_NUMBER"
+          if [ -z "${{ vars.WHATSAPP_NUMBER }}" ]; then
+            echo "Missing repository variable: WHATSAPP_NUMBER"
             exit 1
           fi
 
@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p site
           rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
-          sed -i "s/__WHATSAPP_NUMBER__/${{ secrets.WHATSAPP_NUMBER }}/g" site/index.html
+          sed -i "s/__WHATSAPP_NUMBER__/${{ vars.WHATSAPP_NUMBER }}/g" site/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

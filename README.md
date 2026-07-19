@@ -33,11 +33,13 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 
 ### Deploy updates
 
-Before first deploy, add this repository secret:
+Before first deploy, add this repository variable:
 
 - `WHATSAPP_NUMBER` = WhatsApp number in international format without `+` or spaces (example: `31612345678`)
 
-GitHub: `Settings -> Secrets and variables -> Actions -> New repository secret`
+GitHub: `Settings -> Secrets and variables -> Actions -> Variables -> New repository variable`
+
+Use **Secrets** only for credentials (API keys, tokens, passwords).
 
 ```bash
 cd "C:\Users\Chrystian Guth\Documents\gatoweb-nl"
@@ -77,7 +79,7 @@ DNS propagation: 5-60 minutes.
 ## Content Overview
 
 - **Brand name:** Gato Petsit
-- **WhatsApp:** configured via repository secret `WHATSAPP_NUMBER` (not stored in repo)
+- **WhatsApp:** configured via repository variable `WHATSAPP_NUMBER` (not stored in repo)
 - **Location:** 's-Hertogenbosch
 - **Experience:** 12+ years
 - **Reviews:** 50+ five-star (from Pawshake)
