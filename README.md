@@ -33,9 +33,18 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 
 ### Deploy updates
 
-Before first deploy, add this repository variable:
+Before first deploy, add these repository/environment variables:
 
 - `WHATSAPP_NUMBER` = WhatsApp number in international format without `+` or spaces (example: `31612345678`)
+- `BRAND_NAME` = `Gato Petsit`
+- `SITE_URL` = `https://gatoweb.nl`
+- `CONTACT_EMAIL` = `gatopetsit@gmail.com`
+- `CITY_NAME` = `'s-Hertogenbosch`
+- `DEFAULT_LANG` = `en` or `nl`
+- `REVIEWS_COUNT_LABEL` = `50+`
+- `PRICE_ONE_VISIT` = `18`
+- `PRICE_TWO_VISITS` = `28`
+- `DOG_WALK_PRICE_FROM` = `18`
 
 GitHub: `Settings -> Secrets and variables -> Actions -> Variables -> New repository variable`
 

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gatoweb.nl/sitemap.xml
+Sitemap: __SITE_URL__/sitemap.xml

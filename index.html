@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gato Petsit — 's-Hertogenbosch</title>
-  <meta name="description" content="Professional catsitting in 's-Hertogenbosch by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." />
+  <title>__BRAND_NAME__ — __CITY_NAME__</title>
+  <meta name="description" content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, __REVIEWS_COUNT_LABEL__ five-star reviews, home visits, behaviour consultations." />
   <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://gatoweb.nl/" />
-  <meta property="og:title" content="Gato Petsit — 's-Hertogenbosch" />
-  <meta property="og:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
+  <link rel="canonical" href="__SITE_URL__/" />
+  <meta property="og:title" content="__BRAND_NAME__ — __CITY_NAME__" />
+  <meta property="og:description" content="Respect, love and fun for your cat while you're away. __REVIEWS_COUNT_LABEL__ ⭐ five-star reviews." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://gatoweb.nl/" />
-  <meta property="og:image" content="https://gatoweb.nl/images/ligia-profile.jpg" />
-  <meta property="og:image:alt" content="Lígia from Gato Petsit caring for cats in 's-Hertogenbosch" />
+  <meta property="og:url" content="__SITE_URL__/" />
+  <meta property="og:image" content="__SITE_URL__/images/ligia-profile.jpg" />
+  <meta property="og:image:alt" content="Lígia from __BRAND_NAME__ caring for cats in __CITY_NAME__" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Gato Petsit — 's-Hertogenbosch" />
-  <meta name="twitter:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
-  <meta name="twitter:image" content="https://gatoweb.nl/images/ligia-profile.jpg" />
+  <meta name="twitter:title" content="__BRAND_NAME__ — __CITY_NAME__" />
+  <meta name="twitter:description" content="Respect, love and fun for your cat while you're away. __REVIEWS_COUNT_LABEL__ ⭐ five-star reviews." />
+  <meta name="twitter:image" content="__SITE_URL__/images/ligia-profile.jpg" />
   <meta name="theme-color" content="#2d5a4b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
@@ -80,7 +80,7 @@
 
 <!-- ─── All bilingual text: class="en" shows in English, class="nl" in Dutch ─── -->
 <body class="bg-warm-50 text-gray-800"
-      x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
+  x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : '__DEFAULT_LANG__') }"
       x-init="
         document.body.classList.toggle('show-nl', lang === 'nl');
         $watch('lang', val => {
@@ -99,7 +99,7 @@
       <a href="#" class="flex items-center gap-2 group">
         <span class="text-xl">🐾</span>
         <span class="font-serif font-semibold text-sage-600 text-base group-hover:text-sage-700 transition">
-          Gato Petsit
+          __BRAND_NAME__
         </span>
       </a>
 
@@ -137,12 +137,12 @@
 
         <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
           <span>⭐⭐⭐⭐⭐</span>
-          <span>50+ verified reviews</span>
+          <span>__REVIEWS_COUNT_LABEL__ verified reviews</span>
         </div>
 
         <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
-          <span class="en">Expert catsitting<br>in 's-Hertogenbosch</span>
-          <span class="nl">Professionele<br>kattenoppas in<br>'s-Hertogenbosch</span>
+          <span class="en">Expert catsitting<br>in __CITY_NAME__</span>
+          <span class="nl">Professionele<br>kattenoppas in<br>__CITY_NAME__</span>
         </h1>
 
         <p class="text-white/80 text-lg mb-8 max-w-sm mx-auto md:mx-0">
@@ -170,7 +170,7 @@
         <div class="relative inline-block">
           <img
             src="images/ligia-profile.jpg"
-            alt="Lígia, professional catsitter in 's-Hertogenbosch"
+            alt="Lígia, professional catsitter in __CITY_NAME__"
             class="w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white/25 shadow-2xl"
             loading="eager"
           />
@@ -198,7 +198,7 @@
         </div>
       </div>
       <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
+        <div class="font-serif text-2xl font-bold text-sage-600">__REVIEWS_COUNT_LABEL__ ⭐</div>
         <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
           <span class="en">5-star reviews</span>
           <span class="nl">5-ster beoordelingen</span>
@@ -253,8 +253,8 @@
 
         <div class="space-y-4 text-gray-600 leading-relaxed">
 
-          <p class="en">Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in 's-Hertogenbosch.</p>
-          <p class="nl">Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in 's-Hertogenbosch.</p>
+          <p class="en">Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in __CITY_NAME__.</p>
+          <p class="nl">Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in __CITY_NAME__.</p>
 
           <p class="en">My journey started 12 years ago with an independent rescue project in Brazil (<em>@gatosanonimosfloripa</em>) that helped more than 5,000 stray cats through rescue, rehabilitation, sterilisation and rehoming. Since then I've continuously studied feline behaviour, health and welfare — because cat care is always evolving.</p>
           <p class="nl">Mijn reis begon 12 jaar geleden met een reddingsproject in Brazilië (<em>@gatosanonimosfloripa</em>) dat meer dan 5.000 zwerfkatten hielp via redding, revalidatie, sterilisatie en herplaatsing. Sindsdien studeer ik doorlopend kattengedrag, gezondheid en welzijn — want kattenverzorging evolueert voortdurend.</p>
@@ -322,7 +322,7 @@
             <span class="nl">1 Huisbezoek per dag</span>
           </h3>
           <div class="text-3xl font-bold text-warm-500 mb-4">
-            €18<span class="text-sm font-normal text-gray-400"> /dag</span>
+            €__PRICE_ONE_VISIT__<span class="text-sm font-normal text-gray-400"> /dag</span>
           </div>
           <ul class="text-sm text-gray-600 space-y-2 flex-1">
             <li class="flex gap-2"><span class="text-sage-500">✓</span>
@@ -369,7 +369,7 @@
             <span class="nl">2 Huisbezoeken per dag</span>
           </h3>
           <div class="text-3xl font-bold text-warm-500 mb-4">
-            €28<span class="text-sm font-normal text-gray-400"> /dag</span>
+            €__PRICE_TWO_VISITS__<span class="text-sm font-normal text-gray-400"> /dag</span>
           </div>
           <ul class="text-sm text-gray-600 space-y-2 flex-1">
             <li class="flex gap-2"><span class="text-sage-500">✓</span>
@@ -429,7 +429,7 @@
               <span class="nl">Angst & schuwheid</span>
             </li>
           </ul>
-          <a href="mailto:gatopetsit@gmail.com?subject=Feline%20Behaviour%20Consultation"
+          <a href="mailto:__CONTACT_EMAIL__?subject=Feline%20Behaviour%20Consultation"
              class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm">
             <span class="en">Get in touch</span>
             <span class="nl">Neem contact op</span>
@@ -439,8 +439,8 @@
       </div>
 
       <p class="text-center text-xs text-gray-400 mt-6">
-        <span class="en">Also available for dogs, rabbits, birds, reptiles & small animals &middot; Dog walks from €18</span>
-        <span class="nl">Ook beschikbaar voor honden, konijnen, vogels, reptielen & kleine dieren &middot; Hondenwandelingen vanaf €18</span>
+        <span class="en">Also available for dogs, rabbits, birds, reptiles & small animals &middot; Dog walks from €__DOG_WALK_PRICE_FROM__</span>
+        <span class="nl">Ook beschikbaar voor honden, konijnen, vogels, reptielen & kleine dieren &middot; Hondenwandelingen vanaf €__DOG_WALK_PRICE_FROM__</span>
       </p>
 
     </div>
@@ -506,13 +506,13 @@
 
       <div class="text-center mb-10">
         <h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
-          <span class="en">50+ five-star reviews</span>
-          <span class="nl">50+ vijf-ster beoordelingen</span>
+          <span class="en">__REVIEWS_COUNT_LABEL__ five-star reviews</span>
+          <span class="nl">__REVIEWS_COUNT_LABEL__ vijf-ster beoordelingen</span>
         </h2>
         <div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
         <p class="text-gray-500 text-sm">
-          <span class="en">Verified reviews from cat owners in 's-Hertogenbosch</span>
-          <span class="nl">Geverifieerde beoordelingen van katteneigenaren in 's-Hertogenbosch</span>
+          <span class="en">Verified reviews from cat owners in __CITY_NAME__</span>
+          <span class="nl">Geverifieerde beoordelingen van katteneigenaren in __CITY_NAME__</span>
         </p>
       </div>
 
@@ -562,7 +562,7 @@
             "Erg fijn thuiskomen! Ligia is erg goed voor mijn katten en het geeft mij een gerust gevoel als ik even weg ben. Ze stuurt ook elke keer leuke foto's om mij op de hoogte te houden. Mijn katten zijn helemaal gelukkig als ze langskomt. Bedankt voor de goede zorgen!"
           </p>
           <div class="text-xs text-gray-400 font-medium en">— Alina · Catsitting · June 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Inke · Kattenoppas · 's-Hertogenbosch</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Inke · Kattenoppas · __CITY_NAME__</div>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm">
           <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
@@ -573,7 +573,7 @@
             "Lígia heeft echt een hart voor dieren. Mijn kat heeft de tijd van zijn leven gehad toen ik op vakantie was."
           </p>
           <div class="text-xs text-gray-400 font-medium en">— Marel · Catsitting · April 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Anouk · Huisbezoeken · 's-Hertogenbosch</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Anouk · Huisbezoeken · __CITY_NAME__</div>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm">
           <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
@@ -584,7 +584,7 @@
             "Ligia ervaar ik als zeer bekwaam in omgang met honden. Ze stelde serieuze vragen en stuurt ook foto's van de wandeling. Ik ben erg tevreden!"
           </p>
           <div class="text-xs text-gray-400 font-medium en">— Kıvanç · Dog walking · January 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Nanda · Hondenuitlaatservice · 's-Hertogenbosch</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Nanda · Hondenuitlaatservice · __CITY_NAME__</div>
         </div>
       </div>
 
@@ -746,28 +746,28 @@
       <div>
         <div class="flex items-center gap-2 mb-2">
           <span>🐾</span>
-          <span class="font-serif font-semibold text-base">Gato Petsit</span>
+          <span class="font-serif font-semibold text-base">__BRAND_NAME__</span>
         </div>
-        <p class="text-white/60">'s-Hertogenbosch, Noord-Brabant</p>
+        <p class="text-white/60">__CITY_NAME__, Noord-Brabant</p>
         <p class="text-white/60 mt-0.5 en">Speaks EN · NL · PT · ES</p>
         <p class="text-white/60 mt-0.5 nl">Spreekt EN · NL · PT · ES</p>
       </div>
 
       <div class="text-center">
         <p class="text-white/40 text-xs uppercase tracking-wide mb-2">Contact</p>
-        <a href="mailto:gatopetsit@gmail.com" class="block text-white/80 hover:text-white transition mb-1">
-          gatopetsit@gmail.com
+        <a href="mailto:__CONTACT_EMAIL__" class="block text-white/80 hover:text-white transition mb-1">
+          __CONTACT_EMAIL__
         </a>
 
       </div>
 
       <div class="text-center md:text-right">
         <p class="text-white/40 text-xs">
-          © <span id="footer-year"></span> Gato Petsit
+          © <span id="footer-year"></span> __BRAND_NAME__
         </p>
         <p class="text-white/30 text-xs mt-1 en">Made with 🖤 for cats</p>
         <p class="text-white/30 text-xs mt-1 nl">Gemaakt met 🖤 voor katten</p>
-        <a href="https://gatoweb.nl" class="text-white/20 hover:text-white/40 text-xs mt-2 block transition">gatoweb.nl</a>
+        <a href="__SITE_URL__" class="text-white/20 hover:text-white/40 text-xs mt-2 block transition">__SITE_URL__</a>
       </div>
 
     </div>
