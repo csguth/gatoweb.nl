@@ -33,6 +33,12 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 
 ### Deploy updates
 
+Before first deploy, add this repository secret:
+
+- `WHATSAPP_NUMBER` = WhatsApp number in international format without `+` or spaces (example: `31612345678`)
+
+GitHub: `Settings -> Secrets and variables -> Actions -> New repository secret`
+
 ```bash
 cd "C:\Users\Chrystian Guth\Documents\gatoweb-nl"
 git add .
@@ -40,7 +46,7 @@ git commit -m "Update content"
 git push origin main
 ```
 
-Changes go live in ~1 minute.
+Changes go live in ~1-2 minutes via GitHub Actions.
 
 ---
 
@@ -49,7 +55,7 @@ Changes go live in ~1 minute.
 ### GitHub Pages Setup
 
 1. **GitHub:** https://github.com/csguth/gatoweb.nl/settings/pages
-   - Source: Branch `main`, folder `/ (root)`
+        - Source: **GitHub Actions**
    - Custom domain: `gatoweb.nl`
    - Enforce HTTPS: ✅ (after DNS propagates)
 
@@ -71,7 +77,7 @@ DNS propagation: 5-60 minutes.
 ## Content Overview
 
 - **Brand name:** Gato Petsit
-- **WhatsApp:** +31 6 2608 5958
+- **WhatsApp:** configured via repository secret `WHATSAPP_NUMBER` (not stored in repo)
 - **Location:** 's-Hertogenbosch
 - **Experience:** 12+ years
 - **Reviews:** 50+ five-star (from Pawshake)
@@ -113,13 +119,7 @@ Client visits gatoweb.nl
         ↓
 Clicks "Book a visit"
         ↓
-Cal.com calendar (embedded in page)
+WhatsApp message opens with pre-filled request
         ↓
-Client picks date & time
-        ↓
-Booking confirmed → email to gatopetsit@gmail.com
-        ↓
-Google Calendar updated automatically
-        ↓
-iPhone Calendar updated automatically (via Google sync)
+Lígia confirms availability manually
 ```

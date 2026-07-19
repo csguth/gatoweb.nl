@@ -1,0 +1,54 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate secret
+        run: |
+          if [ -z "${{ secrets.WHATSAPP_NUMBER }}" ]; then
+            echo "Missing repository secret: WHATSAPP_NUMBER"
+            exit 1
+          fi
+
+      - name: Build site with injected phone number
+        run: |
+          mkdir -p site
+          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
+          sed -i "s/__WHATSAPP_NUMBER__/${{ secrets.WHATSAPP_NUMBER }}/g" site/index.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
