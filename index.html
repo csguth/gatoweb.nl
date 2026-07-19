@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gato Petsit — 's-Hertogenbosch</title>
+  <meta name="description" content="Professional catsitting in 's-Hertogenbosch by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." />
+  <meta property="og:title" content="Gato Petsit — 's-Hertogenbosch" />
+  <meta property="og:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
+  <meta property="og:image" content="images/ligia-profile.jpg" />
+  <meta name="theme-color" content="#2d5a4b" />
+
+  <!-- Tailwind CSS (no build process needed) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50:  '#f0f7f4',
+              100: '#d9ede7',
+              200: '#b4dace',
+              300: '#84c0ae',
+              400: '#55a18e',
+              500: '#3a8876',
+              600: '#2d5a4b',
+              700: '#254d3f',
+              800: '#1e3d33',
+              900: '#18312a',
+            },
+            warm: {
+              50:  '#fdf9f4',
+              100: '#f7ede0',
+              200: '#edd8bd',
+              300: '#e0bc92',
+              400: '#d09f65',
+              500: '#c17f3c',
+              600: '#a66a2c',
+              700: '#8a5420',
+              800: '#6e4219',
+              900: '#5a3614',
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans:  ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Alpine.js — bilingual toggle -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* Bilingual toggle — body.show-nl switches to Dutch */
+    .nl { display: none; }
+    body.show-nl .nl { display: revert; }
+    body.show-nl .en { display: none; }
+    html { font-family: 'Inter', system-ui, sans-serif; }
+    .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+  </style>
+</head>
+
+<!-- ─── All bilingual text: class="en" shows in English, class="nl" in Dutch ─── -->
+<body class="bg-warm-50 text-gray-800"
+      x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
+      x-init="
+        document.body.classList.toggle('show-nl', lang === 'nl');
+        $watch('lang', val => {
+          document.body.classList.toggle('show-nl', val === 'nl');
+          localStorage.setItem('gatoweb_lang', val);
+        });
+      ">
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       NAV
+  ══════════════════════════════════════════════════════════ -->
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-warm-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
+
+      <a href="#" class="flex items-center gap-2 group">
+        <span class="text-xl">🐾</span>
+        <span class="font-serif font-semibold text-sage-600 text-base group-hover:text-sage-700 transition">
+          Gato Petsit
+        </span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <!-- Language toggle -->
+        <button
+          @click="lang = lang === 'en' ? 'nl' : 'en'"
+          class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 hover:bg-sage-50 transition select-none"
+          aria-label="Switch language"
+        >
+          <span class="en">🇳🇱 NL</span>
+          <span class="nl">🇬🇧 EN</span>
+        </button>
+
+        <!-- Book CTA (desktop) -->
+        <a href="#booking"
+           class="hidden sm:inline-flex bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition">
+          <span class="en">Book a visit</span>
+          <span class="nl">Boek een bezoek</span>
+        </a>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════════════ -->
+  <header class="bg-sage-600 text-white overflow-hidden">
+    <div class="max-w-5xl mx-auto px-5 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
+
+      <!-- Text -->
+      <div class="flex-1 text-center md:text-left order-2 md:order-1">
+
+        <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+          <span>⭐⭐⭐⭐⭐</span>
+          <span>50+ verified reviews</span>
+        </div>
+
+        <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
+          <span class="en">Expert catsitting<br>in 's-Hertogenbosch</span>
+          <span class="nl">Professionele<br>kattenoppas in<br>'s-Hertogenbosch</span>
+        </h1>
+
+        <p class="text-white/80 text-lg mb-8 max-w-sm mx-auto md:mx-0">
+          <span class="en">Respect, love and fun for your cat — while you're away.</span>
+          <span class="nl">Respect, liefde en plezier voor jouw kat — terwijl jij weg bent.</span>
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+          <a href="#booking"
+             class="bg-warm-500 hover:bg-warm-600 text-white font-semibold px-6 py-3 rounded-full transition shadow-md">
+            <span class="en">📅 Book a visit</span>
+            <span class="nl">📅 Boek een bezoek</span>
+          </a>
+          <a href="https://wa.me/31626085958?text=Hi%20L%C3%ADgia!"
+             target="_blank" rel="noopener noreferrer"
+             class="bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition">
+            💬 WhatsApp
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Profile photo -->
+      <div class="flex-shrink-0 order-1 md:order-2">
+        <div class="relative inline-block">
+          <img
+            src="images/ligia-profile.jpg"
+            alt="Lígia, professional catsitter in 's-Hertogenbosch"
+            class="w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white/25 shadow-2xl"
+            loading="eager"
+          />
+          <div class="absolute -bottom-2 -right-2 bg-warm-500 text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-lg whitespace-nowrap">
+            <span class="en">12+ yrs exp.</span>
+            <span class="nl">12+ jr ervaring</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       TRUST BAR
+  ══════════════════════════════════════════════════════════ -->
+  <div class="bg-white border-b border-warm-100">
+    <div class="max-w-5xl mx-auto px-5 py-7 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="font-serif text-2xl font-bold text-sage-600">5.000+</div>
+        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+          <span class="en">cats rescued</span>
+          <span class="nl">geredde katten</span>
+        </div>
+      </div>
+      <div>
+        <div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
+        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+          <span class="en">5-star reviews</span>
+          <span class="nl">5-ster beoordelingen</span>
+        </div>
+      </div>
+      <div>
+        <div class="font-serif text-2xl font-bold text-sage-600">21</div>
+        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+          <span class="en">returning clients</span>
+          <span class="nl">vaste klanten</span>
+        </div>
+      </div>
+      <div>
+        <div class="font-serif text-2xl font-bold text-sage-600">12+</div>
+        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+          <span class="en">years experience</span>
+          <span class="nl">jaar ervaring</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       ABOUT
+  ══════════════════════════════════════════════════════════ -->
+  <section id="about" class="py-20 bg-warm-50">
+    <div class="max-w-5xl mx-auto px-5 grid md:grid-cols-5 gap-12 items-start">
+
+      <!-- Photo collage -->
+      <div class="md:col-span-2 grid grid-cols-2 gap-3">
+        <img src="images/gallery-1.jpg"
+             alt="Cat being cared for during a home visit"
+             class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" />
+        <img src="images/gallery-2.jpg"
+             alt="Happy cat during catsitting visit"
+             class="rounded-2xl aspect-square object-cover shadow-md mt-6" loading="lazy" />
+        <img src="images/gallery-3.jpg"
+             alt="Playtime during home visit"
+             class="rounded-2xl aspect-square object-cover shadow-md -mt-6" loading="lazy" />
+        <img src="images/gallery-4.jpg"
+             alt="Cat relaxed at home with Lígia"
+             class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" />
+      </div>
+
+      <!-- Bio text -->
+      <div class="md:col-span-3">
+        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-6">
+          <span class="en">About Lígia</span>
+          <span class="nl">Over Lígia</span>
+        </h2>
+
+        <div class="space-y-4 text-gray-600 leading-relaxed">
+
+          <p class="en">Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in 's-Hertogenbosch.</p>
+          <p class="nl">Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in 's-Hertogenbosch.</p>
+
+          <p class="en">My journey started 12 years ago with an independent rescue project in Brazil (<em>@gatosanonimosfloripa</em>) that helped more than 5,000 stray cats through rescue, rehabilitation, sterilisation and rehoming. Since then I've continuously studied feline behaviour, health and welfare — because cat care is always evolving.</p>
+          <p class="nl">Mijn reis begon 12 jaar geleden met een reddingsproject in Brazilië (<em>@gatosanonimosfloripa</em>) dat meer dan 5.000 zwerfkatten hielp via redding, revalidatie, sterilisatie en herplaatsing. Sindsdien studeer ik doorlopend kattengedrag, gezondheid en welzijn — want kattenverzorging evolueert voortdurend.</p>
+
+          <p class="en">Every cat is different. My job is to respect their personality, read their body language, and adapt my approach to what makes them feel comfortable. During every visit I monitor behaviour, appetite, litter box habits and overall wellbeing — small changes can mean a lot.</p>
+          <p class="nl">Elke kat is anders. Mijn taak is hun persoonlijkheid te respecteren, hun lichaamstaal te lezen en mijn aanpak aan te passen aan wat hen comfortabel maakt. Tijdens elk bezoek houd ik gedrag, eetlust, kattenbakgewoonten en algeheel welzijn in de gaten.</p>
+
+          <p class="en font-medium text-sage-700">After every visit, you'll receive photos, videos and a detailed update. I know how hard it is to leave your cat — you deserve to feel informed and reassured. 📸</p>
+          <p class="nl font-medium text-sage-700">Na elk bezoek ontvang je foto's, video's en een gedetailleerde update. Ik weet hoe moeilijk het is om je kat achter te laten — jij verdient het om goed geïnformeerd te zijn. 📸</p>
+
+        </div>
+
+        <!-- Skill tags -->
+        <div class="mt-7 flex flex-wrap gap-2">
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Senior cats</span><span class="nl">Seniore katten</span>
+          </span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">Kittens</span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Shy & fearful cats</span><span class="nl">Schuwe katten</span>
+          </span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Medication</span><span class="nl">Medicatie</span>
+          </span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Post-op care</span><span class="nl">Postop zorg</span>
+          </span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Multi-cat households</span><span class="nl">Meerdere katten</span>
+          </span>
+          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+            <span class="en">Behaviour consultation</span><span class="nl">Gedragsconsultatie</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SERVICES
+  ══════════════════════════════════════════════════════════ -->
+  <section id="services" class="py-20 bg-white">
+    <div class="max-w-5xl mx-auto px-5">
+
+      <div class="text-center mb-12">
+        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+          <span class="en">Services & Pricing</span>
+          <span class="nl">Diensten & Prijzen</span>
+        </h2>
+        <p class="text-gray-500 text-sm">
+          <span class="en">All visits are at your home — no travel stress for your cat.</span>
+          <span class="nl">Alle bezoeken zijn bij jou thuis — geen resstress voor jouw kat.</span>
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+
+        <!-- 1 visit/day -->
+        <div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+          <div class="text-4xl mb-4">🐱</div>
+          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+            <span class="en">1 Home Visit / day</span>
+            <span class="nl">1 Huisbezoek per dag</span>
+          </h3>
+          <div class="text-3xl font-bold text-warm-500 mb-4">
+            €18<span class="text-sm font-normal text-gray-400"> /dag</span>
+          </div>
+          <ul class="text-sm text-gray-600 space-y-2 flex-1">
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Feeding & fresh water</span>
+              <span class="nl">Voeren & vers water</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Litter box cleaning</span>
+              <span class="nl">Kattenbak reinigen</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Playtime & attention</span>
+              <span class="nl">Spelen & aandacht</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Health monitoring</span>
+              <span class="nl">Gezondheidscheck</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Photo & video updates</span>
+              <span class="nl">Foto & video updates</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Plant watering</span>
+              <span class="nl">Planten water geven</span>
+            </li>
+          </ul>
+          <a href="#booking"
+             class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm">
+            <span class="en">Book now</span>
+            <span class="nl">Boek nu</span>
+          </a>
+        </div>
+
+        <!-- 2 visits/day (highlighted) -->
+        <div class="rounded-2xl border-2 border-sage-600 bg-white p-6 flex flex-col shadow-lg relative">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage-600 text-white text-xs font-bold uppercase tracking-wide px-4 py-1 rounded-full shadow whitespace-nowrap">
+            <span class="en">Most popular</span>
+            <span class="nl">Meest gekozen</span>
+          </div>
+          <div class="text-4xl mb-4">🐾</div>
+          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+            <span class="en">2 Home Visits / day</span>
+            <span class="nl">2 Huisbezoeken per dag</span>
+          </h3>
+          <div class="text-3xl font-bold text-warm-500 mb-4">
+            €28<span class="text-sm font-normal text-gray-400"> /dag</span>
+          </div>
+          <ul class="text-sm text-gray-600 space-y-2 flex-1">
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Everything in the 1-visit plan</span>
+              <span class="nl">Alles van het 1-bezoek plan</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Morning + evening visits</span>
+              <span class="nl">Ochtend- & avondbezoek</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Ideal for anxious cats</span>
+              <span class="nl">Ideaal voor angstige katten</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Medication administration</span>
+              <span class="nl">Medicatie toedienen</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Update after each visit</span>
+              <span class="nl">Update na elk bezoek</span>
+            </li>
+          </ul>
+          <a href="#booking"
+             class="mt-6 block text-center bg-warm-500 hover:bg-warm-600 text-white font-medium py-2.5 rounded-full transition text-sm">
+            <span class="en">Book now</span>
+            <span class="nl">Boek nu</span>
+          </a>
+        </div>
+
+        <!-- Behaviour consultation -->
+        <div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+          <div class="text-4xl mb-4">🧠</div>
+          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+            <span class="en">Behaviour Consultation</span>
+            <span class="nl">Gedragsconsultatie</span>
+          </h3>
+          <div class="text-xl font-semibold text-warm-500 mb-4">
+            <span class="en">On request</span>
+            <span class="nl">Op aanvraag</span>
+          </div>
+          <ul class="text-sm text-gray-600 space-y-2 flex-1">
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Litter box issues</span>
+              <span class="nl">Kattenbakproblemen</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Cat-to-cat introductions</span>
+              <span class="nl">Katten introduceren</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Scratching & aggression</span>
+              <span class="nl">Krabben & agressie</span>
+            </li>
+            <li class="flex gap-2"><span class="text-sage-500">✓</span>
+              <span class="en">Anxiety & fearfulness</span>
+              <span class="nl">Angst & schuwheid</span>
+            </li>
+          </ul>
+          <a href="mailto:gatopetsit@gmail.com?subject=Feline%20Behaviour%20Consultation"
+             class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm">
+            <span class="en">Get in touch</span>
+            <span class="nl">Neem contact op</span>
+          </a>
+        </div>
+
+      </div>
+
+      <p class="text-center text-xs text-gray-400 mt-6">
+        <span class="en">Also available for dogs, rabbits, birds, reptiles & small animals &middot; Dog walks from €18</span>
+        <span class="nl">Ook beschikbaar voor honden, konijnen, vogels, reptielen & kleine dieren &middot; Hondenwandelingen vanaf €18</span>
+      </p>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       HOW IT WORKS
+  ══════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-sage-600 text-white">
+    <div class="max-w-5xl mx-auto px-5">
+
+      <h2 class="font-serif text-3xl font-bold text-center mb-14">
+        <span class="en">How it works</span>
+        <span class="nl">Hoe het werkt</span>
+      </h2>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">💬</div>
+          <h3 class="font-semibold text-lg mb-2">
+            <span class="en">1. Get in touch</span>
+            <span class="nl">1. Neem contact op</span>
+          </h3>
+          <p class="text-white/70 text-sm leading-relaxed">
+            <span class="en">Book online or send a WhatsApp. Tell me about your cat(s) and the dates you need.</span>
+            <span class="nl">Boek online of stuur een WhatsApp. Vertel me over jouw kat(ten) en de gewenste data.</span>
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">🤝</div>
+          <h3 class="font-semibold text-lg mb-2">
+            <span class="en">2. Free Meet & Greet</span>
+            <span class="nl">2. Gratis kennismaking</span>
+          </h3>
+          <p class="text-white/70 text-sm leading-relaxed">
+            <span class="en">I visit your home, meet your cat, and learn their routine before the sitting starts.</span>
+            <span class="nl">Ik kom langs, maak kennis met jouw kat en leer hun routine voordat de oppas begint.</span>
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">📸</div>
+          <h3 class="font-semibold text-lg mb-2">
+            <span class="en">3. Relax & receive updates</span>
+            <span class="nl">3. Ontspannen & updates ontvangen</span>
+          </h3>
+          <p class="text-white/70 text-sm leading-relaxed">
+            <span class="en">I visit your home and send photos and a detailed report after every visit. Your cat is in good hands. 🖤</span>
+            <span class="nl">Ik bezoek jouw huis en stuur na elk bezoek foto's en een gedetailleerd verslag. Jouw kat is in goede handen. 🖤</span>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       REVIEWS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="reviews" class="py-20 bg-warm-100">
+    <div class="max-w-5xl mx-auto px-5">
+
+      <div class="text-center mb-10">
+        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
+          <span class="en">50+ five-star reviews</span>
+          <span class="nl">50+ vijf-ster beoordelingen</span>
+        </h2>
+        <div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
+        <p class="text-gray-500 text-sm">
+          <span class="en">Verified reviews from cat owners in 's-Hertogenbosch</span>
+          <span class="nl">Geverifieerde beoordelingen van katteneigenaren in 's-Hertogenbosch</span>
+        </p>
+      </div>
+
+      <!-- Rating breakdown -->
+      <div class="max-w-xs mx-auto mb-12 space-y-3">
+        <div class="flex items-center gap-3 text-sm">
+          <span class="text-gray-500 w-36 text-right en">Communication</span>
+          <span class="text-gray-500 w-36 text-right nl">Communicatie</span>
+          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
+          </div>
+          <span class="font-bold text-sage-700 w-4">5</span>
+        </div>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="text-gray-500 w-36 text-right en">Reliability</span>
+          <span class="text-gray-500 w-36 text-right nl">Betrouwbaarheid</span>
+          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
+          </div>
+          <span class="font-bold text-sage-700 w-4">5</span>
+        </div>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="text-gray-500 w-36 text-right en">Pet care</span>
+          <span class="text-gray-500 w-36 text-right nl">Omgang met dieren</span>
+          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
+          </div>
+          <span class="font-bold text-sage-700 w-4">5</span>
+        </div>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="text-gray-500 w-36 text-right en">Value</span>
+          <span class="text-gray-500 w-36 text-right nl">Prijs-kwaliteit</span>
+          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
+          </div>
+          <span class="font-bold text-sage-700 w-4">5</span>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-5 mb-8">
+        <div class="bg-white rounded-2xl p-5 shadow-sm">
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-sm text-gray-600 italic mb-3 en">
+            "I couldn't have asked for a better cat sitter! Ligia took care of my baby as if it were her own, showing so much love, patience, and attention. She was incredibly attentive to my cat's needs and made sure Jazzy felt comfortable and safe. I received regular updates and could tell my cat was happy and relaxed. I highly recommend Ligia to anyone looking for a trustworthy, caring, and professional pet sitter."
+          </p>
+          <p class="text-sm text-gray-600 italic mb-3 nl">
+            "Erg fijn thuiskomen! Ligia is erg goed voor mijn katten en het geeft mij een gerust gevoel als ik even weg ben. Ze stuurt ook elke keer leuke foto's om mij op de hoogte te houden. Mijn katten zijn helemaal gelukkig als ze langskomt. Bedankt voor de goede zorgen!"
+          </p>
+          <div class="text-xs text-gray-400 font-medium en">— Alina · Catsitting · June 2026</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Inke · Kattenoppas · 's-Hertogenbosch</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm">
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-sm text-gray-600 italic mb-3 en">
+            "She is a great sitter who makes sure your cats are well taken care of. She sends pics/videos every visit and even though one of my cats is VERY shy, she was able to pet and bond with them a little. If you need an experienced and kind sitter, I would for sure recommend her!"
+          </p>
+          <p class="text-sm text-gray-600 italic mb-3 nl">
+            "Lígia heeft echt een hart voor dieren. Mijn kat heeft de tijd van zijn leven gehad toen ik op vakantie was."
+          </p>
+          <div class="text-xs text-gray-400 font-medium en">— Marel · Catsitting · April 2026</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Anouk · Huisbezoeken · 's-Hertogenbosch</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm">
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-sm text-gray-600 italic mb-3 en">
+            "Lígia was great with my dog. She was very friendly, easy to communicate with, and always responsive. She took good care of her, spent time playing with her, and kept me updated with photos. It was so clear she gives real attention and care. I would happily book her again and definitely recommend her."
+          </p>
+          <p class="text-sm text-gray-600 italic mb-3 nl">
+            "Ligia ervaar ik als zeer bekwaam in omgang met honden. Ze stelde serieuze vragen en stuurt ook foto's van de wandeling. Ik ben erg tevreden!"
+          </p>
+          <div class="text-xs text-gray-400 font-medium en">— Kıvanç · Dog walking · January 2026</div>
+          <div class="text-xs text-gray-400 font-medium nl">— Nanda · Hondenuitlaatservice · 's-Hertogenbosch</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       BOOKING
+  ══════════════════════════════════════════════════════════ -->
+  <section id="booking" class="py-20 bg-white">
+    <div class="max-w-lg mx-auto px-5">
+
+      <div class="text-center mb-10">
+        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+          <span class="en">Book a catsitting visit</span>
+          <span class="nl">Boek een kattenoppasbezoek</span>
+        </h2>
+        <p class="text-gray-500 text-sm">
+          <span class="en">Choose your dates and preference — Lígia will confirm within 24 h.</span>
+          <span class="nl">Kies jouw data en voorkeur — Lígia bevestigt binnen 24 uur.</span>
+        </p>
+      </div>
+
+      <!-- Booking form -->
+      <div x-data="bookingForm()" class="bg-warm-50 rounded-2xl p-8 space-y-6 shadow-sm">
+
+        <!-- Dates -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <span class="en">First day</span>
+              <span class="nl">Eerste dag</span>
+            </label>
+            <input type="date" x-model="from" :min="today"
+                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <span class="en">Last day <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
+              <span class="nl">Laatste dag <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+            </label>
+            <input type="date" x-model="to" :min="from || today"
+                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
+          </div>
+        </div>
+
+        <!-- Pets -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <span class="en">Pets</span>
+              <span class="nl">Huisdieren</span>
+            </p>
+            <button type="button" @click="pets.push({ name: '', type: 'cat', otherType: '' })"
+                    class="text-xs text-sage-600 hover:text-sage-700 font-semibold flex items-center gap-1 transition">
+              <span>+</span>
+              <span class="en">Add pet</span>
+              <span class="nl">Huisdier toevoegen</span>
+            </button>
+          </div>
+
+          <template x-for="(pet, i) in pets" :key="i">
+            <div class="bg-white rounded-xl border border-warm-200 p-3 space-y-2">
+              <div class="flex gap-2 items-center">
+                <input type="text" x-model="pet.name"
+                       class="flex-1 border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400 min-w-0"
+                       placeholder="Name / Naam" />
+                <button type="button" x-show="pets.length > 1" @click="pets.splice(i, 1)"
+                        class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-red-400 transition flex-shrink-0 text-xl leading-none">&times;</button>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                <button type="button" @click="pet.type = 'cat'"
+                        :class="pet.type === 'cat' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
+                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                  🐱 Catsitting
+                </button>
+                <button type="button" @click="pet.type = 'dog'"
+                        :class="pet.type === 'dog' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
+                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                  🐶 Dogwalking
+                </button>
+                <button type="button" @click="pet.type = 'other'"
+                        :class="pet.type === 'other' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
+                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
+                  ✏️ <span class="en">Other</span><span class="nl">Anders</span>
+                </button>
+              </div>
+              <input x-show="pet.type === 'other'" type="text" x-model="pet.otherType"
+                     class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400"
+                     placeholder="e.g. rabbit, bird · bijv. konijn, vogel" />
+            </div>
+          </template>
+        </div>
+
+        <!-- Preference -->
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            <span class="en">Visit preference</span>
+            <span class="nl">Bezoekvoorkeur</span>
+          </p>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" @click="pref = 'morning'"
+                    :class="pref === 'morning' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
+                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
+              <div class="text-xl mb-1">🌅</div>
+              <span class="en">Morning <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+              <span class="nl">Ochtend <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+            </button>
+            <button type="button" @click="pref = 'evening'"
+                    :class="pref === 'evening' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
+                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
+              <div class="text-xl mb-1">🌙</div>
+              <span class="en">Evening <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+              <span class="nl">Avond <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+            </button>
+            <button type="button" @click="pref = 'both'"
+                    :class="pref === 'both' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
+                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
+              <div class="text-xl mb-1">🌅🌙</div>
+              <span class="en">Both <span class="font-normal opacity-70 text-xs">(2x/day)</span></span>
+              <span class="nl">Beide <span class="font-normal opacity-70 text-xs">(2x/dag)</span></span>
+            </button>
+            <button type="button" @click="pref = 'none'"
+                    :class="pref === 'none' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
+                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
+              <div class="text-xl mb-1">🐾</div>
+              <span class="en">No pref. <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+              <span class="nl">Geen voorkeur <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Send button -->
+        <button type="button" @click="send()"
+                class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1fba58] text-white font-semibold py-3.5 rounded-xl transition text-sm shadow">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white flex-shrink-0" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span class="en">Send booking request via WhatsApp</span>
+          <span class="nl">Stuur boekingsverzoek via WhatsApp</span>
+        </button>
+
+        <p class="text-center text-xs text-gray-400">
+          <span class="en">Lígia will confirm availability within 24 hours.</span>
+          <span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
+        </p>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer class="bg-sage-700 text-white py-12">
+    <div class="max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-sm">
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span>🐾</span>
+          <span class="font-serif font-semibold text-base">Gato Petsit</span>
+        </div>
+        <p class="text-white/60">'s-Hertogenbosch, Noord-Brabant</p>
+        <p class="text-white/60 mt-0.5 en">Speaks EN · NL · PT · ES</p>
+        <p class="text-white/60 mt-0.5 nl">Spreekt EN · NL · PT · ES</p>
+      </div>
+
+      <div class="text-center">
+        <p class="text-white/40 text-xs uppercase tracking-wide mb-2">Contact</p>
+        <a href="mailto:gatopetsit@gmail.com" class="block text-white/80 hover:text-white transition mb-1">
+          gatopetsit@gmail.com
+        </a>
+
+      </div>
+
+      <div class="text-center md:text-right">
+        <p class="text-white/40 text-xs">
+          © <span id="footer-year"></span> Gato Petsit
+        </p>
+        <p class="text-white/30 text-xs mt-1 en">Made with 🖤 for cats</p>
+        <p class="text-white/30 text-xs mt-1 nl">Gemaakt met 🖤 voor katten</p>
+        <a href="https://gatoweb.nl" class="text-white/20 hover:text-white/40 text-xs mt-2 block transition">gatoweb.nl</a>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       FLOATING WHATSAPP BUTTON
+  ══════════════════════════════════════════════════════════ -->
+  <a href="https://wa.me/31626085958?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!"
+     target="_blank" rel="noopener noreferrer"
+     class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95"
+     aria-label="Contact Lígia via WhatsApp">
+    <svg viewBox="0 0 24 24" class="w-7 h-7 fill-white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    function bookingForm() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem('gatoweb_booking') || '{}'); } catch(e) {}
+
+      return {
+        from: '',
+        to: '',
+        pref: saved.pref || '',
+        pets: saved.pets && saved.pets.length ? saved.pets : [{ name: '', type: 'cat', otherType: '' }],
+        today: new Date().toISOString().split('T')[0],
+        _save() {
+          try { localStorage.setItem('gatoweb_booking', JSON.stringify({ pets: this.pets, pref: this.pref })); } catch(e) {}
+        },
+        init() {
+          this.$watch('pets', () => this._save());
+          this.$watch('pref', () => this._save());
+        },
+        send() {
+          if (!this.from) {
+            alert('Selecteer een datum / Please select a start date');
+            return;
+          }
+          const typeLabels = { cat: 'catsitting', dog: 'dogwalking' };
+          const petsStr = this.pets.map(p => {
+            const name = p.name.trim();
+            const type = p.type === 'other'
+              ? (p.otherType.trim() || 'other/anders')
+              : typeLabels[p.type];
+            return name ? name + ' (' + type + ')' : type;
+          }).join(', ');
+          const prefLabels = {
+            morning: '1x morning (ochtend)',
+            evening: '1x evening (avond)',
+            both: '2x morning + evening (ochtend + avond)',
+            none: '1x no preference (geen voorkeur)'
+          };
+          const pref = this.pref ? prefLabels[this.pref] : '1x no preference (geen voorkeur)';
+          const dates = this.to && this.to > this.from
+            ? this.from + ' \u2192 ' + this.to
+            : this.from;
+          const msg = 'Hi L\u00EDgia! Catsitting / pet care request:\nDates / Data: ' + dates + '\nPets / Huisdieren: ' + petsStr + '\nPreference / Voorkeur: ' + pref;
+          window.open('https://wa.me/31626085958?text=' + encodeURIComponent(msg), '_blank');
+        }
+      };
+    }
+  </script>
+
+</body>
+</html>
