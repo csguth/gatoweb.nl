@@ -114,7 +114,7 @@ DNS propagation: 5-60 minutes.
 
 - **Canonical URL:** `https://gatoweb.nl/`
 - **Open Graph/Twitter cards:** configured in `<head>`
-- **Favicon:** `favicon.svg`
+- **Favicon:** `images/favicon.png`
 - **Robots:** `robots.txt`
 - **Sitemap:** `sitemap.xml`
 
