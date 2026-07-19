@@ -22,7 +22,7 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 ✅ **Real reviews** — 50+ five-star reviews from Pawshake (3 EN + 3 NL)  
 ✅ **WhatsApp booking** — Direct message with pre-filled dates/pets/preference  
 ✅ **Responsive** — Mobile-first design with Tailwind CSS  
-✅ **SEO optimized** — Meta tags, semantic HTML, fast load  
+✅ **SEO optimized** — Meta tags, canonical, Open Graph/Twitter cards, robots.txt, sitemap.xml  
 
 ---
 
@@ -96,6 +96,32 @@ DNS propagation: 5-60 minutes.
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates)
 - **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
 - **Fonts:** Playfair Display (serif) + Inter (sans-serif)
+
+---
+
+## SEO Assets
+
+- **Canonical URL:** `https://gatoweb.nl/`
+- **Open Graph/Twitter cards:** configured in `<head>`
+- **Favicon:** `favicon.svg`
+- **Robots:** `robots.txt`
+- **Sitemap:** `sitemap.xml`
+
+---
+
+## Production Checklist
+
+- [ ] Confirm `WHATSAPP_NUMBER` variable is set in GitHub Actions
+- [ ] Check homepage title/description preview in social share debuggers
+- [ ] Verify `https://gatoweb.nl/robots.txt` returns 200
+- [ ] Verify `https://gatoweb.nl/sitemap.xml` returns 200
+- [ ] Verify WhatsApp links work in hero, floating button and booking form
+- [ ] Verify EN/NL auto-detection and manual toggle persistence
+- [ ] Confirm HTTPS lock appears for `gatoweb.nl` and `www.gatoweb.nl`
+
+### Performance note
+
+The site currently uses Tailwind Play CDN (`cdn.tailwindcss.com`) for simplicity. This is fine for now, but for best performance and to remove browser warnings, migrate later to a small precompiled CSS build.
 
 ---
 
