@@ -157,6 +157,7 @@
             <span class="nl">📅 Boek een bezoek</span>
           </a>
           <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia!"
+             onclick="markWhatsAppIntent()"
              target="_blank" rel="noopener noreferrer"
              class="bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition">
             💬 WhatsApp
@@ -778,6 +779,7 @@
        FLOATING WHATSAPP BUTTON
   ══════════════════════════════════════════════════════════ -->
   <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!"
+      onclick="markWhatsAppIntent()"
      target="_blank" rel="noopener noreferrer"
      class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95"
      aria-label="Contact Lígia via WhatsApp">
@@ -786,8 +788,82 @@
     </svg>
   </a>
 
+  <div id="wa-return-toast"
+       class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(92vw,30rem)] bg-white border border-warm-200 rounded-2xl shadow-2xl p-4 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none"
+       role="status"
+       aria-live="polite"
+       aria-hidden="true">
+    <div class="flex items-start gap-3">
+      <div class="text-2xl leading-none">💚</div>
+      <div class="flex-1">
+        <p class="font-semibold text-sage-700 text-sm en">Thanks for contacting __BRAND_NAME__!</p>
+        <p class="font-semibold text-sage-700 text-sm nl">Bedankt voor je bericht aan __BRAND_NAME__!</p>
+        <p class="text-xs text-gray-500 mt-1 en">We'll reply as soon as possible. If needed, you can send another message.</p>
+        <p class="text-xs text-gray-500 mt-1 nl">We reageren zo snel mogelijk. Je kunt altijd nog een bericht sturen.</p>
+        <a href="#"
+           class="inline-flex mt-3 text-xs font-semibold text-sage-600 hover:text-sage-700 transition">
+          <span class="en">Back to home</span>
+          <span class="nl">Terug naar start</span>
+        </a>
+      </div>
+      <button type="button"
+              onclick="hideWhatsAppToast()"
+              class="text-gray-400 hover:text-gray-600 transition"
+              aria-label="Close">
+        ✕
+      </button>
+    </div>
+  </div>
+
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    const WA_PENDING_KEY = 'gatoweb_wa_pending';
+    let waToastTimer = null;
+
+    function markWhatsAppIntent() {
+      try {
+        localStorage.setItem(WA_PENDING_KEY, String(Date.now()));
+      } catch (e) {}
+    }
+
+    function hideWhatsAppToast() {
+      const toast = document.getElementById('wa-return-toast');
+      if (!toast) return;
+      toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.setAttribute('aria-hidden', 'true');
+    }
+
+    function showWhatsAppToast() {
+      const toast = document.getElementById('wa-return-toast');
+      if (!toast) return;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.setAttribute('aria-hidden', 'false');
+      if (waToastTimer) clearTimeout(waToastTimer);
+      waToastTimer = setTimeout(hideWhatsAppToast, 9000);
+    }
+
+    function maybeShowWhatsAppToast() {
+      let startedAt = 0;
+      try {
+        startedAt = Number(localStorage.getItem(WA_PENDING_KEY) || '0');
+      } catch (e) {}
+      if (!startedAt) return;
+      if (Date.now() - startedAt < 1500) return;
+      try {
+        localStorage.removeItem(WA_PENDING_KEY);
+      } catch (e) {}
+      showWhatsAppToast();
+    }
+
+    window.addEventListener('focus', maybeShowWhatsAppToast);
+    window.addEventListener('pageshow', maybeShowWhatsAppToast);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) maybeShowWhatsAppToast();
+    });
+
+    // Covers the case where the browser restores the tab after returning from the app.
+    setTimeout(maybeShowWhatsAppToast, 400);
 
     function bookingForm() {
       let saved = {};
@@ -830,7 +906,8 @@
             ? this.from + ' \u2192 ' + this.to
             : this.from;
           const msg = 'Hi L\u00EDgia! Catsitting / pet care request:\nDates / Data: ' + dates + '\nPets / Huisdieren: ' + petsStr + '\nPreference / Voorkeur: ' + pref;
-          window.open('https://wa.me/__WHATSAPP_NUMBER__?text=' + encodeURIComponent(msg), '_blank');
+          markWhatsAppIntent();
+          window.open('https://wa.me/__WHATSAPP_NUMBER__?text=' + encodeURIComponent(msg), '_blank', 'noopener');
         }
       };
     }
