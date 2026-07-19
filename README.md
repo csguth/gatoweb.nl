@@ -40,11 +40,13 @@ Before first deploy, add these repository/environment variables:
 - `SITE_URL` = `https://gatoweb.nl`
 - `CONTACT_EMAIL` = `gatopetsit@gmail.com`
 - `CITY_NAME` = `'s-Hertogenbosch`
-- `DEFAULT_LANG` = `en` or `nl`
-- `REVIEWS_COUNT_LABEL` = `50+`
 - `PRICE_ONE_VISIT` = `18`
 - `PRICE_TWO_VISITS` = `28`
 - `DOG_WALK_PRICE_FROM` = `18`
+
+Notes:
+- Language default is hardcoded: browser language detection (`nl` -> Dutch) with fallback to English, or previous user choice saved in localStorage.
+- Review count label is hardcoded in the site (`50+`).
 
 GitHub: `Settings -> Secrets and variables -> Actions -> Variables -> New repository variable`
 

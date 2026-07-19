@@ -29,8 +29,6 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL }}
           CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
           CITY_NAME: ${{ vars.CITY_NAME }}
-          DEFAULT_LANG: ${{ vars.DEFAULT_LANG }}
-          REVIEWS_COUNT_LABEL: ${{ vars.REVIEWS_COUNT_LABEL }}
           PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }}
           PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }}
           DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
@@ -41,8 +39,6 @@ jobs:
             SITE_URL
             CONTACT_EMAIL
             CITY_NAME
-            DEFAULT_LANG
-            REVIEWS_COUNT_LABEL
             PRICE_ONE_VISIT
             PRICE_TWO_VISITS
             DOG_WALK_PRICE_FROM
@@ -54,14 +50,6 @@ jobs:
               exit 1
             fi
           done
-
-          case "$DEFAULT_LANG" in
-            en|nl) ;;
-            *)
-              echo "DEFAULT_LANG must be 'en' or 'nl'"
-              exit 1
-              ;;
-          esac
 
           for n in PRICE_ONE_VISIT PRICE_TWO_VISITS DOG_WALK_PRICE_FROM; do
             value="${!n}"
@@ -81,8 +69,6 @@ jobs:
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/index.html
           sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" site/index.html
           sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" site/index.html
-          sed -i "s|__DEFAULT_LANG__|${{ vars.DEFAULT_LANG }}|g" site/index.html
-          sed -i "s|__REVIEWS_COUNT_LABEL__|${{ vars.REVIEWS_COUNT_LABEL }}|g" site/index.html
           sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" site/index.html
           sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" site/index.html
           sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" site/index.html

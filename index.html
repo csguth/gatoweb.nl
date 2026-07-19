@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>__BRAND_NAME__ — __CITY_NAME__</title>
-  <meta name="description" content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, __REVIEWS_COUNT_LABEL__ five-star reviews, home visits, behaviour consultations." />
+  <meta name="description" content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="canonical" href="__SITE_URL__/" />
   <meta property="og:title" content="__BRAND_NAME__ — __CITY_NAME__" />
-  <meta property="og:description" content="Respect, love and fun for your cat while you're away. __REVIEWS_COUNT_LABEL__ ⭐ five-star reviews." />
+  <meta property="og:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="__SITE_URL__/" />
   <meta property="og:image" content="__SITE_URL__/images/ligia-profile.jpg" />
   <meta property="og:image:alt" content="Lígia from __BRAND_NAME__ caring for cats in __CITY_NAME__" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="__BRAND_NAME__ — __CITY_NAME__" />
-  <meta name="twitter:description" content="Respect, love and fun for your cat while you're away. __REVIEWS_COUNT_LABEL__ ⭐ five-star reviews." />
+  <meta name="twitter:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
   <meta name="twitter:image" content="__SITE_URL__/images/ligia-profile.jpg" />
   <meta name="theme-color" content="#2d5a4b" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -80,7 +80,7 @@
 
 <!-- ─── All bilingual text: class="en" shows in English, class="nl" in Dutch ─── -->
 <body class="bg-warm-50 text-gray-800"
-  x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : '__DEFAULT_LANG__') }"
+  x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
       x-init="
         document.body.classList.toggle('show-nl', lang === 'nl');
         $watch('lang', val => {
@@ -137,7 +137,7 @@
 
         <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
           <span>⭐⭐⭐⭐⭐</span>
-          <span>__REVIEWS_COUNT_LABEL__ verified reviews</span>
+          <span>50+ verified reviews</span>
         </div>
 
         <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
@@ -198,7 +198,7 @@
         </div>
       </div>
       <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">__REVIEWS_COUNT_LABEL__ ⭐</div>
+        <div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
         <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
           <span class="en">5-star reviews</span>
           <span class="nl">5-ster beoordelingen</span>
@@ -506,8 +506,8 @@
 
       <div class="text-center mb-10">
         <h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
-          <span class="en">__REVIEWS_COUNT_LABEL__ five-star reviews</span>
-          <span class="nl">__REVIEWS_COUNT_LABEL__ vijf-ster beoordelingen</span>
+          <span class="en">50+ five-star reviews</span>
+          <span class="nl">50+ vijf-ster beoordelingen</span>
         </h2>
         <div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
         <p class="text-gray-500 text-sm">
