@@ -64,14 +64,24 @@ jobs:
           mkdir -p site
           rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
 
-          sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" site/index.html
-          sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" site/index.html
-          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/index.html
-          sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" site/index.html
-          sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" site/index.html
-          sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" site/index.html
-          sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" site/index.html
-          sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" site/index.html
+          for f in site/index.html site/facturen.html; do
+            sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" "$f"
+            sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" "$f"
+            sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" "$f"
+            sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" "$f"
+            sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" "$f"
+            sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" "$f"
+            sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" "$f"
+            sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" "$f"
+            # Facturen/invoices feature (issue #5) — optional until Supabase project exists.
+            sed -i "s|__SUPABASE_URL__|${{ vars.SUPABASE_URL }}|g" "$f"
+            sed -i "s|__SUPABASE_ANON_KEY__|${{ vars.SUPABASE_ANON_KEY }}|g" "$f"
+            sed -i "s|__BUSINESS_LEGAL_NAME__|${{ vars.BUSINESS_LEGAL_NAME }}|g" "$f"
+            sed -i "s|__BUSINESS_ADDRESS__|${{ vars.BUSINESS_ADDRESS }}|g" "$f"
+            sed -i "s|__KVK_NUMBER__|${{ vars.KVK_NUMBER }}|g" "$f"
+            sed -i "s|__IBAN_NUMBER__|${{ vars.IBAN_NUMBER }}|g" "$f"
+            sed -i "s|__BTW_EXEMPT__|${{ vars.BTW_EXEMPT }}|g" "$f"
+          done
 
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/sitemap.xml

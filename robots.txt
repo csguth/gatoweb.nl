@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /facturen.html
 
 Sitemap: __SITE_URL__/sitemap.xml

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facturen — __BRAND_NAME__</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" href="images/favicon.png" type="image/png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50:  '#f5f5f4', 100: '#e7e6e3', 200: '#c8c6c0', 300: '#a3a099',
+              400: '#726e64', 500: '#453f34', 600: '#221f19', 700: '#141210',
+              800: '#0a0908', 900: '#000000',
+            },
+            warm: {
+              50:  '#faf7f0', 100: '#f2ebd9', 200: '#eee8dc', 300: '#e0cba0',
+              400: '#f8974a', 500: '#fa7d18', 600: '#e2620a', 700: '#bb4a09',
+              800: '#943a0f', 900: '#78320f',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    html { font-family: 'Inter', system-ui, sans-serif; }
+    body { background: #faf7f0; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <div class="max-w-lg mx-auto px-5 py-10" x-data="facturenApp()" x-init="init()">
+
+    <h1 class="font-serif text-2xl font-bold text-sage-700 mb-6 text-center">🐾 Facturen</h1>
+
+    <template x-if="!configured">
+      <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+        Supabase is nog niet geconfigureerd. Voeg de repository variables
+        <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw.
+      </div>
+    </template>
+
+    <template x-if="configured && !session">
+      <form @submit.prevent="login()" class="bg-white rounded-2xl p-6 space-y-4 shadow-sm border border-warm-200">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">E-mail</label>
+          <input type="email" x-model="email" required autocomplete="username"
+                 class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Wachtwoord</label>
+          <input type="password" x-model="password" required autocomplete="current-password"
+                 class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+        </div>
+        <p x-show="loginError" x-text="loginError" class="text-red-600 text-xs"></p>
+        <button type="submit" :disabled="loading"
+                class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition">
+          <span x-show="!loading">Inloggen</span>
+          <span x-show="loading">Bezig...</span>
+        </button>
+      </form>
+    </template>
+
+    <template x-if="configured && session">
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <p class="text-xs text-gray-500" x-text="session.user.email"></p>
+          <div class="flex gap-3">
+            <button @click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">↻ Vernieuwen</button>
+            <button @click="logout()" class="text-xs text-gray-400 hover:text-red-500">Uitloggen</button>
+          </div>
+        </div>
+
+        <p x-show="loadingList" class="text-sm text-gray-400 text-center py-10">Laden...</p>
+        <p x-show="!loadingList && bookings.length === 0" class="text-sm text-gray-400 text-center py-10">
+          Geen openstaande boekingen 🎉
+        </p>
+
+        <template x-for="b in bookings" :key="b.id">
+          <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-warm-200">
+            <div>
+              <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Klant</label>
+              <input type="text" x-model="b.client_name" placeholder="Naam klant"
+                     class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+            </div>
+            <div class="text-sm text-gray-600 space-y-0.5">
+              <div><span class="font-semibold">Data:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+              <div><span class="font-semibold">Huisdieren:</span> <span x-text="petsSummary(b.pets)"></span></div>
+              <div><span class="font-semibold">Voorkeur:</span> <span x-text="b.preference || '-'"></span></div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Bedrag (€)</label>
+              <input type="number" step="0.01" x-model.number="b.final_amount"
+                     class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+            </div>
+            <button @click="approve(b)" :disabled="b._busy"
+                    class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition">
+              <span x-show="!b._busy">Goedkeuren & Factuur genereren</span>
+              <span x-show="b._busy">Bezig...</span>
+            </button>
+          </div>
+        </template>
+      </div>
+    </template>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = '__SUPABASE_URL__';
+    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+    const BUSINESS_LEGAL_NAME = '__BUSINESS_LEGAL_NAME__';
+    const BUSINESS_ADDRESS = '__BUSINESS_ADDRESS__';
+    const KVK_NUMBER = '__KVK_NUMBER__';
+    const IBAN_NUMBER = '__IBAN_NUMBER__';
+    const BTW_EXEMPT = '__BTW_EXEMPT__';
+
+    const configured = Boolean(
+      SUPABASE_URL && !SUPABASE_URL.startsWith('__') &&
+      SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('__')
+    );
+    const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    function petsText(pets) {
+      if (!Array.isArray(pets)) return '-';
+      return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
+    }
+
+    function factuurNumberLabel(n, referenceDate) {
+      const year = new Date(referenceDate || Date.now()).getFullYear();
+      return year + '-' + String(n).padStart(4, '0');
+    }
+
+    function generatePdf(b) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 20;
+
+      doc.setFontSize(16);
+      doc.text(BUSINESS_LEGAL_NAME || '__BRAND_NAME__', 20, y); y += 8;
+      doc.setFontSize(10);
+      if (BUSINESS_ADDRESS) { doc.text(BUSINESS_ADDRESS, 20, y); y += 5; }
+      if (KVK_NUMBER) { doc.text('KVK: ' + KVK_NUMBER, 20, y); y += 5; }
+      y += 5;
+
+      doc.setFontSize(14);
+      doc.text('Factuur ' + factuurNumberLabel(b.factuur_number, b.approved_at), 20, y); y += 8;
+      doc.setFontSize(10);
+      doc.text('Datum: ' + new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL'), 20, y); y += 10;
+
+      doc.text('Klant: ' + (b.client_name || '-'), 20, y); y += 10;
+
+      doc.text('Omschrijving:', 20, y); y += 6;
+      doc.text('Catsitting/oppasdiensten ' + b.date_from + (b.date_to ? ' t/m ' + b.date_to : ''), 20, y); y += 6;
+      doc.text('Huisdieren: ' + petsText(b.pets), 20, y); y += 6;
+      if (b.preference) { doc.text('Voorkeur: ' + b.preference, 20, y); y += 6; }
+      y += 6;
+
+      doc.setFontSize(12);
+      doc.text('Totaal: € ' + Number(b.final_amount).toFixed(2), 20, y); y += 10;
+
+      doc.setFontSize(9);
+      if (BTW_EXEMPT === 'true') {
+        doc.text('Vrijgesteld van BTW op grond van de kleineondernemersregeling (KOR).', 20, y); y += 6;
+      }
+      if (IBAN_NUMBER) { doc.text('Betaling: via Tikkie (apart verzonden) — IBAN ' + IBAN_NUMBER, 20, y); y += 6; }
+
+      doc.save('factuur-' + factuurNumberLabel(b.factuur_number, b.approved_at) + '.pdf');
+    }
+
+    window.facturenApp = function () {
+      return {
+        configured,
+        session: null,
+        email: '',
+        password: '',
+        loginError: '',
+        loading: false,
+        loadingList: false,
+        bookings: [],
+
+        async init() {
+          if (!configured) return;
+          const { data } = await supabase.auth.getSession();
+          this.session = data.session;
+          supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
+          if (this.session) this.loadBookings();
+        },
+
+        async login() {
+          this.loading = true;
+          this.loginError = '';
+          const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
+          this.loading = false;
+          if (error) { this.loginError = error.message; return; }
+          this.session = data.session;
+          this.password = '';
+          this.loadBookings();
+        },
+
+        async logout() {
+          await supabase.auth.signOut();
+          this.session = null;
+          this.bookings = [];
+        },
+
+        async loadBookings() {
+          this.loadingList = true;
+          const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: true });
+          this.loadingList = false;
+          if (error) { alert(error.message); return; }
+          this.bookings = (data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false }));
+        },
+
+        petsSummary(pets) {
+          return petsText(pets);
+        },
+
+        async approve(b) {
+          if (!confirm('Factuur definitief goedkeuren voor ' + (b.client_name || 'deze klant') + '?')) return;
+          b._busy = true;
+
+          if (b.client_name) {
+            await supabase.from('bookings').update({ client_name: b.client_name }).eq('id', b.id);
+          }
+
+          const { data, error } = await supabase.rpc('approve_booking', {
+            p_booking_id: b.id,
+            p_final_amount: b.final_amount
+          });
+
+          b._busy = false;
+          if (error) { alert(error.message); return; }
+
+          const approved = Array.isArray(data) ? data[0] : data;
+          generatePdf({ ...approved, client_name: b.client_name });
+          this.bookings = this.bookings.filter(x => x.id !== b.id);
+        }
+      };
+    };
+  </script>
+
+</body>
+</html>
