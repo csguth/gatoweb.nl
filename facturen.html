@@ -115,35 +115,85 @@
           <span class="nl-l">Laden...</span><span class="en-l">Loading...</span>
         </p>
         <p x-show="!loadingList && bookings.length === 0" class="text-sm text-gray-400 text-center py-10">
-          <span class="nl-l">Geen openstaande boekingen 🎉</span><span class="en-l">No pending bookings 🎉</span>
+          <span class="nl-l">Geen facturen 🎉</span><span class="en-l">No invoices 🎉</span>
         </p>
 
         <template x-for="b in bookings" :key="b.id">
-          <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-warm-200">
-            <div>
-              <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                <span class="nl-l">Klant</span><span class="en-l">Client</span>
-              </label>
-              <input type="text" x-model="b.client_name" :placeholder="lang === 'nl' ? 'Naam klant' : 'Client name'"
-                     class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+          <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border"
+               :class="{
+                 'border-warm-200': b.status === 'pending',
+                 'border-orange-300': b.status === 'approved' && !b.tikkie_sent,
+                 'border-warm-200 opacity-70': b.status === 'approved' && b.tikkie_sent,
+                 'border-gray-200 opacity-50': b.status === 'cancelled'
+               }">
+
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
+                    :class="{
+                      'bg-amber-100 text-amber-700': b.status === 'pending',
+                      'bg-orange-100 text-orange-700': b.status === 'approved' && !b.tikkie_sent,
+                      'bg-green-100 text-green-700': b.status === 'approved' && b.tikkie_sent,
+                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
+                    }">
+                <template x-if="b.status === 'pending'"><span><span class="nl-l">Wacht op goedkeuring</span><span class="en-l">Awaiting approval</span></span></template>
+                <template x-if="b.status === 'approved' && !b.tikkie_sent"><span><span class="nl-l">Tikkie versturen</span><span class="en-l">Send Tikkie</span></span></template>
+                <template x-if="b.status === 'approved' && b.tikkie_sent"><span><span class="nl-l">Voltooid</span><span class="en-l">Completed</span></span></template>
+                <template x-if="b.status === 'cancelled'"><span><span class="nl-l">Geannuleerd</span><span class="en-l">Cancelled</span></span></template>
+              </span>
+              <span x-show="b.factuur_number" class="text-[11px] text-gray-400" x-text="'#' + factuurLabel(b)"></span>
             </div>
-            <div class="text-sm text-gray-600 space-y-0.5">
-              <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l">Dates:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
-              <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l">Pets:</span> <span x-text="petsSummary(b.pets)"></span></div>
-              <div><span class="font-semibold nl-l">Voorkeur:</span><span class="font-semibold en-l">Preference:</span> <span x-text="b.preference || '-'"></span></div>
-            </div>
-            <div>
-              <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                <span class="nl-l">Bedrag (€)</span><span class="en-l">Amount (€)</span>
-              </label>
-              <input type="number" step="0.01" x-model.number="b.final_amount"
-                     class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
-            </div>
-            <button @click="approve(b)" :disabled="b._busy"
-                    class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition">
-              <span x-show="!b._busy"><span class="nl-l">Goedkeuren & Factuur genereren</span><span class="en-l">Approve & generate Invoice</span></span>
-              <span x-show="b._busy"><span class="nl-l">Bezig...</span><span class="en-l">Working...</span></span>
-            </button>
+
+            <template x-if="b.status === 'pending'">
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                    <span class="nl-l">Klant</span><span class="en-l">Client</span>
+                  </label>
+                  <input type="text" x-model="b.client_name" :placeholder="lang === 'nl' ? 'Naam klant' : 'Client name'"
+                         class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+                </div>
+                <div class="text-sm text-gray-600 space-y-0.5">
+                  <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l">Dates:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+                  <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l">Pets:</span> <span x-text="petsSummary(b.pets)"></span></div>
+                  <div><span class="font-semibold nl-l">Voorkeur:</span><span class="font-semibold en-l">Preference:</span> <span x-text="b.preference || '-'"></span></div>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                    <span class="nl-l">Bedrag (€)</span><span class="en-l">Amount (€)</span>
+                  </label>
+                  <input type="number" step="0.01" x-model.number="b.final_amount"
+                         class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" />
+                </div>
+                <button @click="approve(b)" :disabled="b._busy"
+                        class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition">
+                  <span x-show="!b._busy"><span class="nl-l">Goedkeuren & Factuur genereren</span><span class="en-l">Approve & generate Invoice</span></span>
+                  <span x-show="b._busy"><span class="nl-l">Bezig...</span><span class="en-l">Working...</span></span>
+                </button>
+              </div>
+            </template>
+
+            <template x-if="b.status !== 'pending'">
+              <div class="space-y-2">
+                <div class="text-sm text-gray-700 font-semibold" x-text="b.client_name || '-'"></div>
+                <div class="text-sm text-gray-600 space-y-0.5">
+                  <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l">Dates:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+                  <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l">Pets:</span> <span x-text="petsSummary(b.pets)"></span></div>
+                  <div><span class="font-semibold nl-l">Bedrag:</span><span class="font-semibold en-l">Amount:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+                </div>
+                <template x-if="b.status === 'approved'">
+                  <div class="flex gap-2 pt-1">
+                    <button @click="downloadPdf(b)"
+                            class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+                      <span class="nl-l">📄 PDF downloaden</span><span class="en-l">📄 Download PDF</span>
+                    </button>
+                    <button x-show="!b.tikkie_sent" @click="markTikkieSent(b)" :disabled="b._busy"
+                            class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
+                      <span class="nl-l">✓ Tikkie verstuurd</span><span class="en-l">✓ Tikkie sent</span>
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </template>
           </div>
         </template>
       </div>
@@ -192,6 +242,25 @@
     function factuurNumberLabel(n, referenceDate) {
       const year = new Date(referenceDate || Date.now()).getFullYear();
       return year + '-' + String(n).padStart(4, '0');
+    }
+
+    // Priority order for the list: things Ligia still needs to act on come first —
+    // 0) pending bookings waiting for approval, 1) approved invoices whose Tikkie
+    // payment request still needs to be created/sent, 2) approved+Tikkie-sent
+    // (done, informational only), 3) cancelled (informational only).
+    function priorityOf(b) {
+      if (b.status === 'pending') return 0;
+      if (b.status === 'approved' && !b.tikkie_sent) return 1;
+      if (b.status === 'approved' && b.tikkie_sent) return 2;
+      return 3;
+    }
+
+    function sortBookings(list) {
+      return list.slice().sort((a, b) => {
+        const pa = priorityOf(a), pb = priorityOf(b);
+        if (pa !== pb) return pa - pb;
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
     }
 
     function generatePdf(b) {
@@ -272,15 +341,31 @@
           const { data, error } = await supabase
             .from('bookings')
             .select('*')
-            .eq('status', 'pending')
             .order('created_at', { ascending: true });
           this.loadingList = false;
           if (error) { alert(error.message); return; }
-          this.bookings = (data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false }));
+          this.bookings = sortBookings((data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false })));
         },
 
         petsSummary(pets) {
           return petsText(pets);
+        },
+
+        factuurLabel(b) {
+          return factuurNumberLabel(b.factuur_number, b.approved_at);
+        },
+
+        downloadPdf(b) {
+          generatePdf(b);
+        },
+
+        async markTikkieSent(b) {
+          b._busy = true;
+          const { error } = await supabase.from('bookings').update({ tikkie_sent: true }).eq('id', b.id);
+          b._busy = false;
+          if (error) { alert(error.message); return; }
+          b.tikkie_sent = true;
+          this.bookings = sortBookings(this.bookings);
         },
 
         async approve(b) {
@@ -304,8 +389,11 @@
           if (error) { alert(error.message); return; }
 
           const approved = Array.isArray(data) ? data[0] : data;
-          generatePdf({ ...approved, client_name: b.client_name });
-          this.bookings = this.bookings.filter(x => x.id !== b.id);
+          const merged = { ...b, ...approved, client_name: b.client_name, tikkie_sent: false, _busy: false };
+          const idx = this.bookings.findIndex(x => x.id === b.id);
+          if (idx !== -1) this.bookings.splice(idx, 1, merged);
+          this.bookings = sortBookings(this.bookings);
+          generatePdf(merged);
         }
       };
     };

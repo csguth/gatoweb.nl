@@ -23,7 +23,8 @@ create table if not exists public.bookings (
   final_amount numeric(10,2),
   status text not null default 'pending' check (status in ('pending', 'approved', 'cancelled')),
   factuur_number integer unique,
-  approved_at timestamptz
+  approved_at timestamptz,
+  tikkie_sent boolean not null default false
 );
 
 create sequence if not exists public.factuur_number_seq start 1;
