@@ -28,7 +28,6 @@
       },
     };
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
@@ -253,6 +252,10 @@
       };
     };
   </script>
+
+  <!-- Alpine must load after the module script above so window.facturenApp already exists
+       when Alpine scans and evaluates x-data on the page. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </body>
 </html>
