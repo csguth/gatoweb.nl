@@ -1,0 +1,93 @@
+name: Deploy Staging (Cloudflare Pages)
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-staging
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate variables
+        env:
+          WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
+          BRAND_NAME: ${{ vars.BRAND_NAME }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          CITY_NAME: ${{ vars.CITY_NAME }}
+          PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }}
+          PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }}
+          DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
+        run: |
+          required_vars=(
+            WHATSAPP_NUMBER
+            BRAND_NAME
+            SITE_URL
+            CONTACT_EMAIL
+            CITY_NAME
+            PRICE_ONE_VISIT
+            PRICE_TWO_VISITS
+            DOG_WALK_PRICE_FROM
+          )
+
+          for var_name in "${required_vars[@]}"; do
+            if [ -z "${!var_name}" ]; then
+              echo "Missing environment variable: ${var_name}"
+              exit 1
+            fi
+          done
+
+          for n in PRICE_ONE_VISIT PRICE_TWO_VISITS DOG_WALK_PRICE_FROM; do
+            value="${!n}"
+            if ! [[ "$value" =~ ^[0-9]+$ ]]; then
+              echo "${n} must be numeric"
+              exit 1
+            fi
+          done
+
+      - name: Build site with injected variables
+        run: |
+          mkdir -p site
+          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
+
+          for f in site/index.html site/facturen.html; do
+            sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" "$f"
+            sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" "$f"
+            sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" "$f"
+            sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" "$f"
+            sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" "$f"
+            sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" "$f"
+            sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" "$f"
+            sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" "$f"
+            sed -i "s|__SUPABASE_URL__|${{ vars.SUPABASE_URL }}|g" "$f"
+            sed -i "s|__SUPABASE_ANON_KEY__|${{ vars.SUPABASE_ANON_KEY }}|g" "$f"
+            sed -i "s|__BUSINESS_LEGAL_NAME__|${{ vars.BUSINESS_LEGAL_NAME }}|g" "$f"
+            sed -i "s|__BUSINESS_ADDRESS__|${{ vars.BUSINESS_ADDRESS }}|g" "$f"
+            sed -i "s|__KVK_NUMBER__|${{ vars.KVK_NUMBER }}|g" "$f"
+            sed -i "s|__IBAN_NUMBER__|${{ vars.IBAN_NUMBER }}|g" "$f"
+            sed -i "s|__BTW_EXEMPT__|${{ vars.BTW_EXEMPT }}|g" "$f"
+          done
+
+          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt
+          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/sitemap.xml
+
+      - name: Deploy to Cloudflare Pages (staging project)
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gatoweb-nl-staging
+          directory: site
+          branch: staging
