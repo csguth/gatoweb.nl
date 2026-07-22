@@ -81,6 +81,7 @@ jobs:
             sed -i "s|__KVK_NUMBER__|${{ vars.KVK_NUMBER }}|g" "$f"
             sed -i "s|__IBAN_NUMBER__|${{ vars.IBAN_NUMBER }}|g" "$f"
             sed -i "s|__BTW_EXEMPT__|${{ vars.BTW_EXEMPT }}|g" "$f"
+            sed -i "s|__ENV_LABEL__|${{ vars.ENV_LABEL }}|g" "$f"
           done
 
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt

@@ -37,9 +37,13 @@
     .nl-l { display: none; }
     body.show-nl .en-l { display: none; }
     body.show-nl .nl-l { display: revert; }
+    /* Staging environment banner — only visible when built with ENV_LABEL=staging */
+    #env-banner { display: none; }
+    body[data-env="staging"] #env-banner { display: block; }
+    body[data-env="staging"] { padding-top: 28px; }
   </style>
 </head>
-<body class="min-h-screen"
+<body class="min-h-screen" data-env="__ENV_LABEL__"
   x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
   x-init="
     document.body.classList.toggle('show-nl', lang === 'nl');
@@ -48,6 +52,10 @@
       localStorage.setItem('gatoweb_lang', val);
     });
   ">
+
+  <div id="env-banner" class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5">
+    🚧 STAGING — <span class="en-l">test environment, not the live site</span><span class="nl-l">testomgeving, niet de live site</span>
+  </div>
 
   <div class="max-w-lg mx-auto px-5 py-10" x-data="facturenApp()" x-init="init()">
 
