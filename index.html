@@ -635,6 +635,16 @@
       <!-- Booking form -->
       <div x-data="bookingForm()" class="bg-warm-50 rounded-2xl p-8 space-y-6 shadow-sm">
 
+        <!-- Name -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            <span class="en">Your name <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
+            <span class="nl">Jouw naam <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+          </label>
+          <input type="text" x-model="clientName"
+                 class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
+        </div>
+
         <!-- Dates -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -891,18 +901,36 @@
       let saved = {};
       try { saved = JSON.parse(localStorage.getItem('gatoweb_booking') || '{}'); } catch(e) {}
 
+      const PRICE_ONE_VISIT = Number('__PRICE_ONE_VISIT__') || 0;
+      const PRICE_TWO_VISITS = Number('__PRICE_TWO_VISITS__') || 0;
+      const DOG_WALK_PRICE_FROM = Number('__DOG_WALK_PRICE_FROM__') || 0;
+
       return {
+        clientName: saved.clientName || '',
         from: '',
         to: '',
         pref: saved.pref || '',
         pets: saved.pets && saved.pets.length ? saved.pets : [{ name: '', type: 'cat', otherType: '' }],
         today: new Date().toISOString().split('T')[0],
         _save() {
-          try { localStorage.setItem('gatoweb_booking', JSON.stringify({ pets: this.pets, pref: this.pref })); } catch(e) {}
+          try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, pets: this.pets, pref: this.pref })); } catch(e) {}
         },
         init() {
+          this.$watch('clientName', () => this._save());
           this.$watch('pets', () => this._save());
           this.$watch('pref', () => this._save());
+        },
+        _suggestedAmount() {
+          const start = new Date(this.from);
+          const end = this.to && this.to > this.from ? new Date(this.to) : start;
+          const days = Math.max(1, Math.round((end - start) / 86400000) + 1);
+          const hasDog = this.pets.some(p => p.type === 'dog');
+          const hasCat = this.pets.some(p => p.type !== 'dog');
+          const perDay = this.pref === 'both' ? PRICE_TWO_VISITS : PRICE_ONE_VISIT;
+          let total = 0;
+          if (hasCat) total += perDay * days;
+          if (hasDog) total += DOG_WALK_PRICE_FROM * days;
+          return total;
         },
         send() {
           if (!this.from) {
@@ -928,11 +956,51 @@
             ? this.from + ' \u2192 ' + this.to
             : this.from;
           const msg = 'Hi L\u00EDgia! Catsitting / pet care request:\nDates / Data: ' + dates + '\nPets / Huisdieren: ' + petsStr + '\nPreference / Voorkeur: ' + pref;
+
+          if (window.__saveBookingToSupabase) {
+            window.__saveBookingToSupabase({
+              clientName: this.clientName,
+              from: this.from,
+              to: this.to,
+              pets: this.pets,
+              pref: this.pref,
+              suggestedAmount: this._suggestedAmount()
+            });
+          }
+
           markWhatsAppIntent();
           window.open('https://wa.me/__WHATSAPP_NUMBER__?text=' + encodeURIComponent(msg), '_blank', 'noopener');
         }
       };
     }
+  </script>
+
+  <!-- Best-effort booking persistence to Supabase (used by /facturen.html).
+       Never blocks the WhatsApp flow above if it's not configured or fails. -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = '__SUPABASE_URL__';
+    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+    const configured = SUPABASE_URL && !SUPABASE_URL.startsWith('__') && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('__');
+    const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    window.__saveBookingToSupabase = async function (booking) {
+      if (!supabase) return;
+      try {
+        await supabase.from('bookings').insert({
+          client_name: booking.clientName || null,
+          date_from: booking.from,
+          date_to: booking.to || null,
+          pets: booking.pets,
+          preference: booking.pref,
+          suggested_amount: booking.suggestedAmount,
+          status: 'pending'
+        });
+      } catch (e) {
+        console.warn('Could not save booking to Supabase', e);
+      }
+    };
   </script>
 
 </body>
