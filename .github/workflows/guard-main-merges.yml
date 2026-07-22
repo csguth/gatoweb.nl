@@ -1,0 +1,30 @@
+name: Guard main merges
+
+# Enforces the staging -> main promotion workflow: PRs into `main` must come
+# from the `staging` branch (i.e. staging was already deployed and manually
+# tested), unless explicitly labeled `hotfix` for an emergency fix.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR into main comes from staging (or is labeled hotfix)
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          IS_HOTFIX: ${{ contains(github.event.pull_request.labels.*.name, 'hotfix') }}
+        run: |
+          echo "Head ref: $HEAD_REF"
+          if [ "$HEAD_REF" = "staging" ]; then
+            echo "OK: promoting staging -> main"
+            exit 0
+          fi
+          if [ "$IS_HOTFIX" = "true" ]; then
+            echo "OK: 'hotfix' label present, bypassing staging requirement"
+            exit 0
+          fi
+          echo "::error::Direct merges into main are only allowed from the 'staging' branch (after manual testing on staging.gatoweb.nl) or PRs labeled 'hotfix'. Target your feature branch's PR at 'staging' instead."
+          exit 1
