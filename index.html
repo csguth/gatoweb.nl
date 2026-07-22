@@ -1115,11 +1115,14 @@
       SUPABASE_URL && !SUPABASE_URL.startsWith('__') &&
       SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('__')
     );
+    // detectSessionInUrl is true here (unlike facturen.html) because clients may land on /
+    // after clicking the email-confirmation link, which appends the session tokens as a URL
+    // fragment that supabase-js needs to pick up automatically to log them in.
     const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: false,
+        detectSessionInUrl: true,
         storage: window.localStorage,
         storageKey: 'gatoweb-client-auth'
       }

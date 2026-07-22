@@ -198,11 +198,14 @@
     // logged in from the booking form on / stays logged in here, and vice versa. Kept
     // separate from facturen.html's own 'gatoweb-facturen-auth' key (staff-only tool),
     // so a client session here can never be confused with Ligia's staff session.
+    // detectSessionInUrl is true here (unlike facturen.html) because clients land here after
+    // clicking the email-confirmation link, which appends the session tokens as a URL fragment
+    // that supabase-js needs to pick up automatically to log them in.
     const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: false,
+        detectSessionInUrl: true,
         storage: window.localStorage,
         storageKey: 'gatoweb-client-auth'
       }
