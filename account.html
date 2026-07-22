@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My bookings / Mijn boekingen — __BRAND_NAME__</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" href="images/favicon.png" type="image/png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50:  '#f5f5f4', 100: '#e7e6e3', 200: '#c8c6c0', 300: '#a3a099',
+              400: '#726e64', 500: '#453f34', 600: '#221f19', 700: '#141210',
+              800: '#0a0908', 900: '#000000',
+            },
+            warm: {
+              50:  '#faf7f0', 100: '#f2ebd9', 200: '#eee8dc', 300: '#e0cba0',
+              400: '#f8974a', 500: '#fa7d18', 600: '#e2620a', 700: '#bb4a09',
+              800: '#943a0f', 900: '#78320f',
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    html { font-family: 'Inter', system-ui, sans-serif; }
+    body { background: #faf7f0; }
+    /* Bilingual toggle — shared with index.html (localStorage key + .en/.nl classes) */
+    .nl { display: none; }
+    body.show-nl .en { display: none; }
+    body.show-nl .nl { display: revert; }
+    /* Staging environment banner — only visible when built with ENV_LABEL=staging */
+    #env-banner { display: none; }
+    body[data-env="staging"] #env-banner { display: block; }
+    body[data-env="staging"] { padding-top: 28px; }
+  </style>
+</head>
+<body class="min-h-screen" data-env="__ENV_LABEL__"
+  x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
+  x-init="
+    document.body.classList.toggle('show-nl', lang === 'nl');
+    $watch('lang', val => {
+      document.body.classList.toggle('show-nl', val === 'nl');
+      localStorage.setItem('gatoweb_lang', val);
+    });
+  ">
+
+  <div id="env-banner" class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5">
+    🚧 STAGING — <span class="en">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span>
+  </div>
+
+  <div class="max-w-lg mx-auto px-5 py-10" x-data="accountApp()" x-init="init()">
+
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="font-serif text-2xl font-bold text-sage-700">
+        🐾 <span class="en">My bookings</span><span class="nl">Mijn boekingen</span>
+      </h1>
+      <button
+        @click="lang = lang === 'en' ? 'nl' : 'en'"
+        class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 hover:bg-sage-50 transition select-none"
+        aria-label="Switch language"
+      >
+        <span class="nl">🇳🇱 NL</span>
+        <span class="en">🇬🇧 EN</span>
+      </button>
+    </div>
+
+    <template x-if="!configured">
+      <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+        <span class="en">This page isn't configured yet. Please try again later.</span>
+        <span class="nl">Deze pagina is nog niet geconfigureerd. Probeer het later opnieuw.</span>
+      </div>
+    </template>
+
+    <template x-if="configured && !session">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200 space-y-5">
+
+        <div class="flex gap-2 text-sm font-semibold">
+          <button type="button" @click="mode = 'login'"
+                  :class="mode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
+                  class="flex-1 border rounded-lg py-2 transition">
+            <span class="en">Log in</span><span class="nl">Inloggen</span>
+          </button>
+          <button type="button" @click="mode = 'signup'"
+                  :class="mode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
+                  class="flex-1 border rounded-lg py-2 transition">
+            <span class="en">Create account</span><span class="nl">Account aanmaken</span>
+          </button>
+        </div>
+
+        <form @submit.prevent="mode === 'login' ? login() : signup()" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <span class="en">Email</span><span class="nl">E-mail</span>
+            </label>
+            <input type="email" x-model="email" required autocomplete="username"
+                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+              <span class="en">Password</span><span class="nl">Wachtwoord</span>
+            </label>
+            <input type="password" x-model="password" required
+                   :autocomplete="mode === 'login' ? 'current-password' : 'new-password'"
+                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
+          </div>
+
+          <p x-show="errorMsg" x-text="errorMsg" class="text-red-600 text-xs"></p>
+          <p x-show="infoMsg" x-text="infoMsg" class="text-sage-600 text-xs"></p>
+
+          <button type="submit" :disabled="loading"
+                  class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition">
+            <template x-if="!loading && mode === 'login'"><span><span class="en">Log in</span><span class="nl">Inloggen</span></span></template>
+            <template x-if="!loading && mode === 'signup'"><span><span class="en">Create account</span><span class="nl">Account aanmaken</span></span></template>
+            <template x-if="loading"><span><span class="en">Working...</span><span class="nl">Bezig...</span></span></template>
+          </button>
+        </form>
+
+      </div>
+    </template>
+
+    <template x-if="configured && session">
+      <div class="space-y-4">
+        <div class="flex justify-between items-center bg-white rounded-2xl p-4 shadow-sm border border-warm-200">
+          <p class="text-xs text-gray-500" x-text="session.user.email"></p>
+          <div class="flex gap-3">
+            <button @click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">
+              <span class="en">↻ Refresh</span><span class="nl">↻ Vernieuwen</span>
+            </button>
+            <button @click="logout()" class="text-xs text-gray-400 hover:text-red-500">
+              <span class="en">Log out</span><span class="nl">Uitloggen</span>
+            </button>
+          </div>
+        </div>
+
+        <p x-show="loadingList" class="text-sm text-gray-400 text-center py-10">
+          <span class="en">Loading...</span><span class="nl">Laden...</span>
+        </p>
+        <p x-show="!loadingList && bookings.length === 0" class="text-sm text-gray-400 text-center py-10">
+          <span class="en">No bookings yet.</span><span class="nl">Nog geen boekingen.</span>
+        </p>
+
+        <template x-for="b in bookings" :key="b.id">
+          <div class="bg-white rounded-2xl p-4 shadow-sm space-y-2 border"
+               :class="{
+                 'border-warm-200': b.status === 'pending',
+                 'border-orange-300': b.status === 'approved' && !b.tikkie_sent,
+                 'border-warm-200 opacity-70': b.status === 'approved' && b.tikkie_sent,
+                 'border-gray-200 opacity-50': b.status === 'cancelled'
+               }">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
+                    :class="{
+                      'bg-amber-100 text-amber-700': b.status === 'pending',
+                      'bg-orange-100 text-orange-700': b.status === 'approved' && !b.tikkie_sent,
+                      'bg-green-100 text-green-700': b.status === 'approved' && b.tikkie_sent,
+                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
+                    }">
+                <template x-if="b.status === 'pending'"><span><span class="en">Awaiting confirmation</span><span class="nl">Wacht op bevestiging</span></span></template>
+                <template x-if="b.status === 'approved' && !b.tikkie_sent"><span><span class="en">Confirmed — payment request coming</span><span class="nl">Bevestigd — betaalverzoek volgt</span></span></template>
+                <template x-if="b.status === 'approved' && b.tikkie_sent"><span><span class="en">Completed</span><span class="nl">Voltooid</span></span></template>
+                <template x-if="b.status === 'cancelled'"><span><span class="en">Cancelled</span><span class="nl">Geannuleerd</span></span></template>
+              </span>
+              <span x-show="b.factuur_number" class="text-[11px] text-gray-400" x-text="'#' + factuurLabel(b)"></span>
+            </div>
+            <div class="text-sm text-gray-600 space-y-0.5">
+              <div><span class="font-semibold en">Dates:</span><span class="font-semibold nl">Data:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+              <div><span class="font-semibold en">Pets:</span><span class="font-semibold nl">Huisdieren:</span> <span x-text="petsSummary(b.pets)"></span></div>
+              <template x-if="b.status === 'approved' || b.status === 'cancelled'">
+                <div><span class="font-semibold en">Amount:</span><span class="font-semibold nl">Bedrag:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = '__SUPABASE_URL__';
+    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+    const configured = Boolean(
+      SUPABASE_URL && !SUPABASE_URL.startsWith('__') &&
+      SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('__')
+    );
+
+    // Same storageKey as index.html's client auth ('gatoweb-client-auth') so a client who
+    // logged in from the booking form on / stays logged in here, and vice versa. Kept
+    // separate from facturen.html's own 'gatoweb-facturen-auth' key (staff-only tool),
+    // so a client session here can never be confused with Ligia's staff session.
+    const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        storage: window.localStorage,
+        storageKey: 'gatoweb-client-auth'
+      }
+    }) : null;
+
+    function petsText(pets) {
+      if (!Array.isArray(pets)) return '-';
+      return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
+    }
+
+    function factuurNumberLabel(n, referenceDate) {
+      const year = new Date(referenceDate || Date.now()).getFullYear();
+      return year + '-' + String(n).padStart(4, '0');
+    }
+
+    function priorityOf(b) {
+      if (b.status === 'pending') return 0;
+      if (b.status === 'approved' && !b.tikkie_sent) return 1;
+      if (b.status === 'approved' && b.tikkie_sent) return 2;
+      return 3;
+    }
+
+    function sortBookings(list) {
+      return list.slice().sort((a, b) => {
+        const pa = priorityOf(a), pb = priorityOf(b);
+        if (pa !== pb) return pa - pb;
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+    }
+
+    window.accountApp = function () {
+      return {
+        configured,
+        session: null,
+        mode: 'login',
+        email: '',
+        password: '',
+        errorMsg: '',
+        infoMsg: '',
+        loading: false,
+        loadingList: false,
+        bookings: [],
+
+        async init() {
+          if (!configured) return;
+          const { data } = await supabase.auth.getSession();
+          this.session = data.session;
+          supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
+          if (this.session) this.loadBookings();
+        },
+
+        async login() {
+          this.loading = true;
+          this.errorMsg = '';
+          this.infoMsg = '';
+          const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
+          this.loading = false;
+          if (error) { this.errorMsg = error.message; return; }
+          this.session = data.session;
+          this.password = '';
+          this.loadBookings();
+        },
+
+        async signup() {
+          this.loading = true;
+          this.errorMsg = '';
+          this.infoMsg = '';
+          const { data, error } = await supabase.auth.signUp({ email: this.email, password: this.password });
+          this.loading = false;
+          if (error) { this.errorMsg = error.message; return; }
+          if (!data.session) {
+            this.infoMsg = document.body.classList.contains('show-nl')
+              ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.'
+              : 'Account created! Check your email and click the confirmation link, then log in here.';
+            this.mode = 'login';
+            this.password = '';
+            return;
+          }
+          this.session = data.session;
+          this.loadBookings();
+        },
+
+        async logout() {
+          await supabase.auth.signOut();
+          this.session = null;
+          this.bookings = [];
+        },
+
+        async loadBookings() {
+          this.loadingList = true;
+          const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .order('created_at', { ascending: false });
+          this.loadingList = false;
+          if (error) { this.errorMsg = error.message; return; }
+          this.bookings = sortBookings(data || []);
+        },
+
+        petsSummary(pets) {
+          return petsText(pets);
+        },
+
+        factuurLabel(b) {
+          return factuurNumberLabel(b.factuur_number, b.approved_at);
+        }
+      };
+    };
+  </script>
+
+  <!-- Alpine must load after the module script above so window.accountApp already exists
+       when Alpine scans and evaluates x-data on the page. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+</body>
+</html>
