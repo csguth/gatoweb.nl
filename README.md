@@ -122,9 +122,13 @@ Notes:
 - Language default is hardcoded: browser language detection (`nl` → Dutch) with fallback to
   English, or previous user choice saved in localStorage.
 - Review count label is hardcoded in the site (`50+`).
-- Placeholders like `__WHATSAPP_NUMBER__`, `__SITE_URL__`, `__ENV_LABEL__`, etc. in `index.html`,
-  `facturen.html`, `robots.txt` and `sitemap.xml` are substituted with `sed` at deploy time — see
-  the "Build site with injected variables" step in each workflow.
+- Placeholders like `__WHATSAPP_NUMBER__`, `__SITE_URL__`, `__ENV_LABEL__`, etc. — visible markup
+  in `index.html`, `facturen.html`, `account.html`, `robots.txt` and `sitemap.xml` — are substituted
+  with `sed` at deploy time, see the "Build site with injected variables" step in each workflow.
+  Values only needed by JavaScript (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `BUSINESS_LEGAL_NAME`,
+  `BUSINESS_ADDRESS`, `KVK_NUMBER`, `IBAN_NUMBER`, `BTW_EXEMPT`) are instead written into a
+  generated `js/config.js` (`window.GATOWEB_CONFIG`) by the "Generate js/config.js" step — see
+  `js/config.js` for the committed defaults and folder structure under `js/`/`css/`.
 
 Changes go live automatically:
 - push/merge to `staging` → deploys to `staging.gatoweb.nl` in ~1-2 minutes

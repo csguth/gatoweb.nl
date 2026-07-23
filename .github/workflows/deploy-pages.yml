@@ -73,19 +73,29 @@ jobs:
             sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" "$f"
             sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" "$f"
             sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" "$f"
-            # Facturen/invoices feature (issue #5) — optional until Supabase project exists.
-            sed -i "s|__SUPABASE_URL__|${{ vars.SUPABASE_URL }}|g" "$f"
-            sed -i "s|__SUPABASE_ANON_KEY__|${{ vars.SUPABASE_ANON_KEY }}|g" "$f"
-            sed -i "s|__BUSINESS_LEGAL_NAME__|${{ vars.BUSINESS_LEGAL_NAME }}|g" "$f"
-            sed -i "s|__BUSINESS_ADDRESS__|${{ vars.BUSINESS_ADDRESS }}|g" "$f"
-            sed -i "s|__KVK_NUMBER__|${{ vars.KVK_NUMBER }}|g" "$f"
-            sed -i "s|__IBAN_NUMBER__|${{ vars.IBAN_NUMBER }}|g" "$f"
-            sed -i "s|__BTW_EXEMPT__|${{ vars.BTW_EXEMPT }}|g" "$f"
             sed -i "s|__ENV_LABEL__|${{ vars.ENV_LABEL }}|g" "$f"
           done
 
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt
           sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/sitemap.xml
+
+      - name: Generate js/config.js with runtime constants
+        run: |
+          cat > site/js/config.js <<JSEOF
+          window.GATOWEB_CONFIG = {
+            SUPABASE_URL: $(jq -Rn --arg v "${{ vars.SUPABASE_URL }}" '$v'),
+            SUPABASE_ANON_KEY: $(jq -Rn --arg v "${{ vars.SUPABASE_ANON_KEY }}" '$v'),
+            BUSINESS_LEGAL_NAME: $(jq -Rn --arg v "${{ vars.BUSINESS_LEGAL_NAME }}" '$v'),
+            BUSINESS_ADDRESS: $(jq -Rn --arg v "${{ vars.BUSINESS_ADDRESS }}" '$v'),
+            KVK_NUMBER: $(jq -Rn --arg v "${{ vars.KVK_NUMBER }}" '$v'),
+            IBAN_NUMBER: $(jq -Rn --arg v "${{ vars.IBAN_NUMBER }}" '$v'),
+            BTW_EXEMPT: $(jq -Rn --arg v "${{ vars.BTW_EXEMPT }}" '$v'),
+            BRAND_NAME: $(jq -Rn --arg v "${{ vars.BRAND_NAME }}" '$v'),
+            PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
+            PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
+            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
+          };
+          JSEOF
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

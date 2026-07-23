@@ -8,49 +8,16 @@
   <link rel="icon" href="images/favicon.png" type="image/png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            sage: {
-              50:  '#f5f5f4', 100: '#e7e6e3', 200: '#c8c6c0', 300: '#a3a099',
-              400: '#726e64', 500: '#453f34', 600: '#221f19', 700: '#141210',
-              800: '#0a0908', 900: '#000000',
-            },
-            warm: {
-              50:  '#faf7f0', 100: '#f2ebd9', 200: '#eee8dc', 300: '#e0cba0',
-              400: '#f8974a', 500: '#fa7d18', 600: '#e2620a', 700: '#bb4a09',
-              800: '#943a0f', 900: '#78320f',
-            },
-          },
-        },
-      },
-    };
-  </script>
+  <script src="js/tailwind-config.js"></script>
 
-  <style>
-    html { font-family: 'Inter', system-ui, sans-serif; }
-    body { background: #faf7f0; }
-    /* Bilingual toggle — shared with index.html (localStorage key + .en/.nl classes) */
-    .nl { display: none; }
-    body.show-nl .en { display: none; }
-    body.show-nl .nl { display: revert; }
-    /* Staging environment banner — only visible when built with ENV_LABEL=staging */
-    #env-banner { display: none; }
-    body[data-env="staging"] #env-banner { display: block; }
-    body[data-env="staging"] { padding-top: 28px; }
-  </style>
+  <!-- Runtime config (Supabase URL/keys) injected at deploy time -->
+  <script src="js/config.js"></script>
+  <script src="js/lang-toggle.js"></script>
+
+  <link rel="stylesheet" href="css/site.css" />
 </head>
 <body class="min-h-screen" data-env="__ENV_LABEL__"
-  x-data="{ lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en') }"
-  x-init="
-    document.body.classList.toggle('show-nl', lang === 'nl');
-    $watch('lang', val => {
-      document.body.classList.toggle('show-nl', val === 'nl');
-      localStorage.setItem('gatoweb_lang', val);
-    });
-  ">
+  x-data="langToggle()" x-init="init()">
 
   <div id="env-banner" class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5">
     🚧 STAGING — <span class="en">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span>
@@ -184,137 +151,8 @@
 
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-    const SUPABASE_URL = '__SUPABASE_URL__';
-    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
-    const configured = Boolean(
-      SUPABASE_URL && !SUPABASE_URL.startsWith('__') &&
-      SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('__')
-    );
-
-    // Same storageKey as index.html's client auth ('gatoweb-client-auth') so a client who
-    // logged in from the booking form on / stays logged in here, and vice versa. Kept
-    // separate from facturen.html's own 'gatoweb-facturen-auth' key (staff-only tool),
-    // so a client session here can never be confused with Ligia's staff session.
-    // detectSessionInUrl is true here (unlike facturen.html) because clients land here after
-    // clicking the email-confirmation link, which appends the session tokens as a URL fragment
-    // that supabase-js needs to pick up automatically to log them in.
-    const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage,
-        storageKey: 'gatoweb-client-auth'
-      }
-    }) : null;
-
-    function petsText(pets) {
-      if (!Array.isArray(pets)) return '-';
-      return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
-    }
-
-    function factuurNumberLabel(n, referenceDate) {
-      const year = new Date(referenceDate || Date.now()).getFullYear();
-      return year + '-' + String(n).padStart(4, '0');
-    }
-
-    function priorityOf(b) {
-      if (b.status === 'pending') return 0;
-      if (b.status === 'approved' && !b.tikkie_sent) return 1;
-      if (b.status === 'approved' && b.tikkie_sent) return 2;
-      return 3;
-    }
-
-    function sortBookings(list) {
-      return list.slice().sort((a, b) => {
-        const pa = priorityOf(a), pb = priorityOf(b);
-        if (pa !== pb) return pa - pb;
-        return new Date(b.created_at) - new Date(a.created_at);
-      });
-    }
-
-    window.accountApp = function () {
-      return {
-        configured,
-        session: null,
-        mode: 'login',
-        email: '',
-        password: '',
-        errorMsg: '',
-        infoMsg: '',
-        loading: false,
-        loadingList: false,
-        bookings: [],
-
-        async init() {
-          if (!configured) return;
-          const { data } = await supabase.auth.getSession();
-          this.session = data.session;
-          supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
-          if (this.session) this.loadBookings();
-        },
-
-        async login() {
-          this.loading = true;
-          this.errorMsg = '';
-          this.infoMsg = '';
-          const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
-          this.loading = false;
-          if (error) { this.errorMsg = error.message; return; }
-          this.session = data.session;
-          this.password = '';
-          this.loadBookings();
-        },
-
-        async signup() {
-          this.loading = true;
-          this.errorMsg = '';
-          this.infoMsg = '';
-          const { data, error } = await supabase.auth.signUp({ email: this.email, password: this.password });
-          this.loading = false;
-          if (error) { this.errorMsg = error.message; return; }
-          if (!data.session) {
-            this.infoMsg = document.body.classList.contains('show-nl')
-              ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.'
-              : 'Account created! Check your email and click the confirmation link, then log in here.';
-            this.mode = 'login';
-            this.password = '';
-            return;
-          }
-          this.session = data.session;
-          this.loadBookings();
-        },
-
-        async logout() {
-          await supabase.auth.signOut();
-          this.session = null;
-          this.bookings = [];
-        },
-
-        async loadBookings() {
-          this.loadingList = true;
-          const { data, error } = await supabase
-            .from('bookings')
-            .select('*')
-            .order('created_at', { ascending: false });
-          this.loadingList = false;
-          if (error) { this.errorMsg = error.message; return; }
-          this.bookings = sortBookings(data || []);
-        },
-
-        petsSummary(pets) {
-          return petsText(pets);
-        },
-
-        factuurLabel(b) {
-          return factuurNumberLabel(b.factuur_number, b.approved_at);
-        }
-      };
-    };
-  </script>
+  <!-- Client account (issue #12) — see js/account/account-app.js -->
+  <script type="module" src="js/account/account-app.js"></script>
 
   <!-- Alpine must load after the module script above so window.accountApp already exists
        when Alpine scans and evaluates x-data on the page. -->
