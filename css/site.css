@@ -1,0 +1,22 @@
+/* Shared stylesheet for index.html, facturen.html and account.html.
+   Some rules only apply to a subset of pages (e.g. the two different bilingual
+   toggle class-name pairs below) — that's fine, unused selectors are harmless. */
+
+html { font-family: 'Inter', system-ui, sans-serif; }
+.font-serif { font-family: 'Playfair Display', Georgia, serif; }
+body { background: #faf7f0; }
+
+/* Bilingual toggle — body.show-nl switches to Dutch.
+   index.html/account.html use .en/.nl; facturen.html uses .en-l/.nl-l instead. */
+.nl { display: none; }
+body.show-nl .en { display: none; }
+body.show-nl .nl { display: revert; }
+
+.nl-l { display: none; }
+body.show-nl .en-l { display: none; }
+body.show-nl .nl-l { display: revert; }
+
+/* Staging environment banner — only visible when built with ENV_LABEL=staging */
+#env-banner { display: none; }
+body[data-env="staging"] #env-banner { display: block; }
+body[data-env="staging"] { padding-top: 28px; }
