@@ -804,20 +804,38 @@
           </div>
         </template>
 
+        <!-- Success message shown after the booking request is sent -->
+        <template x-if="sent">
+          <div class="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center space-y-2">
+            <div class="text-2xl">✅</div>
+            <p class="text-sm font-semibold text-sage-700">
+              <span class="en">Booking request sent!</span>
+              <span class="nl">Boekingsverzoek verstuurd!</span>
+            </p>
+            <p class="text-xs text-gray-500">
+              <span class="en">Lígia will confirm availability within 24 hours.</span>
+              <span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
+            </p>
+            <a href="account.html" class="inline-block text-xs text-sage-600 hover:text-sage-700 font-semibold">
+              <span class="en">Track my booking →</span>
+              <span class="nl">Mijn boeking volgen →</span>
+            </a>
+          </div>
+        </template>
+
         <!-- Send button -->
-        <button type="button" x-show="!showAuth" @click="send()"
-                class="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1fba58] text-white font-semibold py-3.5 rounded-xl transition text-sm shadow">
-          <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white flex-shrink-0" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          <span class="en">Send booking request via WhatsApp</span>
-          <span class="nl">Stuur boekingsverzoek via WhatsApp</span>
+        <button type="button" x-show="!showAuth && !sent" @click="send()"
+                class="w-full flex items-center justify-center gap-2 bg-sage-600 hover:bg-sage-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow">
+          <span class="en">Send booking request</span>
+          <span class="nl">Boekingsverzoek versturen</span>
         </button>
 
-        <p class="text-center text-xs text-gray-400" x-show="!showAuth">
+        <p class="text-center text-xs text-gray-400" x-show="!showAuth && !sent">
           <span class="en">Lígia will confirm availability within 24 hours.</span>
           <span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
         </p>
 
-        <p class="text-center text-xs" x-show="!showAuth">
+        <p class="text-center text-xs" x-show="!showAuth && !sent">
           <a href="account.html" class="text-sage-600 hover:text-sage-700 font-semibold">
             <span class="en">Track my booking →</span>
             <span class="nl">Mijn boeking volgen →</span>
@@ -842,8 +860,8 @@
           <span class="font-serif font-semibold text-base">__BRAND_NAME__</span>
         </div>
         <p class="text-white/60">__CITY_NAME__, Noord-Brabant</p>
-        <p class="text-white/60 mt-0.5 en">Speaks EN · PT · ES</p>
-        <p class="text-white/60 mt-0.5 nl">Spreekt EN · PT · ES</p>
+        <p class="text-white/60 mt-0.5 en">Speaks EN · NL · PT · ES</p>
+        <p class="text-white/60 mt-0.5 nl">Spreekt EN · NL · PT · ES</p>
       </div>
 
       <div class="text-center">
@@ -976,6 +994,7 @@
         // Client account (issue #12): a booking can only be sent once the client is
         // logged in. `session` mirrors window.__gatoClientAuth's current session.
         session: null,
+        sent: false,
         showAuth: false,
         authMode: 'login',
         authEmail: '',
@@ -1008,27 +1027,6 @@
           if (hasDog) total += DOG_WALK_PRICE_FROM * days;
           return total;
         },
-        _buildMessage() {
-          const typeLabels = { cat: 'catsitting', dog: 'dogwalking' };
-          const petsStr = this.pets.map(p => {
-            const name = p.name.trim();
-            const type = p.type === 'other'
-              ? (p.otherType.trim() || 'other/anders')
-              : typeLabels[p.type];
-            return name ? name + ' (' + type + ')' : type;
-          }).join(', ');
-          const prefLabels = {
-            morning: '1x morning (ochtend)',
-            evening: '1x evening (avond)',
-            both: '2x morning + evening (ochtend + avond)',
-            none: '1x no preference (geen voorkeur)'
-          };
-          const pref = this.pref ? prefLabels[this.pref] : '1x no preference (geen voorkeur)';
-          const dates = this.to && this.to > this.from
-            ? this.from + ' \u2192 ' + this.to
-            : this.from;
-          return 'Hi L\u00EDgia! Catsitting / pet care request:\nDates / Data: ' + dates + '\nPets / Huisdieren: ' + petsStr + '\nPreference / Voorkeur: ' + pref;
-        },
         async send() {
           if (!this.from) {
             alert('Selecteer een datum / Please select a start date');
@@ -1045,8 +1043,6 @@
           await this._completeSend();
         },
         async _completeSend() {
-          const msg = this._buildMessage();
-
           if (window.__saveBookingToSupabase) {
             await window.__saveBookingToSupabase({
               clientName: this.clientName,
@@ -1058,8 +1054,7 @@
             });
           }
 
-          markWhatsAppIntent();
-          window.open('https://wa.me/__WHATSAPP_NUMBER__?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          this.sent = true;
         },
         async authLogin() {
           this.authLoading = true;
