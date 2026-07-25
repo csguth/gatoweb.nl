@@ -22,7 +22,7 @@
 <div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
     🚧 STAGING — <span class="en-l" data-i18n="staging_banner.test_environment_not_the_live">test environment, not the live site</span><span class="nl-l">testomgeving, niet de live site</span><span class="pt-l">ambiente de testes, não é o site oficial</span>
 </div>
-<div class="max-w-lg mx-auto px-5 py-10" x-data="facturenApp()" x-init="init()">
+<div class="max-w-lg mx-auto px-5 py-10">
 <div class="flex items-center justify-between mb-6">
 <h1 class="font-serif text-2xl font-bold text-sage-700">🐾 <span class="en-l" data-i18n="facturen.invoices">Invoices</span><span class="nl-l">Facturen</span><span class="pt-l">Faturas</span></h1>
 <select aria-label="Switch language" class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 bg-white hover:bg-sage-50 transition" x-model="lang">
@@ -31,6 +31,7 @@
 <option value="pt">🇵🇹 PT</option>
 </select>
 </div>
+<div x-data="facturenApp()" x-init="init()">
 <template x-if="!configured">
 <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
 <span class="nl-l">Supabase is nog niet geconfigureerd. Voeg de repository variables
@@ -151,6 +152,7 @@
 </template>
 </div>
 </template>
+</div>
 </div>
 <!-- Ligia's staff-only invoicing app — see js/facturen/facturen-app.js -->
 <script src="js/facturen/facturen-app.js" type="module"></script>
