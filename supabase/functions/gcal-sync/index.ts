@@ -1,10 +1,9 @@
 // gcal-sync — Google Calendar sync for bookings (issue #6)
 //
 // Called by the `notify_gcal_sync()` Postgres trigger (see supabase/schema.sql)
-// whenever a booking is inserted or has its status changed:
-//   - INSERT (status=pending)      -> creates a tentative all-day event
-//   - UPDATE pending -> approved   -> patches the event to confirmed
-// Any other transition (e.g. cancelled) is out of scope for now.
+// whenever a booking's status changes to "approved" by the admin. The event is
+// only created in Google Calendar at that point — pending bookings are NOT put
+// on the calendar, since they may never be approved.
 //
 // Deploy with `--no-verify-jwt`: the caller is Postgres (via pg_net), not a browser
 // with a Supabase session, so auth instead relies on the shared `x-gcal-webhook-secret`
@@ -89,7 +88,7 @@ function addDays(dateStr: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-function buildEventBody(record: BookingRecord, status: "tentative" | "confirmed") {
+function buildEventBody(record: BookingRecord) {
   const summary = `Catsitting — ${record.client_name || record.client_email || "Client"}`;
   const petsLine = petsSummary(record.pets);
   const descriptionLines = [
@@ -107,7 +106,7 @@ function buildEventBody(record: BookingRecord, status: "tentative" | "confirmed"
     description: descriptionLines.join("\n"),
     start: { date: start },
     end: { date: endDate },
-    status,
+    status: "confirmed",
     reminders: { useDefault: true },
   };
 }
@@ -121,36 +120,11 @@ async function createEvent(accessToken: string, calendarId: string, record: Book
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(buildEventBody(record, "tentative")),
+      body: JSON.stringify(buildEventBody(record)),
     },
   );
   if (!res.ok) {
     throw new Error(`Failed to create Google Calendar event: ${res.status} ${await res.text()}`);
-  }
-  return res.json();
-}
-
-async function confirmEvent(
-  accessToken: string,
-  calendarId: string,
-  eventId: string,
-  record: BookingRecord,
-) {
-  const res = await fetch(
-    `${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events/${
-      encodeURIComponent(eventId)
-    }`,
-    {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(buildEventBody(record, "confirmed")),
-    },
-  );
-  if (!res.ok) {
-    throw new Error(`Failed to confirm Google Calendar event: ${res.status} ${await res.text()}`);
   }
   return res.json();
 }
@@ -194,10 +168,6 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "GOOGLE_CALENDAR_ID not configured" }, 500);
   }
 
-  if (req.method !== "POST") {
-    return jsonResponse({ error: "Method not allowed" }, 405);
-  }
-
   let payload: WebhookPayload;
   try {
     payload = await req.json();
@@ -208,22 +178,15 @@ Deno.serve(async (req: Request) => {
   const { type, record, old_record } = payload;
 
   try {
-    const accessToken = await getGoogleAccessToken();
+    const becameApproved = type === "UPDATE" &&
+      record.status === "approved" &&
+      old_record?.status !== "approved";
 
-    if (type === "INSERT" && record.status === "pending") {
+    if (becameApproved && !record.google_event_id) {
+      const accessToken = await getGoogleAccessToken();
       const event = await createEvent(accessToken, calendarId, record);
       await updateBookingGoogleEventId(record.id, event.id);
       return jsonResponse({ ok: true, action: "created", eventId: event.id });
-    }
-
-    if (
-      type === "UPDATE" &&
-      record.status === "approved" &&
-      old_record?.status === "pending" &&
-      record.google_event_id
-    ) {
-      const event = await confirmEvent(accessToken, calendarId, record.google_event_id, record);
-      return jsonResponse({ ok: true, action: "confirmed", eventId: event.id });
     }
 
     return jsonResponse({ ok: true, action: "skipped" });
