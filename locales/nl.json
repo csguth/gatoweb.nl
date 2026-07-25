@@ -1,0 +1,209 @@
+{
+  "booking": {
+    "start_date_required": "Selecteer een startdatum",
+    "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen."
+  },
+  "auth": {
+    "account_created_check_email_login": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.",
+    "not_configured": "De dienst is nog niet geconfigureerd."
+  },
+  "invoice": {
+    "title": "Factuur {{number}}",
+    "date_label": "Datum: {{date}}",
+    "client_label": "Klant: {{client}}",
+    "description_label": "Omschrijving:",
+    "service_description": "Catsitting/oppasdiensten {{from}}{{toPart}}",
+    "date_range_connector": " t/m {{to}}",
+    "pets_label": "Huisdieren: {{pets}}",
+    "preference_label": "Voorkeur: {{preference}}",
+    "total_label": "Totaal: € {{amount}}",
+    "vat_exempt_kor": "Vrijgesteld van BTW op grond van de kleineondernemersregeling (KOR).",
+    "payment_tikkie_iban": "Betaling: via Tikkie (apart verzonden) - IBAN {{iban}}",
+    "file_name": "factuur-{{number}}",
+    "this_client": "deze klant",
+    "confirm_approve": "Factuur definitief goedkeuren voor {{client}}?"
+  },
+  "static": {
+    "index": {
+      "staging_banner": {
+        "test_environment_not_the_live": "testomgeving, niet de live site"
+      },
+      "nav": {
+        "book_a_visit": "Boek een bezoek"
+      },
+      "hero": {
+        "50_verified_reviews": "50+ geverifieerde beoordelingen",
+        "expert_catsitting_in_city_name": "Professionele<br/>kattenoppas in<br/>__CITY_NAME__",
+        "respect_love_and_fun_for": "Respect, liefde en plezier voor jouw kat — terwijl jij weg bent.",
+        "book_a_visit": "📅 Boek een bezoek",
+        "12_yrs_exp": "12+ jr ervaring"
+      },
+      "misc": {
+        "cats_rescued": "geredde katten",
+        "5_star_reviews": "5-ster beoordelingen",
+        "returning_clients": "vaste klanten",
+        "years_experience": "jaar ervaring",
+        "how_it_works": "Hoe het werkt",
+        "1_get_in_touch": "1. Neem contact op",
+        "book_online_or_send_a": "Boek online of stuur een WhatsApp. Vertel me over jouw kat(ten) en de gewenste data.",
+        "2_free_meet_greet": "2. Gratis kennismaking",
+        "i_visit_your_home_meet": "Ik kom langs, maak kennis met jouw kat en leer hun routine voordat de oppas begint.",
+        "3_relax_receive_updates": "3. Ontspannen & updates ontvangen",
+        "i_visit_your_home_and": "Ik bezoek jouw huis en stuur na elk bezoek foto's en een gedetailleerd verslag. Jouw kat is in goede handen. 🖤",
+        "thanks_for_contacting_brand_name": "Bedankt voor je bericht aan __BRAND_NAME__!",
+        "we_ll_reply_as_soon": "We reageren zo snel mogelijk. Je kunt altijd nog een bericht sturen.",
+        "back_to_home": "Terug naar start"
+      },
+      "about": {
+        "about_l_gia": "Over Lígia",
+        "hi_i_m_l_gia": "Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in __CITY_NAME__.",
+        "my_journey_started_12_years": "Mijn reis begon 12 jaar geleden met een reddingsproject in Brazilië (<em>@gatosanonimosfloripa</em>) dat meer dan 5.000 zwerfkatten hielp via redding, revalidatie, sterilisatie en herplaatsing. Sindsdien studeer ik doorlopend kattengedrag, gezondheid en welzijn — want kattenverzorging evolueert voortdurend.",
+        "every_cat_is_different_my": "Elke kat is anders. Mijn taak is hun persoonlijkheid te respecteren, hun lichaamstaal te lezen en mijn aanpak aan te passen aan wat hen comfortabel maakt. Tijdens elk bezoek houd ik gedrag, eetlust, kattenbakgewoonten en algeheel welzijn in de gaten.",
+        "after_every_visit_you_ll": "Na elk bezoek ontvang je foto's, video's en een gedetailleerde update. Ik weet hoe moeilijk het is om je kat achter te laten — jij verdient het om goed geïnformeerd te zijn. 📸",
+        "senior_cats": "Seniore katten",
+        "shy_fearful_cats": "Schuwe katten",
+        "medication": "Medicatie",
+        "post_op_care": "Postop zorg",
+        "multi_cat_households": "Meerdere katten",
+        "behaviour_consultation": "Gedragsconsultatie"
+      },
+      "services": {
+        "services_pricing": "Diensten & Prijzen",
+        "all_visits_are_at_your": "Alle bezoeken zijn bij jou thuis — geen resstress voor jouw kat.",
+        "1_home_visit_day": "1 Huisbezoek per dag",
+        "feeding_fresh_water": "Voeren & vers water",
+        "litter_box_cleaning": "Kattenbak reinigen",
+        "playtime_attention": "Spelen & aandacht",
+        "health_monitoring": "Gezondheidscheck",
+        "photo_video_updates": "Foto & video updates",
+        "plant_watering": "Planten water geven",
+        "book_now": "Boek nu",
+        "most_popular": "Meest gekozen",
+        "2_home_visits_day": "2 Huisbezoeken per dag",
+        "everything_in_the_1_visit": "Alles van het 1-bezoek plan",
+        "morning_evening_visits": "Ochtend- & avondbezoek",
+        "ideal_for_anxious_cats": "Ideaal voor angstige katten",
+        "medication_administration": "Medicatie toedienen",
+        "update_after_each_visit": "Update na elk bezoek",
+        "book_now_2": "Boek nu",
+        "behaviour_consultation": "Gedragsconsultatie",
+        "on_request": "Op aanvraag",
+        "litter_box_issues": "Kattenbakproblemen",
+        "cat_to_cat_introductions": "Katten introduceren",
+        "scratching_aggression": "Krabben & agressie",
+        "anxiety_fearfulness": "Angst & schuwheid",
+        "get_in_touch": "Neem contact op",
+        "also_available_for_dogs_rabbits": "Ook beschikbaar voor honden, konijnen, vogels, reptielen & kleine dieren · Hondenwandelingen vanaf €__DOG_WALK_PRICE_FROM__",
+        "seasonal_surcharges_may_apply_e": "* Seizoensgebonden toeslagen kunnen van toepassing zijn (bijv. feestdagen of zondagen)"
+      },
+      "reviews": {
+        "50_five_star_reviews": "50+ vijf-ster beoordelingen",
+        "verified_reviews_from_cat_owners": "Geverifieerde beoordelingen van katteneigenaren in __CITY_NAME__",
+        "communication": "Communicatie",
+        "reliability": "Betrouwbaarheid",
+        "pet_care": "Omgang met dieren",
+        "value": "Prijs-kwaliteit",
+        "i_couldn_t_have_asked": "\"Erg fijn thuiskomen! Ligia is erg goed voor mijn katten en het geeft mij een gerust gevoel als ik even weg ben. Ze stuurt ook elke keer leuke foto's om mij op de hoogte te houden. Mijn katten zijn helemaal gelukkig als ze langskomt. Bedankt voor de goede zorgen!\"",
+        "alina_catsitting_june_2026": "— Inke · Kattenoppas · __CITY_NAME__",
+        "she_is_a_great_sitter": "\"Lígia heeft echt een hart voor dieren. Mijn kat heeft de tijd van zijn leven gehad toen ik op vakantie was.\"",
+        "marel_catsitting_april_2026": "— Anouk · Huisbezoeken · __CITY_NAME__",
+        "l_gia_was_great_with": "\"Ligia ervaar ik als zeer bekwaam in omgang met honden. Ze stelde serieuze vragen en stuurt ook foto's van de wandeling. Ik ben erg tevreden!\"",
+        "k_van_dog_walking_january": "— Nanda · Hondenuitlaatservice · __CITY_NAME__"
+      },
+      "booking": {
+        "book_a_catsitting_visit": "Boek een kattenoppasbezoek",
+        "choose_your_dates_and_preference": "Kies jouw data en voorkeur — Lígia bevestigt binnen 24 uur.",
+        "logged_in_as": "Ingelogd als",
+        "log_out": "Uitloggen",
+        "your_name_optional": "Jouw naam <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
+        "first_day": "Eerste dag",
+        "last_day_optional": "Laatste dag <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
+        "pets": "Huisdieren",
+        "add_pet": "Huisdier toevoegen",
+        "other": "Anders",
+        "visit_preference": "Bezoekvoorkeur",
+        "morning_1x": "Ochtend <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "evening_1x": "Avond <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "both_2x_day": "Beide <span class=\"font-normal opacity-70 text-xs\">(2x/dag)</span>",
+        "no_pref_1x": "Geen voorkeur <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "create_a_free_account_or": "Maak een gratis account (of log in) om je boeking te versturen — zo kun je de status altijd volgen.",
+        "log_in": "Inloggen",
+        "create_account": "Account aanmaken",
+        "log_in_send": "Inloggen & versturen",
+        "create_account_2": "Account aanmaken",
+        "working": "Bezig...",
+        "cancel": "Annuleren",
+        "booking_request_sent": "Boekingsverzoek verstuurd!",
+        "l_gia_will_confirm_availability": "Lígia bevestigt beschikbaarheid binnen 24 uur.",
+        "track_my_booking": "Mijn boeking volgen →",
+        "send_booking_request": "Boekingsverzoek versturen",
+        "l_gia_will_confirm_availability_2": "Lígia bevestigt beschikbaarheid binnen 24 uur.",
+        "track_my_booking_2": "Mijn boeking volgen →"
+      },
+      "footer": {
+        "speaks_en_pt_es": "Spreekt EN · PT · ES",
+        "made_with_for_cats": "Gemaakt met 🖤 voor katten"
+      }
+    },
+    "account": {
+      "staging_banner": {
+        "test_environment_not_the_live": "testomgeving, niet de live site"
+      },
+      "account": {
+        "my_bookings": "Mijn boekingen",
+        "this_page_isn_t_configured": "Deze pagina is nog niet geconfigureerd. Probeer het later opnieuw.",
+        "log_in": "Inloggen",
+        "create_account": "Account aanmaken",
+        "email": "E-mail",
+        "password": "Wachtwoord",
+        "log_in_2": "Inloggen",
+        "create_account_2": "Account aanmaken",
+        "working": "Bezig...",
+        "refresh": "↻ Vernieuwen",
+        "log_out": "Uitloggen",
+        "loading": "Laden...",
+        "no_bookings_yet": "Nog geen boekingen.",
+        "awaiting_confirmation": "Wacht op bevestiging",
+        "confirmed_payment_request_coming": "Bevestigd — betaalverzoek volgt",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd",
+        "dates": "Data:",
+        "pets": "Huisdieren:",
+        "amount": "Bedrag:"
+      }
+    },
+    "facturen": {
+      "staging_banner": {
+        "test_environment_not_the_live": "testomgeving, niet de live site"
+      },
+      "facturen": {
+        "invoices": "Facturen",
+        "supabase_is_not_configured_yet": "Supabase is nog niet geconfigureerd. Voeg de repository variables\n        <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw.",
+        "email": "E-mail",
+        "password": "Wachtwoord",
+        "log_in": "Inloggen",
+        "working": "Bezig...",
+        "refresh": "↻ Vernieuwen",
+        "log_out": "Uitloggen",
+        "loading": "Laden...",
+        "no_invoices": "Geen facturen 🎉",
+        "awaiting_approval": "Wacht op goedkeuring",
+        "send_tikkie": "Tikkie versturen",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd",
+        "client": "Klant",
+        "dates": "Data:",
+        "pets": "Huisdieren:",
+        "preference": "Voorkeur:",
+        "amount": "Bedrag (€)",
+        "approve_generate_invoice": "Goedkeuren & Factuur genereren",
+        "working_2": "Bezig...",
+        "dates_2": "Data:",
+        "pets_2": "Huisdieren:",
+        "amount_2": "Bedrag:",
+        "download_pdf": "📄 PDF downloaden",
+        "tikkie_sent": "✓ Tikkie verstuurd"
+      }
+    }
+  }
+}

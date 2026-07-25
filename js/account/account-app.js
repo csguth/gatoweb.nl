@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const t = (key, options) => window.t(key, options);
 
 // Same storageKey as index.html's client auth ('gatoweb-client-auth') so a client who
 // logged in from the booking form on / stays logged in here, and vice versa. Kept
@@ -88,9 +89,7 @@ window.accountApp = function () {
       this.loading = false;
       if (error) { this.errorMsg = error.message; return; }
       if (!data.session) {
-        this.infoMsg = document.body.classList.contains('show-nl')
-          ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.'
-          : 'Account created! Check your email and click the confirmation link, then log in here.';
+        this.infoMsg = t('auth.account_created_check_email_login');
         this.mode = 'login';
         this.password = '';
         return;
