@@ -1,6 +1,8 @@
 {
   "booking": {
     "start_date_required": "Please select a start date",
+    "address": "Address",
+    "address_required": "Please enter your address (required for the invoice)",
     "account_created_check_email_send": "Account created! Check your email and click the confirmation link, then log in here to send your booking."
   },
   "auth": {
@@ -21,7 +23,32 @@
     "payment_tikkie_iban": "Payment: via Tikkie (sent separately) - IBAN {{iban}}",
     "file_name": "invoice-{{number}}",
     "this_client": "this client",
-    "confirm_approve": "Permanently approve the invoice for {{client}}?"
+    "confirm_approve": "Permanently approve the invoice for {{client}}?",
+    "recipient_label": "To:",
+    "address_label": "Address: {{address}}",
+    "table": {
+      "description": "Description",
+      "period": "Period",
+      "days": "Days",
+      "unit_price": "Price/day",
+      "subtotal": "Subtotal"
+    },
+    "line": {
+      "service_cat": "Cat sitting",
+      "service_dog": "Dog walking",
+      "period_morning": "daytime",
+      "period_evening": "evening",
+      "period_both": "daytime and evening",
+      "period_none": "",
+      "frequency_1": "1x per day",
+      "frequency_2": "2x per day",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} to {{to}}",
+      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}"
+    },
+    "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
+    "print_button": "🖨️ Print invoice / save as PDF",
+    "popup_blocked": "Please allow pop-ups to view the invoice."
   },
   "static": {
     "index": {
@@ -192,6 +219,7 @@
         "completed": "Completed",
         "cancelled": "Cancelled",
         "client": "Client",
+        "client_address": "Address",
         "dates": "Dates:",
         "pets": "Pets:",
         "preference": "Preference:",
@@ -201,7 +229,7 @@
         "dates_2": "Dates:",
         "pets_2": "Pets:",
         "amount_2": "Amount:",
-        "download_pdf": "📄 Download PDF",
+        "print_invoice": "🖨️ Print invoice",
         "tikkie_sent": "✓ Tikkie sent"
       }
     }

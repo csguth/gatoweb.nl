@@ -1,6 +1,8 @@
 {
   "booking": {
     "start_date_required": "Por favor, selecione uma data de início",
+    "address": "Endereço",
+    "address_required": "Por favor, informe seu endereço (necessário para a fatura)",
     "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva."
   },
   "auth": {
@@ -21,7 +23,32 @@
     "payment_tikkie_iban": "Pagamento: via Tikkie (enviado separadamente) - IBAN {{iban}}",
     "file_name": "fatura-{{number}}",
     "this_client": "este cliente",
-    "confirm_approve": "Aprovar permanentemente a fatura para {{client}}?"
+    "confirm_approve": "Aprovar permanentemente a fatura para {{client}}?",
+    "recipient_label": "Para:",
+    "address_label": "Endereço: {{address}}",
+    "table": {
+      "description": "Descrição",
+      "period": "Período",
+      "days": "Dias",
+      "unit_price": "Preço/dia",
+      "subtotal": "Subtotal"
+    },
+    "line": {
+      "service_cat": "Catsitting",
+      "service_dog": "Dogwalking",
+      "period_morning": "diurno",
+      "period_evening": "noturno",
+      "period_both": "diurno e noturno",
+      "period_none": "",
+      "frequency_1": "1x por dia",
+      "frequency_2": "2x por dia",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} até {{to}}",
+      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}"
+    },
+    "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
+    "print_button": "🖨️ Imprimir fatura / salvar como PDF",
+    "popup_blocked": "Permita pop-ups para visualizar a fatura."
   },
   "static": {
     "index": {
@@ -192,6 +219,7 @@
         "completed": "Concluído",
         "cancelled": "Cancelado",
         "client": "Cliente",
+        "client_address": "Endereço",
         "dates": "Datas:",
         "pets": "Animais de estimação:",
         "preference": "Preferência:",
@@ -201,7 +229,7 @@
         "dates_2": "Datas:",
         "pets_2": "Animais de estimação:",
         "amount_2": "Quantia:",
-        "download_pdf": "📄 Baixar PDF",
+        "print_invoice": "🖨️ Imprimir fatura",
         "tikkie_sent": "✓ Tikkie enviado"
       }
     }

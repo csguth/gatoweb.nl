@@ -10,6 +10,7 @@ function bookingForm() {
 
   return {
     clientName: saved.clientName || '',
+    address: saved.address || '',
     from: '',
     to: '',
     pref: saved.pref || '',
@@ -29,10 +30,11 @@ function bookingForm() {
     authLoading: false,
 
     _save() {
-      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, pets: this.pets, pref: this.pref })); } catch(e) {}
+      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
     async init() {
       this.$watch('clientName', () => this._save());
+      this.$watch('address', () => this._save());
       this.$watch('pets', () => this._save());
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
@@ -57,6 +59,12 @@ function bookingForm() {
         alert(t('booking.start_date_required'));
         return;
       }
+      // Address is required on the invoice (issue #32) — validated client-side same as
+      // the date, since there's no server-side booking form validation on this static site.
+      if (!this.address || !this.address.trim()) {
+        alert(t('booking.address_required'));
+        return;
+      }
       // Client account required (issue #12) — if Supabase is configured and the client
       // isn't logged in yet, show the inline login/signup gate instead of sending.
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured && !this.session) {
@@ -71,6 +79,7 @@ function bookingForm() {
       if (window.__saveBookingToSupabase) {
         await window.__saveBookingToSupabase({
           clientName: this.clientName,
+          address: this.address,
           from: this.from,
           to: this.to,
           pets: this.pets,

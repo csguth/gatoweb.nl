@@ -1,6 +1,8 @@
 {
   "booking": {
     "start_date_required": "Selecteer een startdatum",
+    "address": "Adres",
+    "address_required": "Vul je adres in (nodig voor de factuur)",
     "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen."
   },
   "auth": {
@@ -21,7 +23,32 @@
     "payment_tikkie_iban": "Betaling: via Tikkie (apart verzonden) - IBAN {{iban}}",
     "file_name": "factuur-{{number}}",
     "this_client": "deze klant",
-    "confirm_approve": "Factuur definitief goedkeuren voor {{client}}?"
+    "confirm_approve": "Factuur definitief goedkeuren voor {{client}}?",
+    "recipient_label": "Aan:",
+    "address_label": "Adres: {{address}}",
+    "table": {
+      "description": "Omschrijving",
+      "period": "Periode",
+      "days": "Dagen",
+      "unit_price": "Prijs/dag",
+      "subtotal": "Subtotaal"
+    },
+    "line": {
+      "service_cat": "Catsitting",
+      "service_dog": "Dogwalking",
+      "period_morning": "overdag",
+      "period_evening": "'s avonds",
+      "period_both": "overdag en 's avonds",
+      "period_none": "",
+      "frequency_1": "1x per dag",
+      "frequency_2": "2x per dag",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} t/m {{to}}",
+      "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}"
+    },
+    "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
+    "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",
+    "popup_blocked": "Sta pop-ups toe om de factuur te bekijken."
   },
   "static": {
     "index": {
@@ -192,6 +219,7 @@
         "completed": "Voltooid",
         "cancelled": "Geannuleerd",
         "client": "Klant",
+        "client_address": "Adres",
         "dates": "Data:",
         "pets": "Huisdieren:",
         "preference": "Voorkeur:",
@@ -201,7 +229,7 @@
         "dates_2": "Data:",
         "pets_2": "Huisdieren:",
         "amount_2": "Bedrag:",
-        "download_pdf": "📄 PDF downloaden",
+        "print_invoice": "🖨️ Factuur afdrukken",
         "tikkie_sent": "✓ Tikkie verstuurd"
       }
     }

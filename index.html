@@ -505,6 +505,14 @@
 </label>
 <input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientName"/>
 </div>
+<!-- Address (required — needed on the invoice per issue #32) -->
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.address">Address</span>
+<span class="nl">Adres</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="address" required=""/>
+</div>
 <!-- Dates -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>

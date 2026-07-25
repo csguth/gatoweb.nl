@@ -19,6 +19,7 @@ create table if not exists public.bookings (
   client_email text,
   client_name text,
   client_contact text,
+  client_address text,
   date_from date not null,
   date_to date,
   pets jsonb not null default '[]'::jsonb,
@@ -35,6 +36,12 @@ create table if not exists public.bookings (
 -- this table from issue #5 without these two columns).
 alter table public.bookings add column if not exists user_id uuid references auth.users(id);
 alter table public.bookings add column if not exists client_email text;
+
+-- Idempotent for existing tables created before issue #32 (professional invoices):
+-- client's postal address, required on new bookings (enforced client-side in the booking
+-- form) and shown on the invoice as the recipient's address. Nullable at the DB level so
+-- older, already-approved bookings aren't broken retroactively.
+alter table public.bookings add column if not exists client_address text;
 
 create sequence if not exists public.factuur_number_seq start 1;
 
