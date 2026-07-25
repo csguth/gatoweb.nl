@@ -140,3 +140,81 @@ grant execute on function public.approve_booking(uuid, numeric) to authenticated
 --   sure her email is in the `staff_emails` table above (already inserted by this script).
 --   Only staff can open /facturen.html and see every booking; regular clients created
 --   through /account.html or the booking form on / only ever see their own (RLS above).
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- Google Calendar sync (issue #6)
+--
+-- Every booking insert/status-change is pushed to the gcal-sync Edge Function,
+-- which mirrors it into a dedicated Google Calendar ("Gato Petsit") as a
+-- tentative event on creation and a confirmed event on approval. Reminders
+-- come for free from the Google Calendar app (default notifications on the
+-- calendar), so no bespoke reminder system is built here.
+-- ─────────────────────────────────────────────────────────────────────────
+
+create extension if not exists pg_net;
+
+alter table public.bookings add column if not exists google_event_id text;
+
+-- One-time manual step per project (run once in staging, once in production, in the
+-- SQL editor) to store the values the trigger below needs without committing them to
+-- this file. Use the SAME webhook secret value as the GCAL_WEBHOOK_SECRET Edge
+-- Function secret (see `supabase secrets set`).
+--   select vault.create_secret('<GCAL_WEBHOOK_SECRET value>', 'gcal_webhook_secret');
+--   select vault.create_secret('https://<project-ref>.supabase.co/functions/v1/gcal-sync', 'gcal_sync_url');
+-- To rotate a value later, use `select vault.update_secret(...)` instead (create_secret
+-- errors if the name already exists).
+
+create or replace function public.notify_gcal_sync()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, vault, extensions
+as $$
+declare
+  v_url text;
+  v_secret text;
+begin
+  select decrypted_secret into v_url from vault.decrypted_secrets where name = 'gcal_sync_url';
+  select decrypted_secret into v_secret from vault.decrypted_secrets where name = 'gcal_webhook_secret';
+
+  -- Vault secrets not configured yet on this project (e.g. local/dev) — skip silently
+  -- so bookings keep working even before the Calendar integration is wired up.
+  if v_url is null or v_secret is null then
+    return coalesce(new, old);
+  end if;
+
+  perform net.http_post(
+    url := v_url,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'x-gcal-webhook-secret', v_secret
+    ),
+    body := jsonb_build_object(
+      'type', tg_op,
+      'record', to_jsonb(new),
+      'old_record', case when tg_op = 'UPDATE' then to_jsonb(old) else null end
+    )
+  );
+
+  return coalesce(new, old);
+end;
+$$;
+
+revoke all on function public.notify_gcal_sync() from public;
+
+-- Fires once per new booking (status is always 'pending' on insert).
+drop trigger if exists bookings_gcal_sync_insert on public.bookings;
+create trigger bookings_gcal_sync_insert
+  after insert on public.bookings
+  for each row
+  execute function public.notify_gcal_sync();
+
+-- Fires only when status actually changes (e.g. pending -> approved), not on every
+-- update — this also avoids a loop when the Edge Function writes google_event_id
+-- back onto the row, since that update doesn't touch `status`.
+drop trigger if exists bookings_gcal_sync_status_update on public.bookings;
+create trigger bookings_gcal_sync_status_update
+  after update on public.bookings
+  for each row
+  when (old.status is distinct from new.status)
+  execute function public.notify_gcal_sync();
