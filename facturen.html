@@ -9,7 +9,6 @@
 <link href="images/favicon.png" rel="icon" type="image/png"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="js/tailwind-config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- Runtime config (Supabase URL/keys, business info) injected at deploy time -->
 <script src="js/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/i18next@23.16.8/dist/umd/i18next.min.js"></script>
@@ -111,6 +110,12 @@
 </label>
 <input :placeholder="lang === 'nl' ? 'Naam klant' : (lang === 'pt' ? 'Nome do cliente' : 'Client name')" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b.client_name"/>
 </div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Adres</span><span class="en-l" data-i18n="facturen.client_address">Address</span><span class="pt-l">Endereço</span>
+</label>
+<input :placeholder="lang === 'nl' ? 'Adres klant' : (lang === 'pt' ? 'Endereço do cliente' : 'Client address')" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b.client_address"/>
+</div>
 <div class="text-sm text-gray-600 space-y-0.5">
 <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
@@ -138,8 +143,8 @@
 </div>
 <template x-if="b.status === 'approved'">
 <div class="flex gap-2 pt-1">
-<button @click="downloadPdf(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
-<span class="nl-l">📄 PDF downloaden</span><span class="en-l" data-i18n="facturen.download_pdf">📄 Download PDF</span><span class="pt-l">📄 Baixar PDF</span>
+<button @click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+<span class="nl-l">🖨️ Factuur afdrukken</span><span class="en-l" data-i18n="facturen.print_invoice">🖨️ Print invoice</span><span class="pt-l">🖨️ Imprimir fatura</span>
 </button>
 <button :disabled="b._busy" @click="markTikkieSent(b)" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition" x-show="!b.tikkie_sent">
 <span class="nl-l">✓ Tikkie verstuurd</span><span class="en-l" data-i18n="facturen.tikkie_sent">✓ Tikkie sent</span><span class="pt-l">✓ Tikkie enviado</span>

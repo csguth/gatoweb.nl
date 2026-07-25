@@ -91,7 +91,8 @@ jobs:
             BRAND_NAME: $(jq -Rn --arg v "${{ vars.BRAND_NAME }}" '$v'),
             PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
             PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
-            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
+            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
+            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }}
           };
           JSEOF
 

@@ -9,7 +9,7 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 | Plain HTML + Tailwind CDN | Website | Free |
 | Alpine.js CDN | EN/NL bilingual toggle, booking form, facturen dashboard | Free |
 | Supabase | Bookings database + Auth (facturen feature) | Free tier |
-| jsPDF (CDN) | Client-side invoice PDF generation | Free |
+| Browser print (`@media print`) | A4 invoice layout, "Save as PDF" via native print dialog | Free |
 | WhatsApp | Direct booking / confirmation | Free |
 | GitHub Pages | Production hosting + HTTPS (`gatoweb.nl`) | Free |
 | Cloudflare Pages | Staging hosting (`staging.gatoweb.nl`) | Free |
@@ -113,7 +113,9 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
 
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY` — from the relevant Supabase project's API settings
 - `BUSINESS_LEGAL_NAME`, `BUSINESS_ADDRESS`, `KVK_NUMBER`, `IBAN_NUMBER`, `BTW_EXEMPT` — printed on
-  generated invoices when set; the PDF just omits those lines if unset
+  generated invoices when set; the invoice just omits those lines if unset
+- `SEASONAL_SURCHARGE_PERCENT` — optional numeric percentage (default `0`) added to the unit price
+  for booking days in July, August, December and January (issue #32)
 
 ### Internal / infra
 
@@ -150,7 +152,11 @@ public site, disallowed in `robots.txt`):
   approval) → approved but Tikkie not sent yet → done → cancelled.
 - Approving a booking calls the `approve_booking()` Postgres function, which atomically assigns
   the next sequential invoice number (`factuur_number_seq`) and locks in the final amount.
-- A PDF invoice is generated client-side with jsPDF and can be re-downloaded anytime.
+- The invoice is a standalone A4-styled HTML document (`@page`/`@media print` CSS, no external
+  library), opened in a new tab; Ligia prints it or uses the browser's "Save as PDF". It is always
+  rendered in Dutch (`i18next.getFixedT('nl')`), regardless of the dashboard's current UI language,
+  lists each service with its period/date range/frequency, and applies a seasonal surcharge
+  (`SEASONAL_SURCHARGE_PERCENT`) to days in July, August, December and January.
 - Tikkie payment requests are still sent manually by Ligia (no bank API integration); she just
   marks the booking as "Tikkie sent" once she's done.
 
