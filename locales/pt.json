@@ -44,7 +44,7 @@
       "frequency_2": "2x por dia",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} até {{to}}",
-      "season_high_suffix": " (alta temporada +{{percent}}%)"
+      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}"
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
     "print_button": "🖨️ Imprimir fatura / salvar como PDF",

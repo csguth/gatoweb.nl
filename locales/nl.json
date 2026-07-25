@@ -44,7 +44,7 @@
       "frequency_2": "2x per dag",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} t/m {{to}}",
-      "season_high_suffix": " (hoogseizoen +{{percent}}%)"
+      "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}"
     },
     "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
     "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",

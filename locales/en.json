@@ -44,7 +44,7 @@
       "frequency_2": "2x per day",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} to {{to}}",
-      "season_high_suffix": " (high season +{{percent}}%)"
+      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}"
     },
     "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
     "print_button": "🖨️ Print invoice / save as PDF",

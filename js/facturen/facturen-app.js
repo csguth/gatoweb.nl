@@ -81,8 +81,9 @@ function escapeHtml(str) {
 }
 
 // Turns one structured line item (from invoice-calc.js) into the Dutch sentence shown
-// on the invoice, e.g. "Catsitting 's avonds — 2026-07-01 t/m 2026-07-02, 2x per dag
-// (hoogseizoen +15%)".
+// on the invoice, e.g. "Catsitting 's avonds — 2026-07-01 t/m 2026-07-02, 2x per dag".
+// Seasonal surcharges (item.type === 'surcharge') get their own separate line, so the
+// extra cost is explicit rather than folded into a higher unit price (issue #32 follow-up).
 function lineItemDescription(item) {
   const service = tNl('invoice.line.service_' + item.service);
   const period = tNl('invoice.line.period_' + item.period);
@@ -90,10 +91,11 @@ function lineItemDescription(item) {
   const dateRange = item.from === item.to
     ? tNl('invoice.line.date_range_single', { date: item.from })
     : tNl('invoice.line.date_range_multi', { from: item.from, to: item.to });
-  const seasonSuffix = item.season === 'high'
-    ? tNl('invoice.line.season_high_suffix', { percent: SEASONAL_SURCHARGE_PERCENT })
-    : '';
-  return (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency + seasonSuffix;
+  const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
+  if (item.type === 'surcharge') {
+    return tNl('invoice.line.surcharge_item', { percent: item.percent, description: base });
+  }
+  return base;
 }
 
 // Builds a standalone, self-contained HTML document for the invoice — always in Dutch,

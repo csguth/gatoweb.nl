@@ -74,27 +74,50 @@ export function buildInvoiceLineItems(booking, rates) {
   const hasDog = pets.some(p => p.type === 'dog');
   const { period, visitsPerDay } = frequencyOf(booking.preference);
 
-  const surchargeMultiplier = 1 + (Number(rates.seasonalSurchargePercent) || 0) / 100;
   const catPerDay = visitsPerDay === 2 ? rates.priceTwoVisits : rates.priceOneVisit;
   const dogPerDay = rates.dogWalkPriceFrom;
 
   const items = [];
+  const surchargePercent = Number(rates.seasonalSurchargePercent) || 0;
 
+  // Each service line is always billed at the plain base rate — the seasonal surcharge
+  // (if any) is pushed as its own separate line item right after it, instead of being
+  // folded into the unit price. That way the invoice shows exactly what the surcharge
+  // adds, rather than a single opaque higher unit price (issue #32 follow-up).
   function pushItem(service, group) {
     const basePerDay = service === 'cat' ? catPerDay : dogPerDay;
-    const unitPrice = group.season === 'high' ? basePerDay * surchargeMultiplier : basePerDay;
     const dayCount = group.days.length;
+    const from = isoDate(group.days[0]);
+    const to = isoDate(group.days[group.days.length - 1]);
     items.push({
+      type: 'service',
       service: service, // 'cat' | 'dog'
       period: period, // 'morning' | 'evening' | 'both' | 'none'
       visitsPerDay: visitsPerDay,
       season: group.season, // 'normal' | 'high'
-      from: isoDate(group.days[0]),
-      to: isoDate(group.days[group.days.length - 1]),
+      from: from,
+      to: to,
       dayCount: dayCount,
-      unitPrice: round2(unitPrice),
-      subtotal: round2(unitPrice * dayCount)
+      unitPrice: round2(basePerDay),
+      subtotal: round2(basePerDay * dayCount)
     });
+
+    if (group.season === 'high' && surchargePercent > 0) {
+      const surchargePerDay = basePerDay * (surchargePercent / 100);
+      items.push({
+        type: 'surcharge',
+        service: service,
+        period: period,
+        visitsPerDay: visitsPerDay,
+        season: group.season,
+        percent: surchargePercent,
+        from: from,
+        to: to,
+        dayCount: dayCount,
+        unitPrice: round2(surchargePerDay),
+        subtotal: round2(surchargePerDay * dayCount)
+      });
+    }
   }
 
   for (const group of seasonGroups) {
