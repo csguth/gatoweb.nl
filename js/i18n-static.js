@@ -3,8 +3,10 @@
 (function () {
   function pageKey() {
     const path = (window.location.pathname || '').toLowerCase();
-    if (path.endsWith('/account.html') || path.endsWith('account.html')) return 'account';
-    if (path.endsWith('/facturen.html') || path.endsWith('facturen.html')) return 'facturen';
+    // Cloudflare Pages serves clean URLs (e.g. /facturen, no .html extension) via a
+    // 308 redirect, so this must match both the raw filename and the extensionless path.
+    if (path.endsWith('/account.html') || path.endsWith('account.html') || path.endsWith('/account')) return 'account';
+    if (path.endsWith('/facturen.html') || path.endsWith('facturen.html') || path.endsWith('/facturen')) return 'facturen';
     return 'index';
   }
 
