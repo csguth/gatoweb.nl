@@ -144,11 +144,11 @@ grant execute on function public.approve_booking(uuid, numeric) to authenticated
 -- ─────────────────────────────────────────────────────────────────────────
 -- Google Calendar sync (issue #6)
 --
--- Every booking insert/status-change is pushed to the gcal-sync Edge Function,
--- which mirrors it into a dedicated Google Calendar ("Gato Petsit") as a
--- tentative event on creation and a confirmed event on approval. Reminders
--- come for free from the Google Calendar app (default notifications on the
--- calendar), so no bespoke reminder system is built here.
+-- Bookings only get pushed to the gcal-sync Edge Function when the admin
+-- approves them — pending bookings are not put on the calendar, since they
+-- may never be approved. Reminders come for free from the Google Calendar
+-- app (default notifications on the calendar), so no bespoke reminder
+-- system is built here.
 -- ─────────────────────────────────────────────────────────────────────────
 
 create extension if not exists pg_net;
@@ -202,16 +202,12 @@ $$;
 
 revoke all on function public.notify_gcal_sync() from public;
 
--- Fires once per new booking (status is always 'pending' on insert).
-drop trigger if exists bookings_gcal_sync_insert on public.bookings;
-create trigger bookings_gcal_sync_insert
-  after insert on public.bookings
-  for each row
-  execute function public.notify_gcal_sync();
-
 -- Fires only when status actually changes (e.g. pending -> approved), not on every
 -- update — this also avoids a loop when the Edge Function writes google_event_id
--- back onto the row, since that update doesn't touch `status`.
+-- back onto the row, since that update doesn't touch `status`. The Edge Function
+-- itself decides whether the new status warrants creating a calendar event
+-- (currently: only "approved").
+drop trigger if exists bookings_gcal_sync_insert on public.bookings;
 drop trigger if exists bookings_gcal_sync_status_update on public.bookings;
 create trigger bookings_gcal_sync_status_update
   after update on public.bookings
