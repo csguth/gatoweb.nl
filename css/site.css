@@ -6,15 +6,25 @@ html { font-family: 'Inter', system-ui, sans-serif; }
 .font-serif { font-family: 'Playfair Display', Georgia, serif; }
 body { background: #faf7f0; }
 
-/* Bilingual toggle — body.show-nl switches to Dutch.
-   index.html/account.html use .en/.nl; facturen.html uses .en-l/.nl-l instead. */
+/* Language toggle — default EN, body.show-nl for Dutch, body.show-pt for Portuguese.
+   In PT mode we render translated content through the .en/.en-l spans. */
 .nl { display: none; }
 body.show-nl .en { display: none; }
 body.show-nl .nl { display: revert; }
+body.show-pt .en { display: revert; }
+body.show-pt .nl { display: none; }
+
+.pt { display: none; }
+body.show-pt .pt { display: none; }
 
 .nl-l { display: none; }
 body.show-nl .en-l { display: none; }
 body.show-nl .nl-l { display: revert; }
+body.show-pt .en-l { display: revert; }
+body.show-pt .nl-l { display: none; }
+
+.pt-l { display: none; }
+body.show-pt .pt-l { display: none; }
 
 /* Staging environment banner — only visible when built with ENV_LABEL=staging */
 #env-banner { display: none; }

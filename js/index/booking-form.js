@@ -6,6 +6,7 @@ function bookingForm() {
   const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
   const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
   const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
+  const t = (key, options) => window.t(key, options);
 
   return {
     clientName: saved.clientName || '',
@@ -53,7 +54,7 @@ function bookingForm() {
     },
     async send() {
       if (!this.from) {
-        alert('Selecteer een datum / Please select a start date');
+        alert(t('booking.start_date_required'));
         return;
       }
       // Client account required (issue #12) — if Supabase is configured and the client
@@ -99,9 +100,7 @@ function bookingForm() {
       this.authLoading = false;
       if (error) { this.authError = error; return; }
       if (!session) {
-        this.authInfo = (document.body.classList.contains('show-nl'))
-          ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.'
-          : 'Account created! Check your email and click the confirmation link, then log in here to send your booking.';
+        this.authInfo = t('booking.account_created_check_email_send');
         this.authMode = 'login';
         this.authPassword = '';
         return;

@@ -1,162 +1,133 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My bookings / Mijn boekingen — __BRAND_NAME__</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <link rel="icon" href="images/favicon.png" type="image/png" />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-
-  <!-- Runtime config (Supabase URL/keys) injected at deploy time -->
-  <script src="js/config.js"></script>
-  <script src="js/lang-toggle.js"></script>
-
-  <link rel="stylesheet" href="css/site.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My bookings / Mijn boekingen — __BRAND_NAME__</title>
+<meta content="noindex,nofollow" name="robots"/>
+<link href="images/favicon.png" rel="icon" type="image/png"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="js/tailwind-config.js"></script>
+<!-- Runtime config (Supabase URL/keys) injected at deploy time -->
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/i18next@23.16.8/dist/umd/i18next.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/i18n-static.js"></script>
+<script src="js/lang-toggle.js"></script>
+<link href="css/site.css" rel="stylesheet"/>
 </head>
-<body class="min-h-screen" data-env="__ENV_LABEL__"
-  x-data="langToggle()" x-init="init()">
-
-  <div id="env-banner" class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5">
-    🚧 STAGING — <span class="en">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span>
-  </div>
-
-  <div class="max-w-lg mx-auto px-5 py-10" x-data="accountApp()" x-init="init()">
-
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="font-serif text-2xl font-bold text-sage-700">
-        🐾 <span class="en">My bookings</span><span class="nl">Mijn boekingen</span>
-      </h1>
-      <button
-        @click="lang = lang === 'en' ? 'nl' : 'en'"
-        class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 hover:bg-sage-50 transition select-none"
-        aria-label="Switch language"
-      >
-        <span class="nl">🇳🇱 NL</span>
-        <span class="en">🇬🇧 EN</span>
-      </button>
-    </div>
-
-    <template x-if="!configured">
-      <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
-        <span class="en">This page isn't configured yet. Please try again later.</span>
-        <span class="nl">Deze pagina is nog niet geconfigureerd. Probeer het later opnieuw.</span>
-      </div>
-    </template>
-
-    <template x-if="configured && !session">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200 space-y-5">
-
-        <div class="flex gap-2 text-sm font-semibold">
-          <button type="button" @click="mode = 'login'"
-                  :class="mode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
-                  class="flex-1 border rounded-lg py-2 transition">
-            <span class="en">Log in</span><span class="nl">Inloggen</span>
-          </button>
-          <button type="button" @click="mode = 'signup'"
-                  :class="mode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
-                  class="flex-1 border rounded-lg py-2 transition">
-            <span class="en">Create account</span><span class="nl">Account aanmaken</span>
-          </button>
-        </div>
-
-        <form @submit.prevent="mode === 'login' ? login() : signup()" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-              <span class="en">Email</span><span class="nl">E-mail</span>
-            </label>
-            <input type="email" x-model="email" required autocomplete="username"
-                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-              <span class="en">Password</span><span class="nl">Wachtwoord</span>
-            </label>
-            <input type="password" x-model="password" required
-                   :autocomplete="mode === 'login' ? 'current-password' : 'new-password'"
-                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-          </div>
-
-          <p x-show="errorMsg" x-text="errorMsg" class="text-red-600 text-xs"></p>
-          <p x-show="infoMsg" x-text="infoMsg" class="text-sage-600 text-xs"></p>
-
-          <button type="submit" :disabled="loading"
-                  class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition">
-            <template x-if="!loading && mode === 'login'"><span><span class="en">Log in</span><span class="nl">Inloggen</span></span></template>
-            <template x-if="!loading && mode === 'signup'"><span><span class="en">Create account</span><span class="nl">Account aanmaken</span></span></template>
-            <template x-if="loading"><span><span class="en">Working...</span><span class="nl">Bezig...</span></span></template>
-          </button>
-        </form>
-
-      </div>
-    </template>
-
-    <template x-if="configured && session">
-      <div class="space-y-4">
-        <div class="flex justify-between items-center bg-white rounded-2xl p-4 shadow-sm border border-warm-200">
-          <p class="text-xs text-gray-500" x-text="session.user.email"></p>
-          <div class="flex gap-3">
-            <button @click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">
-              <span class="en">↻ Refresh</span><span class="nl">↻ Vernieuwen</span>
-            </button>
-            <button @click="logout()" class="text-xs text-gray-400 hover:text-red-500">
-              <span class="en">Log out</span><span class="nl">Uitloggen</span>
-            </button>
-          </div>
-        </div>
-
-        <p x-show="loadingList" class="text-sm text-gray-400 text-center py-10">
-          <span class="en">Loading...</span><span class="nl">Laden...</span>
-        </p>
-        <p x-show="!loadingList && bookings.length === 0" class="text-sm text-gray-400 text-center py-10">
-          <span class="en">No bookings yet.</span><span class="nl">Nog geen boekingen.</span>
-        </p>
-
-        <template x-for="b in bookings" :key="b.id">
-          <div class="bg-white rounded-2xl p-4 shadow-sm space-y-2 border"
-               :class="{
+<body class="min-h-screen" data-env="__ENV_LABEL__" x-data="langToggle()" x-init="init()">
+<div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
+    🚧 STAGING — <span class="en" data-i18n="staging_banner.test_environment_not_the_live">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span><span class="pt">ambiente de testes, não é o site oficial</span>
+</div>
+<div class="max-w-lg mx-auto px-5 py-10" x-data="accountApp()" x-init="init()">
+<div class="flex items-center justify-between mb-6">
+<h1 class="font-serif text-2xl font-bold text-sage-700">
+        🐾 <span class="en" data-i18n="account.my_bookings">My bookings</span><span class="nl">Mijn boekingen</span><span class="pt">Minhas reservas</span>
+</h1>
+<select aria-label="Switch language" class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 bg-white hover:bg-sage-50 transition" x-model="lang">
+<option value="en">🇬🇧 EN</option>
+<option value="nl">🇳🇱 NL</option>
+<option value="pt">🇵🇹 PT</option>
+</select>
+</div>
+<template x-if="!configured">
+<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+<span class="en" data-i18n="account.this_page_isn_t_configured">This page isn't configured yet. Please try again later.</span>
+<span class="nl">Deze pagina is nog niet geconfigureerd. Probeer het later opnieuw.</span>
+<span class="pt">Esta página ainda não foi configurada. Tente novamente mais tarde.</span>
+</div>
+</template>
+<template x-if="configured &amp;&amp; !session">
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200 space-y-5">
+<div class="flex gap-2 text-sm font-semibold">
+<button :class="mode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" @click="mode = 'login'" class="flex-1 border rounded-lg py-2 transition" type="button">
+<span class="en" data-i18n="account.log_in">Log in</span><span class="nl">Inloggen</span><span class="pt">Entrar</span>
+</button>
+<button :class="mode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" @click="mode = 'signup'" class="flex-1 border rounded-lg py-2 transition" type="button">
+<span class="en" data-i18n="account.create_account">Create account</span><span class="nl">Account aanmaken</span><span class="pt">Criar conta</span>
+</button>
+</div>
+<form @submit.prevent="mode === 'login' ? login() : signup()" class="space-y-4">
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="account.email">Email</span><span class="nl">E-mail</span><span class="pt">E-mail</span>
+</label>
+<input autocomplete="username" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="email" x-model="email"/>
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="account.password">Password</span><span class="nl">Wachtwoord</span><span class="pt">Senha</span>
+</label>
+<input :autocomplete="mode === 'login' ? 'current-password' : 'new-password'" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="password" x-model="password"/>
+</div>
+<p class="text-red-600 text-xs" x-show="errorMsg" x-text="errorMsg"></p>
+<p class="text-sage-600 text-xs" x-show="infoMsg" x-text="infoMsg"></p>
+<button :disabled="loading" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition" type="submit">
+<template x-if="!loading &amp;&amp; mode === 'login'"><span><span class="en" data-i18n="account.log_in_2">Log in</span><span class="nl">Inloggen</span><span class="pt">Entrar</span></span></template>
+<template x-if="!loading &amp;&amp; mode === 'signup'"><span><span class="en" data-i18n="account.create_account_2">Create account</span><span class="nl">Account aanmaken</span><span class="pt">Criar conta</span></span></template>
+<template x-if="loading"><span><span class="en" data-i18n="account.working">Working...</span><span class="nl">Bezig...</span><span class="pt">Processando...</span></span></template>
+</button>
+</form>
+</div>
+</template>
+<template x-if="configured &amp;&amp; session">
+<div class="space-y-4">
+<div class="flex justify-between items-center bg-white rounded-2xl p-4 shadow-sm border border-warm-200">
+<p class="text-xs text-gray-500" x-text="session.user.email"></p>
+<div class="flex gap-3">
+<button @click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">
+<span class="en" data-i18n="account.refresh">↻ Refresh</span><span class="nl">↻ Vernieuwen</span><span class="pt">↻ Atualizar</span>
+</button>
+<button @click="logout()" class="text-xs text-gray-400 hover:text-red-500">
+<span class="en" data-i18n="account.log_out">Log out</span><span class="nl">Uitloggen</span><span class="pt">Sair</span>
+</button>
+</div>
+</div>
+<p class="text-sm text-gray-400 text-center py-10" x-show="loadingList">
+<span class="en" data-i18n="account.loading">Loading...</span><span class="nl">Laden...</span><span class="pt">Carregando...</span>
+</p>
+<p class="text-sm text-gray-400 text-center py-10" x-show="!loadingList &amp;&amp; bookings.length === 0">
+<span class="en" data-i18n="account.no_bookings_yet">No bookings yet.</span><span class="nl">Nog geen boekingen.</span><span class="pt">Ainda não há reservas.</span>
+</p>
+<template :key="b.id" x-for="b in bookings">
+<div :class="{
                  'border-warm-200': b.status === 'pending',
-                 'border-orange-300': b.status === 'approved' && !b.tikkie_sent,
-                 'border-warm-200 opacity-70': b.status === 'approved' && b.tikkie_sent,
+                 'border-orange-300': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
+                 'border-warm-200 opacity-70': b.status === 'approved' &amp;&amp; b.tikkie_sent,
                  'border-gray-200 opacity-50': b.status === 'cancelled'
-               }">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
-                    :class="{
+               }" class="bg-white rounded-2xl p-4 shadow-sm space-y-2 border">
+<div class="flex items-center justify-between gap-2">
+<span :class="{
                       'bg-amber-100 text-amber-700': b.status === 'pending',
-                      'bg-orange-100 text-orange-700': b.status === 'approved' && !b.tikkie_sent,
-                      'bg-green-100 text-green-700': b.status === 'approved' && b.tikkie_sent,
+                      'bg-orange-100 text-orange-700': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
+                      'bg-green-100 text-green-700': b.status === 'approved' &amp;&amp; b.tikkie_sent,
                       'bg-gray-100 text-gray-500': b.status === 'cancelled'
-                    }">
-                <template x-if="b.status === 'pending'"><span><span class="en">Awaiting confirmation</span><span class="nl">Wacht op bevestiging</span></span></template>
-                <template x-if="b.status === 'approved' && !b.tikkie_sent"><span><span class="en">Confirmed — payment request coming</span><span class="nl">Bevestigd — betaalverzoek volgt</span></span></template>
-                <template x-if="b.status === 'approved' && b.tikkie_sent"><span><span class="en">Completed</span><span class="nl">Voltooid</span></span></template>
-                <template x-if="b.status === 'cancelled'"><span><span class="en">Cancelled</span><span class="nl">Geannuleerd</span></span></template>
-              </span>
-              <span x-show="b.factuur_number" class="text-[11px] text-gray-400" x-text="'#' + factuurLabel(b)"></span>
-            </div>
-            <div class="text-sm text-gray-600 space-y-0.5">
-              <div><span class="font-semibold en">Dates:</span><span class="font-semibold nl">Data:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
-              <div><span class="font-semibold en">Pets:</span><span class="font-semibold nl">Huisdieren:</span> <span x-text="petsSummary(b.pets)"></span></div>
-              <template x-if="b.status === 'approved' || b.status === 'cancelled'">
-                <div><span class="font-semibold en">Amount:</span><span class="font-semibold nl">Bedrag:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
-              </template>
-            </div>
-          </div>
-        </template>
-      </div>
-    </template>
-
-  </div>
-
-  <!-- Client account (issue #12) — see js/account/account-app.js -->
-  <script type="module" src="js/account/account-app.js"></script>
-
-  <!-- Alpine must load after the module script above so window.accountApp already exists
+                    }" class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full">
+<template x-if="b.status === 'pending'"><span><span class="en" data-i18n="account.awaiting_confirmation">Awaiting confirmation</span><span class="nl">Wacht op bevestiging</span><span class="pt">Aguardando confirmação</span></span></template>
+<template x-if="b.status === 'approved' &amp;&amp; !b.tikkie_sent"><span><span class="en" data-i18n="account.confirmed_payment_request_coming">Confirmed — payment request coming</span><span class="nl">Bevestigd — betaalverzoek volgt</span><span class="pt">Confirmado — pedido de pagamento a caminho</span></span></template>
+<template x-if="b.status === 'approved' &amp;&amp; b.tikkie_sent"><span><span class="en" data-i18n="account.completed">Completed</span><span class="nl">Voltooid</span><span class="pt">Concluído</span></span></template>
+<template x-if="b.status === 'cancelled'"><span><span class="en" data-i18n="account.cancelled">Cancelled</span><span class="nl">Geannuleerd</span><span class="pt">Cancelado</span></span></template>
+</span>
+<span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
+</div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span class="font-semibold en" data-i18n="account.dates">Dates:</span><span class="font-semibold nl">Data:</span><span class="font-semibold pt">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold en" data-i18n="account.pets">Pets:</span><span class="font-semibold nl">Huisdieren:</span><span class="font-semibold pt">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
+<template x-if="b.status === 'approved' || b.status === 'cancelled'">
+<div><span class="font-semibold en" data-i18n="account.amount">Amount:</span><span class="font-semibold nl">Bedrag:</span><span class="font-semibold pt">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+</template>
+</div>
+</div>
+</template>
+</div>
+</template>
+</div>
+<!-- Client account (issue #12) — see js/account/account-app.js -->
+<script src="js/account/account-app.js" type="module"></script>
+<!-- Alpine must load after the module script above so window.accountApp already exists
        when Alpine scans and evaluates x-data on the page. -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

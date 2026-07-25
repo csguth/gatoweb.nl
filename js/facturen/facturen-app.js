@@ -10,6 +10,14 @@ const IBAN_NUMBER = window.GATOWEB_CONFIG.IBAN_NUMBER;
 const BTW_EXEMPT = window.GATOWEB_CONFIG.BTW_EXEMPT;
 
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const t = (key, options) => window.t(key, options);
+
+function currentLanguage() {
+  if (window.__gatoI18n && typeof window.__gatoI18n.getLanguage === 'function') {
+    return window.__gatoI18n.getLanguage();
+  }
+  return document.body.classList.contains('show-nl') ? 'nl' : 'en';
+}
 
 // Session persistence: this is a static site with no server, so there's no way to
 // set an httpOnly cookie — Supabase's own localStorage-backed session is the standard,
@@ -61,6 +69,10 @@ function generatePdf(b) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   let y = 20;
+  const lang = currentLanguage();
+  const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at);
+  const dateLabel = new Date(b.approved_at || Date.now()).toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-GB');
+  const toPart = b.date_to ? t('invoice.date_range_connector', { to: b.date_to }) : '';
 
   doc.setFontSize(16);
   doc.text(BUSINESS_LEGAL_NAME || window.GATOWEB_CONFIG.BRAND_NAME, 20, y); y += 8;
@@ -70,28 +82,28 @@ function generatePdf(b) {
   y += 5;
 
   doc.setFontSize(14);
-  doc.text('Factuur ' + factuurNumberLabel(b.factuur_number, b.approved_at), 20, y); y += 8;
+  doc.text(t('invoice.title', { number: numberLabel }), 20, y); y += 8;
   doc.setFontSize(10);
-  doc.text('Datum: ' + new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL'), 20, y); y += 10;
+  doc.text(t('invoice.date_label', { date: dateLabel }), 20, y); y += 10;
 
-  doc.text('Klant: ' + (b.client_name || '-'), 20, y); y += 10;
+  doc.text(t('invoice.client_label', { client: b.client_name || '-' }), 20, y); y += 10;
 
-  doc.text('Omschrijving:', 20, y); y += 6;
-  doc.text('Catsitting/oppasdiensten ' + b.date_from + (b.date_to ? ' t/m ' + b.date_to : ''), 20, y); y += 6;
-  doc.text('Huisdieren: ' + petsText(b.pets), 20, y); y += 6;
-  if (b.preference) { doc.text('Voorkeur: ' + b.preference, 20, y); y += 6; }
+  doc.text(t('invoice.description_label'), 20, y); y += 6;
+  doc.text(t('invoice.service_description', { from: b.date_from, toPart: toPart }), 20, y); y += 6;
+  doc.text(t('invoice.pets_label', { pets: petsText(b.pets) }), 20, y); y += 6;
+  if (b.preference) { doc.text(t('invoice.preference_label', { preference: b.preference }), 20, y); y += 6; }
   y += 6;
 
   doc.setFontSize(12);
-  doc.text('Totaal: € ' + Number(b.final_amount).toFixed(2), 20, y); y += 10;
+  doc.text(t('invoice.total_label', { amount: Number(b.final_amount).toFixed(2) }), 20, y); y += 10;
 
   doc.setFontSize(9);
   if (BTW_EXEMPT === 'true') {
-    doc.text('Vrijgesteld van BTW op grond van de kleineondernemersregeling (KOR).', 20, y); y += 6;
+    doc.text(t('invoice.vat_exempt_kor'), 20, y); y += 6;
   }
-  if (IBAN_NUMBER) { doc.text('Betaling: via Tikkie (apart verzonden) — IBAN ' + IBAN_NUMBER, 20, y); y += 6; }
+  if (IBAN_NUMBER) { doc.text(t('invoice.payment_tikkie_iban', { iban: IBAN_NUMBER }), 20, y); y += 6; }
 
-  doc.save('factuur-' + factuurNumberLabel(b.factuur_number, b.approved_at) + '.pdf');
+  doc.save(t('invoice.file_name', { number: numberLabel }) + '.pdf');
 }
 
 window.facturenApp = function () {
@@ -163,10 +175,9 @@ window.facturenApp = function () {
     },
 
     async approve(b) {
-      const isNl = document.body.classList.contains('show-nl');
-      const confirmMsg = isNl
-        ? 'Factuur definitief goedkeuren voor ' + (b.client_name || 'deze klant') + '?'
-        : 'Permanently approve the invoice for ' + (b.client_name || 'this client') + '?';
+      const confirmMsg = t('invoice.confirm_approve', {
+        client: b.client_name || t('invoice.this_client')
+      });
       if (!confirm(confirmMsg)) return;
       b._busy = true;
 

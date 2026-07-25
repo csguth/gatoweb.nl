@@ -1,0 +1,209 @@
+{
+  "booking": {
+    "start_date_required": "Please select a start date",
+    "account_created_check_email_send": "Account created! Check your email and click the confirmation link, then log in here to send your booking."
+  },
+  "auth": {
+    "account_created_check_email_login": "Account created! Check your email and click the confirmation link, then log in here.",
+    "not_configured": "Service is not configured yet."
+  },
+  "invoice": {
+    "title": "Invoice {{number}}",
+    "date_label": "Date: {{date}}",
+    "client_label": "Client: {{client}}",
+    "description_label": "Description:",
+    "service_description": "Cat sitting/pet care services {{from}}{{toPart}}",
+    "date_range_connector": " to {{to}}",
+    "pets_label": "Pets: {{pets}}",
+    "preference_label": "Preference: {{preference}}",
+    "total_label": "Total: € {{amount}}",
+    "vat_exempt_kor": "VAT exempt under the Dutch small business scheme (KOR).",
+    "payment_tikkie_iban": "Payment: via Tikkie (sent separately) - IBAN {{iban}}",
+    "file_name": "invoice-{{number}}",
+    "this_client": "this client",
+    "confirm_approve": "Permanently approve the invoice for {{client}}?"
+  },
+  "static": {
+    "index": {
+      "staging_banner": {
+        "test_environment_not_the_live": "test environment, not the live site"
+      },
+      "nav": {
+        "book_a_visit": "Book a visit"
+      },
+      "hero": {
+        "50_verified_reviews": "50+ verified reviews",
+        "expert_catsitting_in_city_name": "Expert catsitting<br/>in __CITY_NAME__",
+        "respect_love_and_fun_for": "Respect, love and fun for your cat — while you're away.",
+        "book_a_visit": "📅 Book a visit",
+        "12_yrs_exp": "12+ yrs exp."
+      },
+      "misc": {
+        "cats_rescued": "cats rescued",
+        "5_star_reviews": "5-star reviews",
+        "returning_clients": "returning clients",
+        "years_experience": "years experience",
+        "how_it_works": "How it works",
+        "1_get_in_touch": "1. Get in touch",
+        "book_online_or_send_a": "Book online or send a WhatsApp. Tell me about your cat(s) and the dates you need.",
+        "2_free_meet_greet": "2. Free Meet & Greet",
+        "i_visit_your_home_meet": "I visit your home, meet your cat, and learn their routine before the sitting starts.",
+        "3_relax_receive_updates": "3. Relax & receive updates",
+        "i_visit_your_home_and": "I visit your home and send photos and a detailed report after every visit. Your cat is in good hands. 🖤",
+        "thanks_for_contacting_brand_name": "Thanks for contacting __BRAND_NAME__!",
+        "we_ll_reply_as_soon": "We'll reply as soon as possible. If needed, you can send another message.",
+        "back_to_home": "Back to home"
+      },
+      "about": {
+        "about_l_gia": "About Lígia",
+        "hi_i_m_l_gia": "Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in __CITY_NAME__.",
+        "my_journey_started_12_years": "My journey started 12 years ago with an independent rescue project in Brazil (<em>@gatosanonimosfloripa</em>) that helped more than 5,000 stray cats through rescue, rehabilitation, sterilisation and rehoming. Since then I've continuously studied feline behaviour, health and welfare — because cat care is always evolving.",
+        "every_cat_is_different_my": "Every cat is different. My job is to respect their personality, read their body language, and adapt my approach to what makes them feel comfortable. During every visit I monitor behaviour, appetite, litter box habits and overall wellbeing — small changes can mean a lot.",
+        "after_every_visit_you_ll": "After every visit, you'll receive photos, videos and a detailed update. I know how hard it is to leave your cat — you deserve to feel informed and reassured. 📸",
+        "senior_cats": "Senior cats",
+        "shy_fearful_cats": "Shy & fearful cats",
+        "medication": "Medication",
+        "post_op_care": "Post-op care",
+        "multi_cat_households": "Multi-cat households",
+        "behaviour_consultation": "Behaviour consultation"
+      },
+      "services": {
+        "services_pricing": "Services & Pricing",
+        "all_visits_are_at_your": "All visits are at your home — no travel stress for your cat.",
+        "1_home_visit_day": "1 Home Visit / day",
+        "feeding_fresh_water": "Feeding & fresh water",
+        "litter_box_cleaning": "Litter box cleaning",
+        "playtime_attention": "Playtime & attention",
+        "health_monitoring": "Health monitoring",
+        "photo_video_updates": "Photo & video updates",
+        "plant_watering": "Plant watering",
+        "book_now": "Book now",
+        "most_popular": "Most popular",
+        "2_home_visits_day": "2 Home Visits / day",
+        "everything_in_the_1_visit": "Everything in the 1-visit plan",
+        "morning_evening_visits": "Morning + evening visits",
+        "ideal_for_anxious_cats": "Ideal for anxious cats",
+        "medication_administration": "Medication administration",
+        "update_after_each_visit": "Update after each visit",
+        "book_now_2": "Book now",
+        "behaviour_consultation": "Behaviour Consultation",
+        "on_request": "On request",
+        "litter_box_issues": "Litter box issues",
+        "cat_to_cat_introductions": "Cat-to-cat introductions",
+        "scratching_aggression": "Scratching & aggression",
+        "anxiety_fearfulness": "Anxiety & fearfulness",
+        "get_in_touch": "Get in touch",
+        "also_available_for_dogs_rabbits": "Also available for dogs, rabbits, birds, reptiles & small animals · Dog walks from €__DOG_WALK_PRICE_FROM__",
+        "seasonal_surcharges_may_apply_e": "* Seasonal surcharges may apply (e.g. public holidays or Sundays)"
+      },
+      "reviews": {
+        "50_five_star_reviews": "50+ five-star reviews",
+        "verified_reviews_from_cat_owners": "Verified reviews from cat owners in __CITY_NAME__",
+        "communication": "Communication",
+        "reliability": "Reliability",
+        "pet_care": "Pet care",
+        "value": "Value",
+        "i_couldn_t_have_asked": "\"I couldn't have asked for a better cat sitter! Ligia took care of my baby as if it were her own, showing so much love, patience, and attention. She was incredibly attentive to my cat's needs and made sure Jazzy felt comfortable and safe. I received regular updates and could tell my cat was happy and relaxed. I highly recommend Ligia to anyone looking for a trustworthy, caring, and professional pet sitter.\"",
+        "alina_catsitting_june_2026": "— Alina · Catsitting · June 2026",
+        "she_is_a_great_sitter": "\"She is a great sitter who makes sure your cats are well taken care of. She sends pics/videos every visit and even though one of my cats is VERY shy, she was able to pet and bond with them a little. If you need an experienced and kind sitter, I would for sure recommend her!\"",
+        "marel_catsitting_april_2026": "— Marel · Catsitting · April 2026",
+        "l_gia_was_great_with": "\"Lígia was great with my dog. She was very friendly, easy to communicate with, and always responsive. She took good care of her, spent time playing with her, and kept me updated with photos. It was so clear she gives real attention and care. I would happily book her again and definitely recommend her.\"",
+        "k_van_dog_walking_january": "— Kıvanç · Dog walking · January 2026"
+      },
+      "booking": {
+        "book_a_catsitting_visit": "Book a catsitting visit",
+        "choose_your_dates_and_preference": "Choose your dates and preference — Lígia will confirm within 24 h.",
+        "logged_in_as": "Logged in as",
+        "log_out": "Log out",
+        "your_name_optional": "Your name <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
+        "first_day": "First day",
+        "last_day_optional": "Last day <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
+        "pets": "Pets",
+        "add_pet": "Add pet",
+        "other": "Other",
+        "visit_preference": "Visit preference",
+        "morning_1x": "Morning <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "evening_1x": "Evening <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "both_2x_day": "Both <span class=\"font-normal opacity-70 text-xs\">(2x/day)</span>",
+        "no_pref_1x": "No pref. <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "create_a_free_account_or": "Create a free account (or log in) to send your booking — this lets you track its status anytime.",
+        "log_in": "Log in",
+        "create_account": "Create account",
+        "log_in_send": "Log in & send",
+        "create_account_2": "Create account",
+        "working": "Working...",
+        "cancel": "Cancel",
+        "booking_request_sent": "Booking request sent!",
+        "l_gia_will_confirm_availability": "Lígia will confirm availability within 24 hours.",
+        "track_my_booking": "Track my booking →",
+        "send_booking_request": "Send booking request",
+        "l_gia_will_confirm_availability_2": "Lígia will confirm availability within 24 hours.",
+        "track_my_booking_2": "Track my booking →"
+      },
+      "footer": {
+        "speaks_en_pt_es": "Speaks EN · PT · ES",
+        "made_with_for_cats": "Made with 🖤 for cats"
+      }
+    },
+    "account": {
+      "staging_banner": {
+        "test_environment_not_the_live": "test environment, not the live site"
+      },
+      "account": {
+        "my_bookings": "My bookings",
+        "this_page_isn_t_configured": "This page isn't configured yet. Please try again later.",
+        "log_in": "Log in",
+        "create_account": "Create account",
+        "email": "Email",
+        "password": "Password",
+        "log_in_2": "Log in",
+        "create_account_2": "Create account",
+        "working": "Working...",
+        "refresh": "↻ Refresh",
+        "log_out": "Log out",
+        "loading": "Loading...",
+        "no_bookings_yet": "No bookings yet.",
+        "awaiting_confirmation": "Awaiting confirmation",
+        "confirmed_payment_request_coming": "Confirmed — payment request coming",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "dates": "Dates:",
+        "pets": "Pets:",
+        "amount": "Amount:"
+      }
+    },
+    "facturen": {
+      "staging_banner": {
+        "test_environment_not_the_live": "test environment, not the live site"
+      },
+      "facturen": {
+        "invoices": "Invoices",
+        "supabase_is_not_configured_yet": "Supabase is not configured yet. Add the repository variables\n        <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> and redeploy.",
+        "email": "Email",
+        "password": "Password",
+        "log_in": "Log in",
+        "working": "Working...",
+        "refresh": "↻ Refresh",
+        "log_out": "Log out",
+        "loading": "Loading...",
+        "no_invoices": "No invoices 🎉",
+        "awaiting_approval": "Awaiting approval",
+        "send_tikkie": "Send Tikkie",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "client": "Client",
+        "dates": "Dates:",
+        "pets": "Pets:",
+        "preference": "Preference:",
+        "amount": "Amount (€)",
+        "approve_generate_invoice": "Approve & generate Invoice",
+        "working_2": "Working...",
+        "dates_2": "Dates:",
+        "pets_2": "Pets:",
+        "amount_2": "Amount:",
+        "download_pdf": "📄 Download PDF",
+        "tikkie_sent": "✓ Tikkie sent"
+      }
+    }
+  }
+}
