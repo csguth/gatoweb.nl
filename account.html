@@ -21,7 +21,7 @@
 <div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
     🚧 STAGING — <span class="en" data-i18n="staging_banner.test_environment_not_the_live">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span><span class="pt">ambiente de testes, não é o site oficial</span>
 </div>
-<div class="max-w-lg mx-auto px-5 py-10" x-data="accountApp()" x-init="init()">
+<div class="max-w-lg mx-auto px-5 py-10">
 <div class="flex items-center justify-between mb-6">
 <h1 class="font-serif text-2xl font-bold text-sage-700">
         🐾 <span class="en" data-i18n="account.my_bookings">My bookings</span><span class="nl">Mijn boekingen</span><span class="pt">Minhas reservas</span>
@@ -32,6 +32,7 @@
 <option value="pt">🇵🇹 PT</option>
 </select>
 </div>
+<div x-data="accountApp()" x-init="init()">
 <template x-if="!configured">
 <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
 <span class="en" data-i18n="account.this_page_isn_t_configured">This page isn't configured yet. Please try again later.</span>
@@ -123,6 +124,7 @@
 </template>
 </div>
 </template>
+</div>
 </div>
 <!-- Client account (issue #12) — see js/account/account-app.js -->
 <script src="js/account/account-app.js" type="module"></script>
