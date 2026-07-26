@@ -10,6 +10,8 @@
     "account_created_check_email_login": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.",
     "not_configured": "De dienst is nog niet geconfigureerd."
   },
+  "adjustment_note_required": "Geef een reden op voor de correctie voordat je goedkeurt.",
+  "client_edit_reason_required": "Geef een reden op voordat je de klantgegevens opslaat.",
   "invoice": {
     "title": "Factuur {{number}}",
     "date_label": "Datum: {{date}}",
@@ -27,6 +29,7 @@
     "confirm_approve": "Factuur definitief goedkeuren voor {{client}}?",
     "recipient_label": "Aan:",
     "address_label": "Adres: {{address}}",
+    "contact_label": "WhatsApp/telefoon: {{contact}}",
     "table": {
       "description": "Omschrijving",
       "period": "Periode",
@@ -45,7 +48,8 @@
       "frequency_2": "2x per dag",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} t/m {{to}}",
-      "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}"
+      "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}",
+      "adjustment": "Correctie: {{note}}"
     },
     "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
     "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",
@@ -239,7 +243,18 @@
         "amount_2": "Bedrag:",
         "print_invoice": "🖨️ Factuur afdrukken",
         "tikkie_sent": "✓ Tikkie verstuurd",
-        "whatsapp_client": "WhatsApp klant"
+        "whatsapp_client": "WhatsApp klant",
+        "edit_client_info": "✏️ Klantgegevens",
+        "edit_client_info_short": "✏️ Bewerken",
+        "edit_client_info_title": "Klantgegevens bewerken",
+        "edit_client_info_help": "Deze gegevens komen uit de boeking van de klant. Wijzig ze alleen om een fout te corrigeren en geef altijd een reden op.",
+        "client_edit_reason": "Reden (verplicht)",
+        "cancel": "Annuleren",
+        "save": "Opslaan",
+        "calculated_subtotal": "Subtotaal (berekend)",
+        "adjustment_amount": "Correctie (€)",
+        "final_total": "Totaal (€)",
+        "adjustment_note": "Reden correctie (verplicht)"
       }
     }
   }

@@ -103,34 +103,56 @@
 </span>
 </div>
 <div class="space-y-3">
-<div>
-<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-<span class="nl-l">Klant</span><span class="en-l" data-i18n="facturen.client">Client</span><span class="pt-l">Cliente</span>
-</label>
-<input :placeholder="lang === 'nl' ? 'Naam klant' : (lang === 'pt' ? 'Nome do cliente' : 'Client name')" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b.client_name"/>
+<div class="flex items-start justify-between gap-2">
+<div class="text-sm text-gray-700 space-y-0.5">
+<div class="font-semibold" x-text="b.client_name || '-'"></div>
+<div class="text-xs text-gray-500" x-text="b.client_contact || '-'"></div>
+<div class="text-xs text-gray-500" x-text="b.client_address || '-'"></div>
 </div>
-<div>
-<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-<span class="nl-l">Adres</span><span class="en-l" data-i18n="facturen.client_address">Address</span><span class="pt-l">Endereço</span>
-</label>
-<input :placeholder="lang === 'nl' ? 'Adres klant' : (lang === 'pt' ? 'Endereço do cliente' : 'Client address')" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b.client_address"/>
-</div>
-<div>
-<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-<span class="nl-l">WhatsApp / telefoon</span><span class="en-l" data-i18n="facturen.client_contact">WhatsApp / phone</span><span class="pt-l">WhatsApp / telefone</span>
-</label>
-<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="+31 6 12345678" type="tel" x-model="b.client_contact"/>
+<button @click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span class="nl-l">✏️ Klant</span><span class="en-l" data-i18n="facturen.edit_client_info">✏️ Client info</span><span class="pt-l">✏️ Cliente</span>
+</button>
 </div>
 <div class="text-sm text-gray-600 space-y-0.5">
 <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <div><span class="font-semibold nl-l">Voorkeur:</span><span class="font-semibold en-l" data-i18n="facturen.preference">Preference:</span><span class="font-semibold pt-l">Preferência:</span> <span x-text="b.preference || '-'"></span></div>
 </div>
+<div class="border border-warm-200 rounded-lg overflow-hidden">
+<table class="w-full text-xs">
+<tbody>
+<template :key="i" x-for="(item, i) in invoiceItems(b)">
+<tr class="border-t border-warm-100 first:border-t-0">
+<td class="px-2 py-1.5 text-gray-600" x-text="itemLabel(item)"></td>
+<td class="px-2 py-1.5 text-right text-gray-700 font-semibold whitespace-nowrap">€ <span x-text="item.subtotal.toFixed(2)"></span></td>
+</tr>
+</template>
+</tbody>
+</table>
+<div class="flex items-center justify-between px-2 py-1.5 bg-warm-50 text-xs font-semibold text-gray-700 border-t border-warm-100">
+<span class="nl-l">Subtotaal (berekend)</span><span class="en-l" data-i18n="facturen.calculated_subtotal">Calculated subtotal</span><span class="pt-l">Subtotal calculado</span>
+<span>€ <span x-text="calculatedTotal(b).toFixed(2)"></span></span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
 <div>
 <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-<span class="nl-l">Bedrag (€)</span><span class="en-l" data-i18n="facturen.amount">Amount (€)</span><span class="pt-l">Valor (€)</span>
+<span class="nl-l">Correctie (€)</span><span class="en-l" data-i18n="facturen.adjustment_amount">Adjustment (€)</span><span class="pt-l">Ajuste (€)</span>
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" step="0.01" type="number" x-model.number="b.final_amount"/>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" step="0.01" type="number" x-model.number="b._adjustmentAmount"/>
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Totaal (€)</span><span class="en-l" data-i18n="facturen.final_total">Total (€)</span><span class="pt-l">Total (€)</span>
+</label>
+<div class="w-full border border-warm-100 bg-warm-50 rounded-lg px-2 py-1.5 text-sm font-semibold text-gray-700">€ <span x-text="finalTotal(b).toFixed(2)"></span></div>
+</div>
+</div>
+<div x-show="Number(b._adjustmentAmount || 0) !== 0">
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Reden correctie (verplicht)</span><span class="en-l" data-i18n="facturen.adjustment_note">Adjustment reason (required)</span><span class="pt-l">Motivo do ajuste (obrigatório)</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b._adjustmentNote"/>
 </div>
 <button :disabled="b._busy" @click="approve(b)" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition">
 <span x-show="!b._busy"><span class="nl-l">Goedkeuren &amp; Factuur genereren</span><span class="en-l" data-i18n="facturen.approve_generate_invoice">Approve &amp; generate Invoice</span><span class="pt-l">Aprovar e gerar fatura</span></span>
@@ -162,7 +184,12 @@
 <span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
 </div>
 <div class="space-y-2">
+<div class="flex items-start justify-between gap-2">
 <div class="text-sm text-gray-700 font-semibold" x-text="b.client_name || '-'"></div>
+<button @click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span class="nl-l">✏️</span><span class="en-l" data-i18n="facturen.edit_client_info_short">✏️ Edit</span><span class="pt-l">✏️</span>
+</button>
+</div>
 <div class="text-sm text-gray-600 space-y-0.5">
 <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
@@ -209,7 +236,12 @@ WhatsApp
 <span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
 </div>
 <div class="space-y-2">
+<div class="flex items-start justify-between gap-2">
 <div class="text-sm text-gray-700 font-semibold" x-text="b.client_name || '-'"></div>
+<button @click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span class="nl-l">✏️</span><span class="en-l" data-i18n="facturen.edit_client_info_short">✏️ Edit</span><span class="pt-l">✏️</span>
+</button>
+</div>
 <div class="text-sm text-gray-600 space-y-0.5">
 <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
@@ -234,6 +266,54 @@ WhatsApp
 </template>
 </div>
 </template>
+<!-- Client info edit modal (issue #52): the ONLY way to change client name/phone/address
+     once a booking exists. Requires a reason, and writes an audit row via edit_client_info()
+     — see js/facturen/facturen-app.js openClientEdit()/saveClientEdit(). -->
+<div class="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center p-4" x-cloak="" x-show="clientEdit">
+<div @click.outside="closeClientEdit()" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-lg">
+<h3 class="font-serif text-lg font-bold text-sage-700">
+<span class="nl-l">Klantgegevens bewerken</span><span class="en-l" data-i18n="facturen.edit_client_info_title">Edit client info</span><span class="pt-l">Editar dados do cliente</span>
+</h3>
+<p class="text-xs text-gray-500">
+<span class="nl-l">Deze gegevens komen uit de boeking van de klant. Wijzig ze alleen om een fout te corrigeren en geef altijd een reden op.</span>
+<span class="en-l" data-i18n="facturen.edit_client_info_help">This info comes from the client's own booking. Only change it to correct a mistake, and always give a reason.</span>
+<span class="pt-l">Estes dados vêm da reserva do próprio cliente. Altere apenas para corrigir um erro e sempre informe um motivo.</span>
+</p>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Klant</span><span class="en-l" data-i18n="facturen.client">Client</span><span class="pt-l">Cliente</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientEdit.client_name"/>
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">WhatsApp / telefoon</span><span class="en-l" data-i18n="facturen.client_contact">WhatsApp / phone</span><span class="pt-l">WhatsApp / telefone</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="tel" x-model="clientEdit.client_contact"/>
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Adres</span><span class="en-l" data-i18n="facturen.client_address">Address</span><span class="pt-l">Endereço</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientEdit.client_address"/>
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">Reden (verplicht)</span><span class="en-l" data-i18n="facturen.client_edit_reason">Reason (required)</span><span class="pt-l">Motivo (obrigatório)</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientEdit.reason"/>
+</div>
+<p class="text-red-600 text-xs" x-show="clientEdit.error" x-text="clientEdit.error"></p>
+<div class="flex gap-2 pt-1">
+<button @click="closeClientEdit()" class="flex-1 border border-warm-200 text-gray-600 hover:bg-warm-50 text-sm font-semibold py-2 rounded-xl transition">
+<span class="nl-l">Annuleren</span><span class="en-l" data-i18n="facturen.cancel">Cancel</span><span class="pt-l">Cancelar</span>
+</button>
+<button :disabled="clientEdit.busy" @click="saveClientEdit()" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-xl transition">
+<span class="nl-l">Opslaan</span><span class="en-l" data-i18n="facturen.save">Save</span><span class="pt-l">Salvar</span>
+</button>
+</div>
+</div>
+</div>
 </div>
 </div>
 <!-- Ligia's staff-only invoicing app — see js/facturen/facturen-app.js -->

@@ -10,6 +10,8 @@
     "account_created_check_email_login": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui.",
     "not_configured": "O serviço ainda não está configurado."
   },
+  "adjustment_note_required": "Informe um motivo para o ajuste antes de aprovar.",
+  "client_edit_reason_required": "Informe um motivo antes de salvar os dados do cliente.",
   "invoice": {
     "title": "Fatura {{number}}",
     "date_label": "Data: {{date}}",
@@ -27,6 +29,7 @@
     "confirm_approve": "Aprovar permanentemente a fatura para {{client}}?",
     "recipient_label": "Para:",
     "address_label": "Endereço: {{address}}",
+    "contact_label": "WhatsApp/telefone: {{contact}}",
     "table": {
       "description": "Descrição",
       "period": "Período",
@@ -45,7 +48,8 @@
       "frequency_2": "2x por dia",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} até {{to}}",
-      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}"
+      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}",
+      "adjustment": "Ajuste: {{note}}"
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
     "print_button": "🖨️ Imprimir fatura / salvar como PDF",
@@ -239,7 +243,18 @@
         "amount_2": "Quantia:",
         "print_invoice": "🖨️ Imprimir fatura",
         "tikkie_sent": "✓ Tikkie enviado",
-        "whatsapp_client": "WhatsApp do cliente"
+        "whatsapp_client": "WhatsApp do cliente",
+        "edit_client_info": "✏️ Dados do cliente",
+        "edit_client_info_short": "✏️ Editar",
+        "edit_client_info_title": "Editar dados do cliente",
+        "edit_client_info_help": "Estes dados vêm da reserva do próprio cliente. Altere apenas para corrigir um erro e sempre informe um motivo.",
+        "client_edit_reason": "Motivo (obrigatório)",
+        "cancel": "Cancelar",
+        "save": "Salvar",
+        "calculated_subtotal": "Subtotal calculado",
+        "adjustment_amount": "Ajuste (€)",
+        "final_total": "Total (€)",
+        "adjustment_note": "Motivo do ajuste (obrigatório)"
       }
     }
   }
