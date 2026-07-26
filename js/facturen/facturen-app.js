@@ -38,30 +38,17 @@ function factuurNumberLabel(n, referenceDate) {
   return year + '-' + String(n).padStart(4, '0');
 }
 
-// Priority order within the confirmed list: things Ligia still needs to act on
-// come first — 0) approved invoices whose Tikkie payment request still needs to
-// be created/sent, 1) approved+Tikkie-sent (done, informational only),
-// 2) cancelled (informational only). Pending bookings live in their own inbox,
-// sorted separately (oldest first).
-function priorityOf(b) {
-  if (b.status === 'approved' && !b.tikkie_sent) return 0;
-  if (b.status === 'approved' && b.tikkie_sent) return 1;
-  return 2;
-}
+// Kanban board columns: pending (inbox) → confirmed (send Tikkie) → done
+// (Tikkie sent, or cancelled). Each column is sorted independently.
 
 // Inbox: bookings still awaiting approval, oldest first.
 function sortInbox(list) {
   return list.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 }
 
-// Confirmed: everything else, in calendar order (by stay start date), with
-// bookings still needing a Tikkie surfaced above completed/cancelled ones.
-function sortConfirmed(list) {
-  return list.slice().sort((a, b) => {
-    const pa = priorityOf(a), pb = priorityOf(b);
-    if (pa !== pb) return pa - pb;
-    return new Date(a.date_from) - new Date(b.date_from);
-  });
+// Calendar order (by stay start date) for the confirmed/done columns.
+function sortByDate(list) {
+  return list.slice().sort((a, b) => new Date(a.date_from) - new Date(b.date_from));
 }
 
 function matchesSearch(b, term) {
@@ -132,7 +119,12 @@ window.facturenApp = function () {
 
     get confirmedBookings() {
       const term = this.search.trim().toLowerCase();
-      return sortConfirmed(this.bookings.filter(b => b.status !== 'pending' && matchesSearch(b, term)));
+      return sortByDate(this.bookings.filter(b => b.status === 'approved' && !b.tikkie_sent && matchesSearch(b, term)));
+    },
+
+    get doneBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.tikkie_sent)) && matchesSearch(b, term)));
     },
 
     async init() {
