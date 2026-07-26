@@ -33,6 +33,21 @@ function petsText(pets) {
   return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
 }
 
+// Builds a wa.me link to message the client directly from the panel (issue #39): the
+// reverse of index.html's client-to-Ligia WhatsApp button. wa.me only accepts digits,
+// so any formatting (spaces, +, parentheses) in client_contact is stripped here.
+function whatsappLinkFor(b) {
+  const digits = String(b.client_contact || '').replace(/\D/g, '');
+  if (!digits) return null;
+  const isNl = document.body.classList.contains('show-nl');
+  const dates = b.date_from + (b.date_to ? ' t/m ' + b.date_to : '');
+  const name = b.client_name || '';
+  const message = isNl
+    ? 'Hoi' + (name ? ' ' + name : '') + '! Je boeking (' + dates + ') is bevestigd. Tot snel! 🐱'
+    : 'Hi' + (name ? ' ' + name : '') + '! Your booking (' + dates + ') is confirmed. See you soon! 🐱';
+  return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
+}
+
 function factuurNumberLabel(n, referenceDate) {
   const year = new Date(referenceDate || Date.now()).getFullYear();
   return year + '-' + String(n).padStart(4, '0');
@@ -149,6 +164,10 @@ window.facturenApp = function () {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
     },
 
+    whatsappLink(b) {
+      return whatsappLinkFor(b);
+    },
+
     downloadPdf(b) {
       generatePdf(b);
     },
@@ -170,8 +189,8 @@ window.facturenApp = function () {
       if (!confirm(confirmMsg)) return;
       b._busy = true;
 
-      if (b.client_name) {
-        await supabase.from('bookings').update({ client_name: b.client_name }).eq('id', b.id);
+      if (b.client_name || b.client_contact) {
+        await supabase.from('bookings').update({ client_name: b.client_name, client_contact: b.client_contact }).eq('id', b.id);
       }
 
       const { data, error } = await supabase.rpc('approve_booking', {
@@ -183,7 +202,7 @@ window.facturenApp = function () {
       if (error) { alert(error.message); return; }
 
       const approved = Array.isArray(data) ? data[0] : data;
-      const merged = { ...b, ...approved, client_name: b.client_name, tikkie_sent: false, _busy: false };
+      const merged = { ...b, ...approved, client_name: b.client_name, client_contact: b.client_contact, tikkie_sent: false, _busy: false };
       const idx = this.bookings.findIndex(x => x.id === b.id);
       if (idx !== -1) this.bookings.splice(idx, 1, merged);
       this.bookings = sortBookings(this.bookings);

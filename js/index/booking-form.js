@@ -9,6 +9,7 @@ function bookingForm() {
 
   return {
     clientName: saved.clientName || '',
+    clientContact: saved.clientContact || '',
     from: '',
     to: '',
     pref: saved.pref || '',
@@ -28,10 +29,11 @@ function bookingForm() {
     authLoading: false,
 
     _save() {
-      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, pets: this.pets, pref: this.pref })); } catch(e) {}
+      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, clientContact: this.clientContact, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
     async init() {
       this.$watch('clientName', () => this._save());
+      this.$watch('clientContact', () => this._save());
       this.$watch('pets', () => this._save());
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
@@ -70,6 +72,7 @@ function bookingForm() {
       if (window.__saveBookingToSupabase) {
         await window.__saveBookingToSupabase({
           clientName: this.clientName,
+          clientContact: this.clientContact,
           from: this.from,
           to: this.to,
           pets: this.pets,
