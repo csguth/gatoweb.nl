@@ -55,23 +55,30 @@ function factuurNumberLabel(n, referenceDate) {
   return year + '-' + String(n).padStart(4, '0');
 }
 
-// Priority order for the list: things Ligia still needs to act on come first —
-// 0) pending bookings waiting for approval, 1) approved invoices whose Tikkie
-// payment request still needs to be created/sent, 2) approved+Tikkie-sent
-// (done, informational only), 3) cancelled (informational only).
-function priorityOf(b) {
-  if (b.status === 'pending') return 0;
-  if (b.status === 'approved' && !b.tikkie_sent) return 1;
-  if (b.status === 'approved' && b.tikkie_sent) return 2;
-  return 3;
+// Kanban board columns: pending (inbox) → confirmed (send Tikkie) → done
+// (Tikkie sent, or cancelled). Each column is sorted independently.
+
+// Inbox: bookings still awaiting approval, oldest first.
+function sortInbox(list) {
+  return list.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 }
 
-function sortBookings(list) {
-  return list.slice().sort((a, b) => {
-    const pa = priorityOf(a), pb = priorityOf(b);
-    if (pa !== pb) return pa - pb;
-    return new Date(a.created_at) - new Date(b.created_at);
-  });
+// Calendar order (by stay start date) for the confirmed/done columns.
+function sortByDate(list) {
+  return list.slice().sort((a, b) => new Date(a.date_from) - new Date(b.date_from));
+}
+
+function matchesSearch(b, term) {
+  if (!term) return true;
+  const haystack = [
+    b.client_name,
+    b.client_email,
+    b.client_address,
+    b.client_contact,
+    petsText(b.pets),
+    b.preference
+  ].filter(Boolean).join(' ').toLowerCase();
+  return haystack.includes(term);
 }
 
 function escapeHtml(str) {
@@ -203,6 +210,22 @@ window.facturenApp = function () {
     loading: false,
     loadingList: false,
     bookings: [],
+    search: '',
+
+    get inboxBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortInbox(this.bookings.filter(b => b.status === 'pending' && matchesSearch(b, term)));
+    },
+
+    get confirmedBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortByDate(this.bookings.filter(b => b.status === 'approved' && !b.tikkie_sent && matchesSearch(b, term)));
+    },
+
+    get doneBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.tikkie_sent)) && matchesSearch(b, term)));
+    },
 
     async init() {
       if (!configured) return;
@@ -237,7 +260,7 @@ window.facturenApp = function () {
         .order('created_at', { ascending: true });
       this.loadingList = false;
       if (error) { alert(error.message); return; }
-      this.bookings = sortBookings((data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false })));
+      this.bookings = (data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false }));
     },
 
     petsSummary(pets) {
@@ -258,7 +281,6 @@ window.facturenApp = function () {
       b._busy = false;
       if (error) { alert(error.message); return; }
       b.tikkie_sent = true;
-      this.bookings = sortBookings(this.bookings);
     },
 
     async approve(b) {
@@ -284,7 +306,6 @@ window.facturenApp = function () {
       const merged = { ...b, ...approved, client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact, tikkie_sent: false, _busy: false };
       const idx = this.bookings.findIndex(x => x.id === b.id);
       if (idx !== -1) this.bookings.splice(idx, 1, merged);
-      this.bookings = sortBookings(this.bookings);
       openInvoicePrintWindow(merged);
     },
 
