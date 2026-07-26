@@ -15,5 +15,10 @@ window.GATOWEB_CONFIG = {
   BRAND_NAME: '',
   PRICE_ONE_VISIT: 0,
   PRICE_TWO_VISITS: 0,
-  DOG_WALK_PRICE_FROM: 0
+  DOG_WALK_PRICE_FROM: 0,
+  // Percentage surcharge applied to invoice line items that fall in high-season
+  // months (Jul, Aug, Dec, Jan) — see js/facturen/invoice-calc.js. 0 means no
+  // surcharge is applied. Only affects the final invoice, never the public
+  // price estimate shown on the booking form.
+  SEASONAL_SURCHARGE_PERCENT: 0
 };

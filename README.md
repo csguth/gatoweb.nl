@@ -9,7 +9,7 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 | Plain HTML + Tailwind CDN | Website | Free |
 | Alpine.js CDN | EN/NL bilingual toggle, booking form, facturen dashboard | Free |
 | Supabase | Bookings database + Auth (facturen feature) | Free tier |
-| jsPDF (CDN) | Client-side invoice PDF generation | Free |
+| Browser print (`@media print`) | A4 invoice layout, "Save as PDF" via native print dialog | Free |
 | WhatsApp | Direct booking / confirmation | Free |
 | GitHub Pages | Production hosting + HTTPS (`gatoweb.nl`) | Free |
 | Cloudflare Pages | Staging hosting (`staging.gatoweb.nl`) | Free |
@@ -28,6 +28,9 @@ supabase/schema.sql  Database schema: bookings table, RLS policies, approve_book
 robots.txt, sitemap.xml
 CNAME                GitHub Pages custom domain config
 images/              Favicon and other static assets
+js/                  Browser JavaScript (Alpine components + i18n runtime + static i18n bridge)
+locales/             Translation files for static HTML + JS runtime strings (en.json, nl.json, pt.json)
+scripts/i18n-check.mjs  Checks that all JS t('...') keys exist in locale files
 .github/workflows/
   deploy-pages.yml               Production deploy -> GitHub Pages (push to main)
   deploy-staging-cloudflare.yml  Staging deploy -> Cloudflare Pages (push to staging)
@@ -38,7 +41,7 @@ images/              Favicon and other static assets
 
 ## Features
 
-✅ **Bilingual** — Auto-detects browser language (EN/NL), manual toggle, persisted in localStorage
+✅ **Unified i18n (static + runtime)** — Language toggle with EN/NL/PT persisted in localStorage, with both static HTML copy and JS runtime strings managed in shared JSON locale files
 ✅ **Real reviews** — 50+ five-star reviews from Pawshake (3 EN + 3 NL)
 ✅ **WhatsApp booking** — Direct message with pre-filled dates/pets/preference
 ✅ **Booking persistence** — Booking form also saves an optional record to Supabase (`bookings` table) when configured
@@ -110,7 +113,9 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
 
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY` — from the relevant Supabase project's API settings
 - `BUSINESS_LEGAL_NAME`, `BUSINESS_ADDRESS`, `KVK_NUMBER`, `IBAN_NUMBER`, `BTW_EXEMPT` — printed on
-  generated invoices when set; the PDF just omits those lines if unset
+  generated invoices when set; the invoice just omits those lines if unset
+- `SEASONAL_SURCHARGE_PERCENT` — optional numeric percentage (default `0`) added to the unit price
+  for booking days in July, August, December and January (issue #32)
 
 ### Internal / infra
 
@@ -147,7 +152,11 @@ public site, disallowed in `robots.txt`):
   approval) → approved but Tikkie not sent yet → done → cancelled.
 - Approving a booking calls the `approve_booking()` Postgres function, which atomically assigns
   the next sequential invoice number (`factuur_number_seq`) and locks in the final amount.
-- A PDF invoice is generated client-side with jsPDF and can be re-downloaded anytime.
+- The invoice is a standalone A4-styled HTML document (`@page`/`@media print` CSS, no external
+  library), opened in a new tab; Ligia prints it or uses the browser's "Save as PDF". It is always
+  rendered in Dutch (`i18next.getFixedT('nl')`), regardless of the dashboard's current UI language,
+  lists each service with its period/date range/frequency, and applies a seasonal surcharge
+  (`SEASONAL_SURCHARGE_PERCENT`) to days in July, August, December and January.
 - Tikkie payment requests are still sent manually by Ligia (no bank API integration); she just
   marks the booking as "Tikkie sent" once she's done.
 
@@ -199,17 +208,18 @@ DNS propagation: 5-60 minutes.
 - **Location:** 's-Hertogenbosch
 - **Experience:** 12+ years
 - **Reviews:** 50+ five-star (from Pawshake)
-- **Languages:** English / Nederlands (auto-detected + manual toggle)
+- **Languages:** English / Nederlands in static HTML, plus Portuguese support for JS runtime strings
 - **Booking:** WhatsApp form (dates, pets, preference) + optional Supabase persistence
 
 ---
 
 ## Tech Details
 
-- **Bilingual system:** CSS-based (`index.html`: `.en`/`.nl` classes; `facturen.html`: `.en-l`/`.nl-l`
-  classes, to avoid clashing if the files are ever merged), toggled via `body.show-nl`
+- **Unified i18n system:** both static HTML strings and JavaScript runtime strings flow through i18next (`js/i18n.js` + `js/i18n-static.js`) and shared locale files (`locales/en.json`, `locales/nl.json`, `locales/pt.json`)
+- **Static key naming:** each translated HTML element pair (`.en`/`.nl`(/`.pt`)) is tagged with a `data-i18n="section.slug"` attribute on its EN element (e.g. `data-i18n="hero.book_a_visit"`), which `js/i18n-static.js` reads to resolve the locale key `static.<page>.section.slug` (e.g. `static.index.hero.book_a_visit`). Keys are semantic and grouped by page section (`hero`, `about`, `services`, `reviews`, `booking`, `footer`, `nav`, `misc`, ...), not positional, so they stay readable and stable even if markup is reordered. Untagged pairs still fall back to the legacy positional `kNNN` key for safety, but new content should always get a `data-i18n` attribute.
 - **Auto-detection:** `navigator.language.startsWith('nl')` → defaults to NL
 - **Persistence:** Language choice saved in `localStorage.gatoweb_lang` (shared across both pages)
+- **JS translation check:** run `node scripts/i18n-check.mjs` to validate that all `t('...')` keys used in JS exist in locale files
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates)
 - **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
 - **Fonts:** Playfair Display (serif) + Inter (sans-serif)

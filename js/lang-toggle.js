@@ -1,16 +1,49 @@
 // Shared Alpine component for the EN/NL bilingual toggle, used on <body> of
 // index.html, facturen.html and account.html: x-data="langToggle()" x-init="init()".
-// Reads/writes the shared localStorage key 'gatoweb_lang' and toggles the
-// 'show-nl' class on <body>, which css/site.css uses to show/hide .en/.nl
-// (and facturen.html's .en-l/.nl-l) spans.
+// Reads/writes the shared localStorage key 'gatoweb_lang' and toggles language
+// classes on <body> (`show-nl`, `show-pt`) that css/site.css uses for visibility.
 function langToggle() {
+  const normalizeLang = (val) => {
+    if (window.__gatoI18n && typeof window.__gatoI18n.normalizeLanguage === 'function') {
+      return window.__gatoI18n.normalizeLanguage(val);
+    }
+    const v = String(val || '').toLowerCase();
+    if (v.startsWith('nl')) return 'nl';
+    if (v.startsWith('pt')) return 'pt';
+    return 'en';
+  };
+
+  const stored = localStorage.getItem('gatoweb_lang');
   return {
-    lang: localStorage.getItem('gatoweb_lang') || (navigator.language.startsWith('nl') ? 'nl' : 'en'),
+    lang: normalizeLang(stored || navigator.language),
     init() {
-      document.body.classList.toggle('show-nl', this.lang === 'nl');
+      const applyBodyClass = (lang) => {
+        document.body.classList.toggle('show-nl', lang === 'nl');
+        document.body.classList.toggle('show-pt', lang === 'pt');
+      };
+
+      applyBodyClass(this.lang);
+      if (window.__gatoI18n && typeof window.__gatoI18n.init === 'function') {
+        window.__gatoI18n.init()
+          .then(() => {
+            const resolvedLang = window.__gatoI18n.getLanguage();
+            if (this.lang !== resolvedLang) this.lang = resolvedLang;
+            applyBodyClass(resolvedLang);
+          })
+          .catch((error) => {
+            console.error('Could not initialize i18n runtime', error);
+          });
+      }
+
       this.$watch('lang', val => {
-        document.body.classList.toggle('show-nl', val === 'nl');
-        localStorage.setItem('gatoweb_lang', val);
+        const normalized = normalizeLang(val);
+        applyBodyClass(normalized);
+        localStorage.setItem('gatoweb_lang', normalized);
+        if (window.__gatoI18n && typeof window.__gatoI18n.setLanguage === 'function') {
+          window.__gatoI18n.setLanguage(normalized).catch((error) => {
+            console.error('Could not change i18n language', error);
+          });
+        }
       });
     }
   };

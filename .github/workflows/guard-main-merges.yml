@@ -5,7 +5,6 @@ name: Guard main merges
 # tested), unless explicitly labeled `hotfix` for an emergency fix.
 on:
   pull_request:
-    branches: [main]
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 jobs:
@@ -14,10 +13,16 @@ jobs:
     steps:
       - name: Ensure PR into main comes from staging (or is labeled hotfix)
         env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.head_ref }}
           IS_HOTFIX: ${{ contains(github.event.pull_request.labels.*.name, 'hotfix') }}
         run: |
+          echo "Base ref: $BASE_REF"
           echo "Head ref: $HEAD_REF"
+          if [ "$BASE_REF" != "main" ]; then
+            echo "OK: base branch is '$BASE_REF', not 'main' - guard does not apply"
+            exit 0
+          fi
           if [ "$HEAD_REF" = "staging" ]; then
             echo "OK: promoting staging -> main"
             exit 0
