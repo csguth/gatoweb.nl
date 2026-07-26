@@ -10,6 +10,11 @@
     "account_created_check_email_login": "Account created! Check your email and click the confirmation link, then log in here.",
     "not_configured": "Service is not configured yet."
   },
+  "adjustment_note_required": "Please provide a reason for the adjustment before approving.",
+  "client_edit_reason_required": "Please provide a reason before saving the client info.",
+  "not_staff_error": "This account doesn't have access to the invoicing dashboard.",
+  "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the Done column.",
+  "reject_button_title": "Reject booking",
   "invoice": {
     "title": "Invoice {{number}}",
     "date_label": "Date: {{date}}",
@@ -27,6 +32,7 @@
     "confirm_approve": "Permanently approve the invoice for {{client}}?",
     "recipient_label": "To:",
     "address_label": "Address: {{address}}",
+    "contact_label": "WhatsApp/phone: {{contact}}",
     "table": {
       "description": "Description",
       "period": "Period",
@@ -45,7 +51,8 @@
       "frequency_2": "2x per day",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} to {{to}}",
-      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}"
+      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}",
+      "adjustment": "Adjustment: {{note}}"
     },
     "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
     "print_button": "🖨️ Print invoice / save as PDF",
@@ -239,7 +246,19 @@
         "amount_2": "Amount:",
         "print_invoice": "🖨️ Print invoice",
         "tikkie_sent": "✓ Tikkie sent",
-        "whatsapp_client": "WhatsApp client"
+        "whatsapp_client": "WhatsApp client",
+        "edit_client_info": "✏️ Client info",
+        "edit_client_info_short": "✏️ Edit",
+        "edit_client_info_title": "Edit client info",
+        "edit_client_info_help": "This info comes from the client's own booking. Only change it to correct a mistake, and always give a reason.",
+        "client_edit_reason": "Reason (required)",
+        "cancel": "Cancel",
+        "save": "Save",
+        "calculated_subtotal": "Calculated subtotal",
+        "adjustment_amount": "Adjustment (€)",
+        "final_total": "Total (€)",
+        "adjustment_note": "Adjustment reason (required)",
+        "restore_to_inbox": "↩️ Restore to inbox"
       }
     }
   }

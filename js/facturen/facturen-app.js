@@ -81,6 +81,36 @@ function matchesSearch(b, term) {
   return haystack.includes(term);
 }
 
+// Issue #52: the invoice total must always be traceable back to the booking's actual
+// line items — this bundles the pricing config once so invoiceItems()/calculatedTotal()
+// (used by the dashboard) and buildInvoiceLineItems() (used by the printed invoice) are
+// always computed from the exact same numbers.
+function rates() {
+  return {
+    priceOneVisit: PRICE_ONE_VISIT,
+    priceTwoVisits: PRICE_TWO_VISITS,
+    dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
+    seasonalSurchargePercent: SEASONAL_SURCHARGE_PERCENT
+  };
+}
+
+// Short on-screen summary for one invoice line item, in whatever language the dashboard
+// is currently set to (as opposed to lineItemDescription() above, which is always Dutch
+// for the printed invoice).
+function itemSummary(item) {
+  const service = t('invoice.line.service_' + item.service);
+  const period = t('invoice.line.period_' + item.period);
+  const frequency = t('invoice.line.frequency_' + item.visitsPerDay);
+  const dateRange = item.from === item.to
+    ? t('invoice.line.date_range_single', { date: item.from })
+    : t('invoice.line.date_range_multi', { from: item.from, to: item.to });
+  const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
+  if (item.type === 'surcharge') {
+    return t('invoice.line.surcharge_item', { percent: item.percent, description: base });
+  }
+  return base;
+}
+
 function escapeHtml(str) {
   return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -112,16 +142,12 @@ function lineItemDescription(item) {
 function buildInvoiceDocumentHtml(b) {
   const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at);
   const dateLabel = new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL');
-  const { items, total } = buildInvoiceLineItems(b, {
-    priceOneVisit: PRICE_ONE_VISIT,
-    priceTwoVisits: PRICE_TWO_VISITS,
-    dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
-    seasonalSurchargePercent: SEASONAL_SURCHARGE_PERCENT
-  });
-  // Prefer the invoiced total Ligia actually confirmed (final_amount) when it's set,
-  // since she can still hand-adjust it before approving; fall back to the calculated
-  // total otherwise (e.g. for older bookings without a final_amount).
-  const displayTotal = b.final_amount != null ? Number(b.final_amount) : total;
+  const { items, total } = buildInvoiceLineItems(b, rates());
+  const adjustment = Number(b.adjustment_amount || 0);
+  // final_amount is always calculated total + adjustment (set atomically by the
+  // approve_booking() RPC — issue #52) — never a free-typed number, so it can never
+  // silently diverge from the line items shown below.
+  const displayTotal = b.final_amount != null ? Number(b.final_amount) : total + adjustment;
   const hasHighSeasonItem = items.some(function (item) { return item.season === 'high'; });
 
   const rows = items.map(function (item) {
@@ -132,6 +158,13 @@ function buildInvoiceDocumentHtml(b) {
       '<td class="num">€ ' + item.subtotal.toFixed(2) + '</td>' +
       '</tr>';
   }).join('');
+
+  const adjustmentRow = adjustment !== 0
+    ? '<tr>' +
+        '<td colspan="3">' + escapeHtml(tNl('invoice.line.adjustment', { note: b.adjustment_note || '' })) + '</td>' +
+        '<td class="num">€ ' + adjustment.toFixed(2) + '</td>' +
+      '</tr>'
+    : '';
 
   const businessName = escapeHtml(BUSINESS_LEGAL_NAME || window.GATOWEB_CONFIG.BRAND_NAME);
   const title = escapeHtml(tNl('invoice.title', { number: numberLabel }));
@@ -166,13 +199,14 @@ function buildInvoiceDocumentHtml(b) {
       '<div><strong>' + escapeHtml(tNl('invoice.recipient_label')) + '</strong></div>' +
       '<div>' + escapeHtml(tNl('invoice.client_label', { client: b.client_name || '-' })) + '</div>' +
       (b.client_address ? '<div>' + escapeHtml(tNl('invoice.address_label', { address: b.client_address })) + '</div>' : '') +
+      (b.client_contact ? '<div>' + escapeHtml(tNl('invoice.contact_label', { contact: b.client_contact })) + '</div>' : '') +
     '</div>' +
     '<table><thead><tr>' +
       '<th>' + escapeHtml(tNl('invoice.table.description')) + '</th>' +
       '<th class="num">' + escapeHtml(tNl('invoice.table.days')) + '</th>' +
       '<th class="num">' + escapeHtml(tNl('invoice.table.unit_price')) + '</th>' +
       '<th class="num">' + escapeHtml(tNl('invoice.table.subtotal')) + '</th>' +
-    '</tr></thead><tbody>' + rows +
+    '</tr></thead><tbody>' + rows + adjustmentRow +
       '<tr class="total-row"><td colspan="3">' + escapeHtml(tNl('invoice.table.subtotal')) + '</td>' +
       '<td class="num">€ ' + displayTotal.toFixed(2) + '</td></tr>' +
     '</tbody></table>' +
@@ -211,6 +245,7 @@ window.facturenApp = function () {
     loadingList: false,
     bookings: [],
     search: '',
+    clientEdit: null,
 
     get inboxBookings() {
       const term = this.search.trim().toLowerCase();
@@ -230,17 +265,42 @@ window.facturenApp = function () {
     async init() {
       if (!configured) return;
       const { data } = await supabase.auth.getSession();
-      this.session = data.session;
-      supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
+      if (data.session && await this.checkStaffAccess(data.session)) {
+        this.session = data.session;
+      }
+      supabase.auth.onAuthStateChange((_event, session) => {
+        // Only ever set this.session after a fresh staff check — otherwise a
+        // non-staff account could slip in through a token refresh event.
+        if (!session) this.session = null;
+      });
       if (this.session) this.loadBookings();
+    },
+
+    // Issue #52 follow-up: facturen.html is staff-only, but until now ANY authenticated
+    // Supabase user (e.g. a regular client account) could log in and see the dashboard
+    // shell — only individual actions (approve, edit client info) failed later with a
+    // cryptic "not authorized" error from the RPCs. This checks is_staff() right after
+    // login (and on session restore) and immediately signs the user back out if they
+    // aren't on the staff_emails allow-list, so non-staff accounts never see the board.
+    async checkStaffAccess(session) {
+      const { data: staff, error } = await supabase.rpc('is_staff');
+      if (error || !staff) {
+        await supabase.auth.signOut();
+        this.session = null;
+        this.loginError = t('not_staff_error');
+        return false;
+      }
+      return true;
     },
 
     async login() {
       this.loading = true;
       this.loginError = '';
       const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
+      if (error) { this.loading = false; this.loginError = error.message; return; }
+      const isStaff = await this.checkStaffAccess(data.session);
       this.loading = false;
-      if (error) { this.loginError = error.message; return; }
+      if (!isStaff) return;
       this.session = data.session;
       this.password = '';
       this.loadBookings();
@@ -260,7 +320,16 @@ window.facturenApp = function () {
         .order('created_at', { ascending: true });
       this.loadingList = false;
       if (error) { alert(error.message); return; }
-      this.bookings = (data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false }));
+      // _adjustmentAmount/_adjustmentNote are dashboard-only draft fields for a pending
+      // booking's approval (issue #52) — they seed from any previously-saved adjustment
+      // so re-opening a booking doesn't lose it, but are never sent anywhere until approve().
+      this.bookings = (data || []).map(b => ({
+        ...b,
+        final_amount: b.final_amount ?? b.suggested_amount ?? 0,
+        _adjustmentAmount: Number(b.adjustment_amount || 0),
+        _adjustmentNote: b.adjustment_note || '',
+        _busy: false
+      }));
     },
 
     petsSummary(pets) {
@@ -271,8 +340,76 @@ window.facturenApp = function () {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
     },
 
+    // Issue #52: the invoice line items are always derived from the booking's actual
+    // dates/pets/preference — never free-typed — so the printed invoice and the total
+    // shown on the dashboard can never drift apart.
+    invoiceItems(b) {
+      return buildInvoiceLineItems(b, rates()).items;
+    },
+
+    itemLabel(item) {
+      return itemSummary(item);
+    },
+
+    calculatedTotal(b) {
+      return buildInvoiceLineItems(b, rates()).total;
+    },
+
+    // The only way the final invoiced amount can differ from calculatedTotal(b) is via
+    // an explicit, reasoned adjustment (b._adjustmentAmount + b._adjustmentNote), which
+    // approve() enforces below and the printed invoice shows as its own line item.
+    finalTotal(b) {
+      return this.calculatedTotal(b) + Number(b._adjustmentAmount || 0);
+    },
+
     printInvoice(b) {
       openInvoicePrintWindow(b);
+    },
+
+    // Issue #52: client name/phone/address are read-only everywhere else in this
+    // dashboard — this is the ONLY path that can change them, and it always requires a
+    // reason, which edit_client_info() records in booking_client_edits for an audit trail.
+    openClientEdit(b) {
+      this.clientEdit = {
+        bookingId: b.id,
+        client_name: b.client_name || '',
+        client_contact: b.client_contact || '',
+        client_address: b.client_address || '',
+        reason: '',
+        error: '',
+        busy: false
+      };
+    },
+
+    closeClientEdit() {
+      this.clientEdit = null;
+    },
+
+    async saveClientEdit() {
+      const edit = this.clientEdit;
+      if (!edit) return;
+      if (!edit.reason || !edit.reason.trim()) {
+        edit.error = t('client_edit_reason_required');
+        return;
+      }
+      edit.busy = true;
+      edit.error = '';
+      const { data, error } = await supabase.rpc('edit_client_info', {
+        p_booking_id: edit.bookingId,
+        p_new_client_name: edit.client_name,
+        p_new_client_contact: edit.client_contact,
+        p_new_client_address: edit.client_address,
+        p_reason: edit.reason.trim()
+      });
+      edit.busy = false;
+      if (error) { edit.error = error.message; return; }
+
+      const updated = Array.isArray(data) ? data[0] : data;
+      const idx = this.bookings.findIndex(x => x.id === edit.bookingId);
+      if (idx !== -1) {
+        this.bookings.splice(idx, 1, { ...this.bookings[idx], ...updated });
+      }
+      this.clientEdit = null;
     },
 
     async markTikkieSent(b) {
@@ -283,27 +420,72 @@ window.facturenApp = function () {
       b.tikkie_sent = true;
     },
 
+    // Rejects a still-pending booking (the "✕" button in the inbox column). Always asks
+    // for confirmation first so an accidental click can never silently discard a request.
+    // Only flips status -> 'cancelled'; nothing else about the booking is touched, so it
+    // can be safely restored later (see restoreBooking()) without losing any data.
+    async rejectBooking(b) {
+      const confirmMsg = t('reject_confirm', {
+        client: b.client_name || t('invoice.this_client')
+      });
+      if (!confirm(confirmMsg)) return;
+
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', b.id)
+        .eq('status', 'pending');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'cancelled';
+    },
+
+    // Brings a rejected booking back into the inbox (pending) so it can be reconsidered —
+    // it does NOT need to go all the way through approval again immediately. No extra
+    // confirmation here since restoring is non-destructive (unlike rejecting).
+    async restoreBooking(b) {
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'pending' })
+        .eq('id', b.id)
+        .eq('status', 'cancelled');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'pending';
+    },
+
     async approve(b) {
       const confirmMsg = t('invoice.confirm_approve', {
         client: b.client_name || t('invoice.this_client')
       });
       if (!confirm(confirmMsg)) return;
-      b._busy = true;
 
-      if (b.client_name || b.client_address || b.client_contact) {
-        await supabase.from('bookings').update({ client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact }).eq('id', b.id);
+      const adjustmentAmount = Number(b._adjustmentAmount || 0);
+      const adjustmentNote = (b._adjustmentNote || '').trim();
+      if (adjustmentAmount !== 0 && !adjustmentNote) {
+        alert(t('adjustment_note_required'));
+        return;
       }
 
+      b._busy = true;
+
+      // Issue #52: the final amount is always the calculated line-items total plus this
+      // explicit, reasoned adjustment — client_name/client_address/client_contact are
+      // read-only here and are never written by this flow (use openClientEdit() instead).
       const { data, error } = await supabase.rpc('approve_booking', {
         p_booking_id: b.id,
-        p_final_amount: b.final_amount
+        p_calculated_total: this.calculatedTotal(b),
+        p_adjustment_amount: adjustmentAmount,
+        p_adjustment_note: adjustmentNote || null
       });
 
       b._busy = false;
       if (error) { alert(error.message); return; }
 
       const approved = Array.isArray(data) ? data[0] : data;
-      const merged = { ...b, ...approved, client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact, tikkie_sent: false, _busy: false };
+      const merged = { ...b, ...approved, tikkie_sent: false, _busy: false };
       const idx = this.bookings.findIndex(x => x.id === b.id);
       if (idx !== -1) this.bookings.splice(idx, 1, merged);
       openInvoicePrintWindow(merged);

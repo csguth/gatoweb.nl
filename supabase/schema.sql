@@ -43,6 +43,14 @@ alter table public.bookings add column if not exists client_email text;
 -- older, already-approved bookings aren't broken retroactively.
 alter table public.bookings add column if not exists client_address text;
 
+-- Idempotent for existing tables created before issue #52 (invoice integrity fix):
+-- the invoice total is no longer a free-typed number — it's always the calculated
+-- line-items total (js/facturen/invoice-calc.js) plus an optional, explicit adjustment
+-- (with a mandatory reason) recorded here, so the printed invoice and the stored total
+-- can never silently drift apart. See approve_booking() below.
+alter table public.bookings add column if not exists adjustment_amount numeric(10,2) not null default 0;
+alter table public.bookings add column if not exists adjustment_note text;
+
 create sequence if not exists public.factuur_number_seq start 1;
 
 -- Staff allow-list: authenticated users who can see/manage ALL bookings (as opposed to a
@@ -108,9 +116,24 @@ revoke insert on public.bookings from anon;
 grant select, insert, update on public.bookings to authenticated;
 grant usage, select on sequence public.factuur_number_seq to authenticated;
 
--- Atomically approve a pending booking: assigns the next sequential factuur
--- number and locks in the final amount. Only callable by staff.
-create or replace function public.approve_booking(p_booking_id uuid, p_final_amount numeric)
+-- Atomically approve a pending booking: assigns the next sequential factuur number and
+-- locks in the final amount. Only callable by staff.
+--
+-- Issue #52: the final amount is no longer an arbitrary number typed by staff — it's
+-- always p_calculated_total (the sum of the invoice line items, computed client-side by
+-- js/facturen/invoice-calc.js from the booking's actual dates/pets/preference) plus an
+-- optional, explicit p_adjustment_amount. A non-zero adjustment REQUIRES a reason
+-- (p_adjustment_note), so any deviation from the calculated total is always visible and
+-- explained on the stored booking / printed invoice, instead of silently overwriting the
+-- total with an unrelated number.
+drop function if exists public.approve_booking(uuid, numeric);
+
+create or replace function public.approve_booking(
+  p_booking_id uuid,
+  p_calculated_total numeric,
+  p_adjustment_amount numeric default 0,
+  p_adjustment_note text default null
+)
 returns public.bookings
 language plpgsql
 security definer
@@ -123,9 +146,15 @@ begin
     raise exception 'not authorized';
   end if;
 
+  if coalesce(p_adjustment_amount, 0) <> 0 and (p_adjustment_note is null or btrim(p_adjustment_note) = '') then
+    raise exception 'adjustment_note is required when adjustment_amount is non-zero';
+  end if;
+
   update public.bookings
     set status = 'approved',
-        final_amount = p_final_amount,
+        final_amount = round(coalesce(p_calculated_total, 0) + coalesce(p_adjustment_amount, 0), 2),
+        adjustment_amount = coalesce(p_adjustment_amount, 0),
+        adjustment_note = nullif(btrim(coalesce(p_adjustment_note, '')), ''),
         factuur_number = nextval('public.factuur_number_seq'),
         approved_at = now()
     where id = p_booking_id and status = 'pending'
@@ -139,8 +168,98 @@ begin
 end;
 $$;
 
-revoke all on function public.approve_booking(uuid, numeric) from public;
-grant execute on function public.approve_booking(uuid, numeric) to authenticated;
+revoke all on function public.approve_booking(uuid, numeric, numeric, text) from public;
+grant execute on function public.approve_booking(uuid, numeric, numeric, text) to authenticated;
+
+-- Issue #52: client name/phone/address are normally read-only in facturen.html once a
+-- booking exists — they come from the client's own booking submission. When staff really
+-- need to correct a mistake (typo, outdated phone number, etc.) they go through this
+-- separate, audited RPC instead of a free-text field in the approval flow, so every
+-- correction has a reason and a paper trail (booking_client_edits).
+create table if not exists public.booking_client_edits (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid not null references public.bookings(id) on delete cascade,
+  edited_by uuid references auth.users(id),
+  edited_at timestamptz not null default now(),
+  reason text not null,
+  old_client_name text,
+  new_client_name text,
+  old_client_contact text,
+  new_client_contact text,
+  old_client_address text,
+  new_client_address text
+);
+
+alter table public.booking_client_edits enable row level security;
+
+drop policy if exists "staff can select client edits" on public.booking_client_edits;
+create policy "staff can select client edits"
+  on public.booking_client_edits for select
+  to authenticated
+  using (public.is_staff());
+
+drop policy if exists "staff can insert client edits" on public.booking_client_edits;
+create policy "staff can insert client edits"
+  on public.booking_client_edits for insert
+  to authenticated
+  with check (public.is_staff());
+
+grant select, insert on public.booking_client_edits to authenticated;
+
+create or replace function public.edit_client_info(
+  p_booking_id uuid,
+  p_new_client_name text,
+  p_new_client_contact text,
+  p_new_client_address text,
+  p_reason text
+)
+returns public.bookings
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_old public.bookings;
+  v_row public.bookings;
+begin
+  if not public.is_staff() then
+    raise exception 'not authorized';
+  end if;
+
+  if p_reason is null or btrim(p_reason) = '' then
+    raise exception 'reason is required to edit client info';
+  end if;
+
+  select * into v_old from public.bookings where id = p_booking_id;
+  if v_old.id is null then
+    raise exception 'booking not found';
+  end if;
+
+  update public.bookings
+    set client_name = p_new_client_name,
+        client_contact = p_new_client_contact,
+        client_address = p_new_client_address
+    where id = p_booking_id
+    returning * into v_row;
+
+  insert into public.booking_client_edits (
+    booking_id, edited_by, reason,
+    old_client_name, new_client_name,
+    old_client_contact, new_client_contact,
+    old_client_address, new_client_address
+  ) values (
+    p_booking_id, auth.uid(), btrim(p_reason),
+    v_old.client_name, p_new_client_name,
+    v_old.client_contact, p_new_client_contact,
+    v_old.client_address, p_new_client_address
+  );
+
+  return v_row;
+end;
+$$;
+
+revoke all on function public.edit_client_info(uuid, text, text, text, text) from public;
+grant execute on function public.edit_client_info(uuid, text, text, text, text) to authenticated;
 
 -- Manual step after running this file:
 --   Authentication > Users > Add user — create Ligia's login (email + password), and make
