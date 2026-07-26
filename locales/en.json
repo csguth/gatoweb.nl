@@ -13,6 +13,8 @@
   "adjustment_note_required": "Please provide a reason for the adjustment before approving.",
   "client_edit_reason_required": "Please provide a reason before saving the client info.",
   "not_staff_error": "This account doesn't have access to the invoicing dashboard.",
+  "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the Done column.",
+  "reject_button_title": "Reject booking",
   "invoice": {
     "title": "Invoice {{number}}",
     "date_label": "Date: {{date}}",
@@ -255,7 +257,8 @@
         "calculated_subtotal": "Calculated subtotal",
         "adjustment_amount": "Adjustment (€)",
         "final_total": "Total (€)",
-        "adjustment_note": "Adjustment reason (required)"
+        "adjustment_note": "Adjustment reason (required)",
+        "restore_to_inbox": "↩️ Restore to inbox"
       }
     }
   }

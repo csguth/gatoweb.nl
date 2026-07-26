@@ -13,6 +13,8 @@
   "adjustment_note_required": "Geef een reden op voor de correctie voordat je goedkeurt.",
   "client_edit_reason_required": "Geef een reden op voordat je de klantgegevens opslaat.",
   "not_staff_error": "Dit account heeft geen toegang tot het facturendashboard.",
+  "reject_confirm": "Boekingsverzoek van {{client}} afwijzen? Dit kan later ongedaan worden gemaakt vanuit de kolom 'Klaar'.",
+  "reject_button_title": "Boeking afwijzen",
   "invoice": {
     "title": "Factuur {{number}}",
     "date_label": "Datum: {{date}}",
@@ -255,7 +257,8 @@
         "calculated_subtotal": "Subtotaal (berekend)",
         "adjustment_amount": "Correctie (€)",
         "final_total": "Totaal (€)",
-        "adjustment_note": "Reden correctie (verplicht)"
+        "adjustment_note": "Reden correctie (verplicht)",
+        "restore_to_inbox": "↩️ Terugzetten naar postvak in"
       }
     }
   }

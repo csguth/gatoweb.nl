@@ -420,6 +420,42 @@ window.facturenApp = function () {
       b.tikkie_sent = true;
     },
 
+    // Rejects a still-pending booking (the "✕" button in the inbox column). Always asks
+    // for confirmation first so an accidental click can never silently discard a request.
+    // Only flips status -> 'cancelled'; nothing else about the booking is touched, so it
+    // can be safely restored later (see restoreBooking()) without losing any data.
+    async rejectBooking(b) {
+      const confirmMsg = t('reject_confirm', {
+        client: b.client_name || t('invoice.this_client')
+      });
+      if (!confirm(confirmMsg)) return;
+
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', b.id)
+        .eq('status', 'pending');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'cancelled';
+    },
+
+    // Brings a rejected booking back into the inbox (pending) so it can be reconsidered —
+    // it does NOT need to go all the way through approval again immediately. No extra
+    // confirmation here since restoring is non-destructive (unlike rejecting).
+    async restoreBooking(b) {
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'pending' })
+        .eq('id', b.id)
+        .eq('status', 'cancelled');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'pending';
+    },
+
     async approve(b) {
       const confirmMsg = t('invoice.confirm_approve', {
         client: b.client_name || t('invoice.this_client')

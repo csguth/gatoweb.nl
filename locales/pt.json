@@ -13,6 +13,8 @@
   "adjustment_note_required": "Informe um motivo para o ajuste antes de aprovar.",
   "client_edit_reason_required": "Informe um motivo antes de salvar os dados do cliente.",
   "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
+  "reject_confirm": "Rejeitar o pedido de reserva de {{client}}? Isso pode ser desfeito depois na coluna 'Concluído'.",
+  "reject_button_title": "Rejeitar reserva",
   "invoice": {
     "title": "Fatura {{number}}",
     "date_label": "Data: {{date}}",
@@ -255,7 +257,8 @@
         "calculated_subtotal": "Subtotal calculado",
         "adjustment_amount": "Ajuste (€)",
         "final_total": "Total (€)",
-        "adjustment_note": "Motivo do ajuste (obrigatório)"
+        "adjustment_note": "Motivo do ajuste (obrigatório)",
+        "restore_to_inbox": "↩️ Restaurar para caixa de entrada"
       }
     }
   }
