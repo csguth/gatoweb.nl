@@ -147,6 +147,7 @@
         "logged_in_as": "Logado como",
         "log_out": "Sair",
         "your_name_optional": "Seu nome <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
+        "address": "Endereço",
         "whatsapp_phone_optional": "WhatsApp / telefone <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "first_day": "Primeiro dia",
         "last_day_optional": "Último dia <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",

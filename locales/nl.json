@@ -147,6 +147,7 @@
         "logged_in_as": "Ingelogd als",
         "log_out": "Uitloggen",
         "your_name_optional": "Jouw naam <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
+        "address": "Adres",
         "whatsapp_phone_optional": "WhatsApp / telefoon <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
         "first_day": "Eerste dag",
         "last_day_optional": "Laatste dag <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",

@@ -98,7 +98,8 @@ function bookingForm() {
     whatsappConfirmLink() {
       const toRange = this.to && this.to > this.from ? ' \u2192 ' + this.to : '';
       const message = t('booking.whatsapp_confirm_message', { from: this.from, toRange });
-      return 'https://wa.me/__WHATSAPP_NUMBER__?text=' + encodeURIComponent(message);
+      const number = (window.GATOWEB_CONFIG && window.GATOWEB_CONFIG.WHATSAPP_NUMBER) || '';
+      return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
     },
     async authLogin() {
       this.authLoading = true;
