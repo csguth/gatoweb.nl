@@ -21,8 +21,8 @@
 <div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
     🚧 STAGING — <span class="en-l" data-i18n="staging_banner.test_environment_not_the_live">test environment, not the live site</span><span class="nl-l">testomgeving, niet de live site</span><span class="pt-l">ambiente de testes, não é o site oficial</span>
 </div>
-<div class="max-w-lg mx-auto px-5 py-10">
-<div class="flex items-center justify-between mb-6">
+<div class="mx-auto px-5 py-10">
+<div class="max-w-lg mx-auto flex items-center justify-between mb-6">
 <h1 class="font-serif text-2xl font-bold text-sage-700">🐾 <span class="en-l" data-i18n="facturen.invoices">Invoices</span><span class="nl-l">Facturen</span><span class="pt-l">Faturas</span></h1>
 <select aria-label="Switch language" class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 bg-white hover:bg-sage-50 transition" x-model="lang">
 <option value="en">🇬🇧 EN</option>
@@ -32,7 +32,7 @@
 </div>
 <div x-data="facturenApp()" x-init="init()">
 <template x-if="!configured">
-<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+<div class="max-w-lg mx-auto bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
 <span class="nl-l">Supabase is nog niet geconfigureerd. Voeg de repository variables
         <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw.</span>
 <span class="en-l" data-i18n="facturen.supabase_is_not_configured_yet">Supabase is not configured yet. Add the repository variables
@@ -42,7 +42,7 @@
 </div>
 </template>
 <template x-if="configured &amp;&amp; !session">
-<form @submit.prevent="login()" class="bg-white rounded-2xl p-6 space-y-4 shadow-sm border border-warm-200">
+<form @submit.prevent="login()" class="max-w-lg mx-auto bg-white rounded-2xl p-6 space-y-4 shadow-sm border border-warm-200">
 <div>
 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
 <span class="nl-l">E-mail</span><span class="en-l" data-i18n="facturen.email">Email</span><span class="pt-l">E-mail</span>
@@ -63,7 +63,7 @@
 </form>
 </template>
 <template x-if="configured &amp;&amp; session">
-<div class="space-y-4">
+<div class="max-w-lg md:max-w-6xl mx-auto space-y-4">
 <div class="flex justify-between items-center">
 <p class="text-xs text-gray-500" x-text="session.user.email"></p>
 <div class="flex gap-3">
@@ -81,28 +81,27 @@
 <p class="text-sm text-gray-400 text-center py-10" x-show="!loadingList &amp;&amp; bookings.length === 0">
 <span class="nl-l">Geen facturen 🎉</span><span class="en-l" data-i18n="facturen.no_invoices">No invoices 🎉</span><span class="pt-l">Sem faturas 🎉</span>
 </p>
-<template :key="b.id" x-for="b in bookings">
-<div :class="{
-                 'border-warm-200': b.status === 'pending',
-                 'border-orange-300': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
-                 'border-warm-200 opacity-70': b.status === 'approved' &amp;&amp; b.tikkie_sent,
-                 'border-gray-200 opacity-50': b.status === 'cancelled'
-               }" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border">
-<div class="flex items-center justify-between gap-2">
-<span :class="{
-                      'bg-amber-100 text-amber-700': b.status === 'pending',
-                      'bg-orange-100 text-orange-700': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
-                      'bg-green-100 text-green-700': b.status === 'approved' &amp;&amp; b.tikkie_sent,
-                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
-                    }" class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full">
-<template x-if="b.status === 'pending'"><span><span class="nl-l">Wacht op goedkeuring</span><span class="en-l" data-i18n="facturen.awaiting_approval">Awaiting approval</span><span class="pt-l">Aguardando aprovação</span></span></template>
-<template x-if="b.status === 'approved' &amp;&amp; !b.tikkie_sent"><span><span class="nl-l">Tikkie versturen</span><span class="en-l" data-i18n="facturen.send_tikkie">Send Tikkie</span><span class="pt-l">Enviar Tikkie</span></span></template>
-<template x-if="b.status === 'approved' &amp;&amp; b.tikkie_sent"><span><span class="nl-l">Voltooid</span><span class="en-l" data-i18n="facturen.completed">Completed</span><span class="pt-l">Concluído</span></span></template>
-<template x-if="b.status === 'cancelled'"><span><span class="nl-l">Geannuleerd</span><span class="en-l" data-i18n="facturen.cancelled">Cancelled</span><span class="pt-l">Cancelado</span></span></template>
-</span>
-<span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
+<div class="relative max-w-lg md:max-w-none mx-auto" x-show="!loadingList &amp;&amp; bookings.length &gt; 0">
+<input :placeholder="lang === 'nl' ? 'Zoeken op naam, telefoon, huisdier...' : (lang === 'pt' ? 'Pesquisar por nome, telefone, animal...' : 'Search by name, phone, pet...')" class="w-full border border-warm-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="search" x-model="search"/>
 </div>
-<template x-if="b.status === 'pending'">
+<template x-if="!loadingList &amp;&amp; bookings.length &gt; 0">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-amber-700 mb-2">
+<span class="nl-l">📥 Postvak in</span><span class="en-l">📥 Inbox</span><span class="pt-l">📥 Caixa de entrada</span>
+<span class="font-normal text-gray-400 normal-case" x-show="inboxBookings.length" x-text="'(' + inboxBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" x-show="inboxBookings.length === 0">
+<span class="nl-l">Niets te bevestigen</span><span class="en-l">Nothing to confirm</span><span class="pt-l">Nada para confirmar</span>
+</p>
+<div class="space-y-4">
+<template :key="b.id" x-for="b in inboxBookings">
+<div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border-2 border-amber-300">
+<div class="flex items-center justify-between gap-2">
+<span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+<span class="nl-l">Wacht op goedkeuring</span><span class="en-l" data-i18n="facturen.awaiting_approval">Awaiting approval</span><span class="pt-l">Aguardando aprovação</span>
+</span>
+</div>
 <div class="space-y-3">
 <div>
 <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
@@ -141,8 +140,74 @@
 <span class="nl-l">WhatsApp klant</span><span class="en-l" data-i18n="facturen.whatsapp_client">WhatsApp client</span><span class="pt-l">WhatsApp do cliente</span>
 </a>
 </div>
+</div>
 </template>
-<template x-if="b.status !== 'pending'">
+</div>
+</div>
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-orange-700 mb-2">
+<span class="nl-l">💸 Bevestigd</span><span class="en-l">💸 Confirmed</span><span class="pt-l">💸 Confirmado</span>
+<span class="font-normal text-gray-400 normal-case" x-show="confirmedBookings.length" x-text="'(' + confirmedBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" x-show="confirmedBookings.length === 0">
+<span class="nl-l">Geen Tikkies te versturen</span><span class="en-l">No Tikkies to send</span><span class="pt-l">Nenhum Tikkie para enviar</span>
+</p>
+<div class="space-y-4">
+<template :key="b.id" x-for="b in confirmedBookings">
+<div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-orange-300">
+<div class="flex items-center justify-between gap-2">
+<span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-orange-100 text-orange-700">
+<span class="nl-l">Tikkie versturen</span><span class="en-l" data-i18n="facturen.send_tikkie">Send Tikkie</span><span class="pt-l">Enviar Tikkie</span>
+</span>
+<span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
+</div>
+<div class="space-y-2">
+<div class="text-sm text-gray-700 font-semibold" x-text="b.client_name || '-'"></div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
+<div><span class="font-semibold nl-l">Bedrag:</span><span class="font-semibold en-l" data-i18n="facturen.amount_2">Amount:</span><span class="font-semibold pt-l">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+</div>
+<div class="flex gap-2 pt-1">
+<a :href="whatsappLink(b)" :title="t('invoice.whatsapp_client')" class="flex-none flex items-center justify-center border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold px-3 rounded-xl transition" rel="noopener noreferrer" target="_blank" x-show="whatsappLink(b) !== '#'">
+WhatsApp
+</a>
+<button @click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+<span class="nl-l">🖨️ Factuur afdrukken</span><span class="en-l" data-i18n="facturen.print_invoice">🖨️ Print invoice</span><span class="pt-l">🖨️ Imprimir fatura</span>
+</button>
+<button :disabled="b._busy" @click="markTikkieSent(b)" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
+<span class="nl-l">✓ Tikkie verstuurd</span><span class="en-l" data-i18n="facturen.tikkie_sent">✓ Tikkie sent</span><span class="pt-l">✓ Tikkie enviado</span>
+</button>
+</div>
+</div>
+</div>
+</template>
+</div>
+</div>
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">
+<span class="nl-l">✅ Klaar</span><span class="en-l">✅ Done</span><span class="pt-l">✅ Concluído</span>
+<span class="font-normal text-gray-400 normal-case" x-show="doneBookings.length" x-text="'(' + doneBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" x-show="doneBookings.length === 0">
+<span class="nl-l">Nog niets voltooid</span><span class="en-l">Nothing completed yet</span><span class="pt-l">Nada concluído ainda</span>
+</p>
+<div class="space-y-4">
+<template :key="b.id" x-for="b in doneBookings">
+<div :class="{
+                 'border-warm-200 opacity-70': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                 'border-gray-200 opacity-50': b.status === 'cancelled'
+               }" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border">
+<div class="flex items-center justify-between gap-2">
+<span :class="{
+                      'bg-green-100 text-green-700': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
+                    }" class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full">
+<template x-if="b.status === 'approved' &amp;&amp; b.tikkie_sent"><span><span class="nl-l">Voltooid</span><span class="en-l" data-i18n="facturen.completed">Completed</span><span class="pt-l">Concluído</span></span></template>
+<template x-if="b.status === 'cancelled'"><span><span class="nl-l">Geannuleerd</span><span class="en-l" data-i18n="facturen.cancelled">Cancelled</span><span class="pt-l">Cancelado</span></span></template>
+</span>
+<span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
+</div>
 <div class="space-y-2">
 <div class="text-sm text-gray-700 font-semibold" x-text="b.client_name || '-'"></div>
 <div class="text-sm text-gray-600 space-y-0.5">
@@ -158,13 +223,13 @@ WhatsApp
 <button @click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
 <span class="nl-l">🖨️ Factuur afdrukken</span><span class="en-l" data-i18n="facturen.print_invoice">🖨️ Print invoice</span><span class="pt-l">🖨️ Imprimir fatura</span>
 </button>
-<button :disabled="b._busy" @click="markTikkieSent(b)" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition" x-show="!b.tikkie_sent">
-<span class="nl-l">✓ Tikkie verstuurd</span><span class="en-l" data-i18n="facturen.tikkie_sent">✓ Tikkie sent</span><span class="pt-l">✓ Tikkie enviado</span>
-</button>
 </div>
 </template>
 </div>
+</div>
 </template>
+</div>
+</div>
 </div>
 </template>
 </div>
