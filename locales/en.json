@@ -50,8 +50,8 @@
     "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
     "print_button": "🖨️ Print invoice / save as PDF",
     "popup_blocked": "Please allow pop-ups to view the invoice.",
-    "whatsapp_message": "Hi {{name}}! Your booking ({{dates}}) is confirmed. See you soon! 🐱",
-    "whatsapp_message_generic": "Hi! Your booking ({{dates}}) is confirmed. See you soon! 🐱",
+    "whatsapp_message": "Hi {{name}}! Your booking ({{dates}}) is confirmed. See you soon!",
+    "whatsapp_message_generic": "Hi! Your booking ({{dates}}) is confirmed. See you soon!",
     "whatsapp_client": "WhatsApp client"
   },
   "static": {

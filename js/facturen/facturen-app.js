@@ -268,7 +268,7 @@ window.facturenApp = function () {
       if (!confirm(confirmMsg)) return;
       b._busy = true;
 
-      if (b.client_name || b.client_address) {
+      if (b.client_name || b.client_address || b.client_contact) {
         await supabase.from('bookings').update({ client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact }).eq('id', b.id);
       }
 
@@ -296,8 +296,8 @@ window.facturenApp = function () {
       const digits = String(b.client_contact).replace(/\D/g, '');
       if (!digits) return '#';
       const message = b.client_name
-        ? tNl('invoice.whatsapp_message', { name: b.client_name, dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') })
-        : tNl('invoice.whatsapp_message_generic', { dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') });
+        ? t('invoice.whatsapp_message', { name: b.client_name, dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') })
+        : t('invoice.whatsapp_message_generic', { dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') });
       return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     }
   };

@@ -50,8 +50,8 @@
     "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
     "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",
     "popup_blocked": "Sta pop-ups toe om de factuur te bekijken.",
-    "whatsapp_message": "Hoi {{name}}! Je boeking ({{dates}}) is bevestigd. Tot snel! 🐱",
-    "whatsapp_message_generic": "Hoi! Je boeking ({{dates}}) is bevestigd. Tot snel! 🐱",
+    "whatsapp_message": "Hoi {{name}}! Je boeking ({{dates}}) is bevestigd. Tot snel!",
+    "whatsapp_message_generic": "Hoi! Je boeking ({{dates}}) is bevestigd. Tot snel!",
     "whatsapp_client": "WhatsApp klant"
   },
   "static": {

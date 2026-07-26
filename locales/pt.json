@@ -50,8 +50,8 @@
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
     "print_button": "🖨️ Imprimir fatura / salvar como PDF",
     "popup_blocked": "Permita pop-ups para visualizar a fatura.",
-    "whatsapp_message": "Oi {{name}}! Sua reserva ({{dates}}) está confirmada. Até breve! 🐱",
-    "whatsapp_message_generic": "Oi! Sua reserva ({{dates}}) está confirmada. Até breve! 🐱",
+    "whatsapp_message": "Oi {{name}}! Sua reserva ({{dates}}) está confirmada. Até breve!",
+    "whatsapp_message_generic": "Oi! Sua reserva ({{dates}}) está confirmada. Até breve!",
     "whatsapp_client": "WhatsApp do cliente"
   },
   "static": {
