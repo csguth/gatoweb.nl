@@ -116,6 +116,12 @@
 </label>
 <input :placeholder="lang === 'nl' ? 'Adres klant' : (lang === 'pt' ? 'Endereço do cliente' : 'Client address')" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="b.client_address"/>
 </div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span class="nl-l">WhatsApp / telefoon</span><span class="en-l" data-i18n="facturen.client_contact">WhatsApp / phone</span><span class="pt-l">WhatsApp / telefone</span>
+</label>
+<input :placeholder="lang === 'nl' ? '+31 6 12345678' : '+31 6 12345678'" class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="tel" x-model="b.client_contact"/>
+</div>
 <div class="text-sm text-gray-600 space-y-0.5">
 <div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
@@ -131,6 +137,9 @@
 <span x-show="!b._busy"><span class="nl-l">Goedkeuren &amp; Factuur genereren</span><span class="en-l" data-i18n="facturen.approve_generate_invoice">Approve &amp; generate Invoice</span><span class="pt-l">Aprovar e gerar fatura</span></span>
 <span x-show="b._busy"><span class="nl-l">Bezig...</span><span class="en-l" data-i18n="facturen.working_2">Working...</span><span class="pt-l">Processando...</span></span>
 </button>
+<a :href="whatsappLink(b)" :title="t('invoice.whatsapp_client')" class="w-full flex items-center justify-center gap-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition" rel="noopener noreferrer" target="_blank" x-show="b.client_contact">
+💬 <span class="nl-l">WhatsApp klant</span><span class="en-l" data-i18n="facturen.whatsapp_client">WhatsApp client</span><span class="pt-l">WhatsApp do cliente</span>
+</a>
 </div>
 </template>
 <template x-if="b.status !== 'pending'">
@@ -143,6 +152,9 @@
 </div>
 <template x-if="b.status === 'approved'">
 <div class="flex gap-2 pt-1">
+<a :href="whatsappLink(b)" :title="t('invoice.whatsapp_client')" class="flex-none flex items-center justify-center border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold px-3 rounded-xl transition" rel="noopener noreferrer" target="_blank" x-show="b.client_contact">
+💬
+</a>
 <button @click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
 <span class="nl-l">🖨️ Factuur afdrukken</span><span class="en-l" data-i18n="facturen.print_invoice">🖨️ Print invoice</span><span class="pt-l">🖨️ Imprimir fatura</span>
 </button>

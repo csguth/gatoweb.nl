@@ -62,6 +62,7 @@ window.__saveBookingToSupabase = async function (booking) {
       client_email: session.user.email,
       client_name: booking.clientName || null,
       client_address: booking.address || null,
+      client_contact: booking.clientContact || null,
       date_from: booking.from,
       date_to: booking.to || null,
       pets: booking.pets,

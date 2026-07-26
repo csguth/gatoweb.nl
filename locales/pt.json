@@ -3,7 +3,8 @@
     "start_date_required": "Por favor, selecione uma data de início",
     "address": "Endereço",
     "address_required": "Por favor, informe seu endereço (necessário para a fatura)",
-    "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva."
+    "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva.",
+    "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo sua confirmação!"
   },
   "auth": {
     "account_created_check_email_login": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui.",
@@ -48,7 +49,10 @@
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
     "print_button": "🖨️ Imprimir fatura / salvar como PDF",
-    "popup_blocked": "Permita pop-ups para visualizar a fatura."
+    "popup_blocked": "Permita pop-ups para visualizar a fatura.",
+    "whatsapp_message": "Oi {{name}}! Sua reserva ({{dates}}) está confirmada. Até breve! 🐱",
+    "whatsapp_message_generic": "Oi! Sua reserva ({{dates}}) está confirmada. Até breve! 🐱",
+    "whatsapp_client": "WhatsApp do cliente"
   },
   "static": {
     "index": {
@@ -143,6 +147,7 @@
         "logged_in_as": "Logado como",
         "log_out": "Sair",
         "your_name_optional": "Seu nome <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
+        "whatsapp_phone_optional": "WhatsApp / telefone <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "first_day": "Primeiro dia",
         "last_day_optional": "Último dia <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "pets": "Animais de estimação",
@@ -163,6 +168,7 @@
         "booking_request_sent": "Pedido de reserva enviado!",
         "l_gia_will_confirm_availability": "Lígia confirmará a disponibilidade em até 24 horas.",
         "track_my_booking": "Acompanhar minha reserva →",
+        "message_ligia_whatsapp": "Enviar WhatsApp para Lígia",
         "send_booking_request": "Enviar pedido de reserva",
         "l_gia_will_confirm_availability_2": "Lígia confirmará a disponibilidade em até 24 horas.",
         "track_my_booking_2": "Acompanhar minha reserva →"
@@ -220,6 +226,7 @@
         "cancelled": "Cancelado",
         "client": "Cliente",
         "client_address": "Endereço",
+        "client_contact": "WhatsApp / telefone",
         "dates": "Datas:",
         "pets": "Animais de estimação:",
         "preference": "Preferência:",
@@ -230,7 +237,8 @@
         "pets_2": "Animais de estimação:",
         "amount_2": "Quantia:",
         "print_invoice": "🖨️ Imprimir fatura",
-        "tikkie_sent": "✓ Tikkie enviado"
+        "tikkie_sent": "✓ Tikkie enviado",
+        "whatsapp_client": "WhatsApp do cliente"
       }
     }
   }

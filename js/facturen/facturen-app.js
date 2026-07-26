@@ -269,7 +269,7 @@ window.facturenApp = function () {
       b._busy = true;
 
       if (b.client_name || b.client_address) {
-        await supabase.from('bookings').update({ client_name: b.client_name, client_address: b.client_address }).eq('id', b.id);
+        await supabase.from('bookings').update({ client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact }).eq('id', b.id);
       }
 
       const { data, error } = await supabase.rpc('approve_booking', {
@@ -281,11 +281,24 @@ window.facturenApp = function () {
       if (error) { alert(error.message); return; }
 
       const approved = Array.isArray(data) ? data[0] : data;
-      const merged = { ...b, ...approved, client_name: b.client_name, client_address: b.client_address, tikkie_sent: false, _busy: false };
+      const merged = { ...b, ...approved, client_name: b.client_name, client_address: b.client_address, client_contact: b.client_contact, tikkie_sent: false, _busy: false };
       const idx = this.bookings.findIndex(x => x.id === b.id);
       if (idx !== -1) this.bookings.splice(idx, 1, merged);
       this.bookings = sortBookings(this.bookings);
       openInvoicePrintWindow(merged);
+    },
+
+    // Builds the wa.me link Lígia uses to message the client directly (issue #39),
+    // pre-filled with a confirmation message. Returns '#' when there's no phone
+    // number saved so the button (hidden via x-show) never navigates anywhere.
+    whatsappLink(b) {
+      if (!b.client_contact) return '#';
+      const digits = String(b.client_contact).replace(/\D/g, '');
+      if (!digits) return '#';
+      const message = b.client_name
+        ? tNl('invoice.whatsapp_message', { name: b.client_name, dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') })
+        : tNl('invoice.whatsapp_message_generic', { dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') });
+      return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     }
   };
 };
