@@ -12,6 +12,7 @@
   },
   "adjustment_note_required": "Geef een reden op voor de correctie voordat je goedkeurt.",
   "client_edit_reason_required": "Geef een reden op voordat je de klantgegevens opslaat.",
+  "not_staff_error": "Dit account heeft geen toegang tot het facturendashboard.",
   "invoice": {
     "title": "Factuur {{number}}",
     "date_label": "Datum: {{date}}",

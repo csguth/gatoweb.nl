@@ -265,17 +265,42 @@ window.facturenApp = function () {
     async init() {
       if (!configured) return;
       const { data } = await supabase.auth.getSession();
-      this.session = data.session;
-      supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
+      if (data.session && await this.checkStaffAccess(data.session)) {
+        this.session = data.session;
+      }
+      supabase.auth.onAuthStateChange((_event, session) => {
+        // Only ever set this.session after a fresh staff check — otherwise a
+        // non-staff account could slip in through a token refresh event.
+        if (!session) this.session = null;
+      });
       if (this.session) this.loadBookings();
+    },
+
+    // Issue #52 follow-up: facturen.html is staff-only, but until now ANY authenticated
+    // Supabase user (e.g. a regular client account) could log in and see the dashboard
+    // shell — only individual actions (approve, edit client info) failed later with a
+    // cryptic "not authorized" error from the RPCs. This checks is_staff() right after
+    // login (and on session restore) and immediately signs the user back out if they
+    // aren't on the staff_emails allow-list, so non-staff accounts never see the board.
+    async checkStaffAccess(session) {
+      const { data: staff, error } = await supabase.rpc('is_staff');
+      if (error || !staff) {
+        await supabase.auth.signOut();
+        this.session = null;
+        this.loginError = t('not_staff_error');
+        return false;
+      }
+      return true;
     },
 
     async login() {
       this.loading = true;
       this.loginError = '';
       const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
+      if (error) { this.loading = false; this.loginError = error.message; return; }
+      const isStaff = await this.checkStaffAccess(data.session);
       this.loading = false;
-      if (error) { this.loginError = error.message; return; }
+      if (!isStaff) return;
       this.session = data.session;
       this.password = '';
       this.loadBookings();

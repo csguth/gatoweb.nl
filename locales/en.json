@@ -12,6 +12,7 @@
   },
   "adjustment_note_required": "Please provide a reason for the adjustment before approving.",
   "client_edit_reason_required": "Please provide a reason before saving the client info.",
+  "not_staff_error": "This account doesn't have access to the invoicing dashboard.",
   "invoice": {
     "title": "Invoice {{number}}",
     "date_label": "Date: {{date}}",

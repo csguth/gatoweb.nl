@@ -12,6 +12,7 @@
   },
   "adjustment_note_required": "Informe um motivo para o ajuste antes de aprovar.",
   "client_edit_reason_required": "Informe um motivo antes de salvar os dados do cliente.",
+  "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
   "invoice": {
     "title": "Fatura {{number}}",
     "date_label": "Data: {{date}}",
