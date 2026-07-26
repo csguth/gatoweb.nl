@@ -3,7 +3,8 @@
     "start_date_required": "Selecteer een startdatum",
     "address": "Adres",
     "address_required": "Vul je adres in (nodig voor de factuur)",
-    "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen."
+    "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.",
+    "whatsapp_confirm_message": "Hoi Lígia! Ik heb net een boekingsverzoek verstuurd voor {{from}}{{toRange}}. Ik hoor graag van je!"
   },
   "auth": {
     "account_created_check_email_login": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.",
@@ -48,7 +49,10 @@
     },
     "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
     "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",
-    "popup_blocked": "Sta pop-ups toe om de factuur te bekijken."
+    "popup_blocked": "Sta pop-ups toe om de factuur te bekijken.",
+    "whatsapp_message": "Hoi {{name}}! Je boeking ({{dates}}) is bevestigd. Tot snel!",
+    "whatsapp_message_generic": "Hoi! Je boeking ({{dates}}) is bevestigd. Tot snel!",
+    "whatsapp_client": "WhatsApp klant"
   },
   "static": {
     "index": {
@@ -143,6 +147,8 @@
         "logged_in_as": "Ingelogd als",
         "log_out": "Uitloggen",
         "your_name_optional": "Jouw naam <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
+        "address": "Adres",
+        "whatsapp_phone_optional": "WhatsApp / telefoon <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
         "first_day": "Eerste dag",
         "last_day_optional": "Laatste dag <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
         "pets": "Huisdieren",
@@ -163,6 +169,7 @@
         "booking_request_sent": "Boekingsverzoek verstuurd!",
         "l_gia_will_confirm_availability": "Lígia bevestigt beschikbaarheid binnen 24 uur.",
         "track_my_booking": "Mijn boeking volgen →",
+        "message_ligia_whatsapp": "Stuur Lígia een WhatsApp",
         "send_booking_request": "Boekingsverzoek versturen",
         "l_gia_will_confirm_availability_2": "Lígia bevestigt beschikbaarheid binnen 24 uur.",
         "track_my_booking_2": "Mijn boeking volgen →"
@@ -220,6 +227,7 @@
         "cancelled": "Geannuleerd",
         "client": "Klant",
         "client_address": "Adres",
+        "client_contact": "WhatsApp / telefoon",
         "dates": "Data:",
         "pets": "Huisdieren:",
         "preference": "Voorkeur:",
@@ -230,7 +238,8 @@
         "pets_2": "Huisdieren:",
         "amount_2": "Bedrag:",
         "print_invoice": "🖨️ Factuur afdrukken",
-        "tikkie_sent": "✓ Tikkie verstuurd"
+        "tikkie_sent": "✓ Tikkie verstuurd",
+        "whatsapp_client": "WhatsApp klant"
       }
     }
   }

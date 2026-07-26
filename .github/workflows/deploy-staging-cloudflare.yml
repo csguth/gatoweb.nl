@@ -92,7 +92,8 @@ jobs:
             PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
             PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
             DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
-            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }}
+            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }},
+            WHATSAPP_NUMBER: $(jq -Rn --arg v "${{ vars.WHATSAPP_NUMBER }}" '$v')
           };
           JSEOF
 

@@ -11,6 +11,7 @@ function bookingForm() {
   return {
     clientName: saved.clientName || '',
     address: saved.address || '',
+    clientContact: saved.clientContact || '',
     from: '',
     to: '',
     pref: saved.pref || '',
@@ -30,11 +31,12 @@ function bookingForm() {
     authLoading: false,
 
     _save() {
-      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, pets: this.pets, pref: this.pref })); } catch(e) {}
+      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, clientContact: this.clientContact, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
     async init() {
       this.$watch('clientName', () => this._save());
       this.$watch('address', () => this._save());
+      this.$watch('clientContact', () => this._save());
       this.$watch('pets', () => this._save());
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
@@ -80,6 +82,7 @@ function bookingForm() {
         await window.__saveBookingToSupabase({
           clientName: this.clientName,
           address: this.address,
+          clientContact: this.clientContact,
           from: this.from,
           to: this.to,
           pets: this.pets,
@@ -89,6 +92,14 @@ function bookingForm() {
       }
 
       this.sent = true;
+    },
+    // Lets the client message Lígia on WhatsApp right after sending the request,
+    // pre-filled with the dates just booked, mirroring the existing wa.me buttons.
+    whatsappConfirmLink() {
+      const toRange = this.to && this.to > this.from ? ' \u2192 ' + this.to : '';
+      const message = t('booking.whatsapp_confirm_message', { from: this.from, toRange });
+      const number = (window.GATOWEB_CONFIG && window.GATOWEB_CONFIG.WHATSAPP_NUMBER) || '';
+      return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
     },
     async authLogin() {
       this.authLoading = true;
