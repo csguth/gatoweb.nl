@@ -4,17 +4,12 @@
     "address": "Endereço",
     "address_required": "Por favor, informe seu endereço (necessário para a fatura)",
     "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva.",
-    "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo sua confirmação!"
+    "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo seu retorno!"
   },
   "auth": {
     "account_created_check_email_login": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui.",
     "not_configured": "O serviço ainda não está configurado."
   },
-  "adjustment_note_required": "Informe um motivo para o ajuste antes de aprovar.",
-  "client_edit_reason_required": "Informe um motivo antes de salvar os dados do cliente.",
-  "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
-  "reject_confirm": "Rejeitar o pedido de reserva de {{client}}? Isso pode ser desfeito depois na coluna 'Concluído'.",
-  "reject_button_title": "Rejeitar reserva",
   "invoice": {
     "title": "Fatura {{number}}",
     "date_label": "Data: {{date}}",
@@ -32,7 +27,9 @@
     "confirm_approve": "Aprovar permanentemente a fatura para {{client}}?",
     "recipient_label": "Para:",
     "address_label": "Endereço: {{address}}",
-    "contact_label": "WhatsApp/telefone: {{contact}}",
+    "contact_label": "Telefone: {{contact}}",
+    "adjustment_note_required": "Informe um motivo para o ajuste do valor.",
+    "client_edit_reason_required": "Informe um motivo para corrigir os dados do cliente.",
     "table": {
       "description": "Descrição",
       "period": "Período",
@@ -51,15 +48,11 @@
       "frequency_2": "2x por dia",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} até {{to}}",
-      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}",
-      "adjustment": "Ajuste: {{note}}"
+      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}"
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
     "print_button": "🖨️ Imprimir fatura / salvar como PDF",
-    "popup_blocked": "Permita pop-ups para visualizar a fatura.",
-    "whatsapp_message": "Oi {{name}}! Sua reserva ({{dates}}) está confirmada. Até breve!",
-    "whatsapp_message_generic": "Oi! Sua reserva ({{dates}}) está confirmada. Até breve!",
-    "whatsapp_client": "WhatsApp do cliente"
+    "popup_blocked": "Permita pop-ups para visualizar a fatura."
   },
   "static": {
     "index": {
@@ -154,8 +147,6 @@
         "logged_in_as": "Logado como",
         "log_out": "Sair",
         "your_name_optional": "Seu nome <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
-        "address": "Endereço",
-        "whatsapp_phone_optional": "WhatsApp / telefone <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "first_day": "Primeiro dia",
         "last_day_optional": "Último dia <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "pets": "Animais de estimação",
@@ -176,7 +167,6 @@
         "booking_request_sent": "Pedido de reserva enviado!",
         "l_gia_will_confirm_availability": "Lígia confirmará a disponibilidade em até 24 horas.",
         "track_my_booking": "Acompanhar minha reserva →",
-        "message_ligia_whatsapp": "Enviar WhatsApp para Lígia",
         "send_booking_request": "Enviar pedido de reserva",
         "l_gia_will_confirm_availability_2": "Lígia confirmará a disponibilidade em até 24 horas.",
         "track_my_booking_2": "Acompanhar minha reserva →"
@@ -234,7 +224,6 @@
         "cancelled": "Cancelado",
         "client": "Cliente",
         "client_address": "Endereço",
-        "client_contact": "WhatsApp / telefone",
         "dates": "Datas:",
         "pets": "Animais de estimação:",
         "preference": "Preferência:",
@@ -245,20 +234,7 @@
         "pets_2": "Animais de estimação:",
         "amount_2": "Quantia:",
         "print_invoice": "🖨️ Imprimir fatura",
-        "tikkie_sent": "✓ Tikkie enviado",
-        "whatsapp_client": "WhatsApp do cliente",
-        "edit_client_info": "✏️ Dados do cliente",
-        "edit_client_info_short": "✏️ Editar",
-        "edit_client_info_title": "Editar dados do cliente",
-        "edit_client_info_help": "Estes dados vêm da reserva do próprio cliente. Altere apenas para corrigir um erro e sempre informe um motivo.",
-        "client_edit_reason": "Motivo (obrigatório)",
-        "cancel": "Cancelar",
-        "save": "Salvar",
-        "calculated_subtotal": "Subtotal calculado",
-        "adjustment_amount": "Ajuste (€)",
-        "final_total": "Total (€)",
-        "adjustment_note": "Motivo do ajuste (obrigatório)",
-        "restore_to_inbox": "↩️ Restaurar para caixa de entrada"
+        "tikkie_sent": "✓ Tikkie enviado"
       }
     }
   }

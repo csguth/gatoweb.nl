@@ -90,8 +90,60 @@ Rules enforced on GitHub:
 - Both `main` and `staging` require a Pull Request to merge (no direct pushes) and block force-pushes/deletions.
 - `.github/workflows/guard-main-merges.yml` fails any PR targeting `main` whose source branch isn't
   `staging`, unless the PR is labeled `hotfix` (emergency bypass for urgent production fixes).
-- `staging` has no required status checks yet since there's no automated test suite — once tests
-  are added, mark their job as a required check on `staging`'s branch protection.
+- `.github/workflows/test.yml` runs the BDD test suite (see [Automated tests](#automated-tests)) on
+  every push/PR to `staging` and `main`. It is not yet marked as a required status check — do that
+  in `staging`'s branch protection settings once you've seen it pass reliably a few times.
+
+---
+
+## Automated tests
+
+A [Playwright](https://playwright.dev/) + [playwright-bdd](https://vitalets.github.io/playwright-bdd/)
+(Gherkin) test suite lives in `tests/bdd/` and covers the main user-facing requirements:
+
+- **Booking form** (`tests/bdd/features/booking-form.feature`) — required-field validation, suggested
+  price calculation, the WhatsApp confirmation message, and the login gate when Supabase auth is configured.
+- **Language toggle** (`tests/bdd/features/i18n.feature`) — EN/NL/PT switching and that the choice is
+  remembered across a reload.
+- **Invoice calculation** (`tests/bdd/features/invoice-calc.feature`) — `js/facturen/invoice-calc.js`,
+  including the high-season surcharge split.
+- **Staging banner** (`tests/bdd/features/staging-banner.feature`) — visible on the staging build,
+  hidden on production.
+
+Since the site has no build step, the tests build three throwaway "compiled" copies of the site in a
+temp folder (production / staging / production-with-auth), mirroring the same placeholder
+substitution the deploy workflows do, with fake test values — no real secrets or deployments involved.
+
+### Running locally
+
+```
+npm ci
+npx playwright install --with-deps chromium   # first time only
+npm test                                      # builds fixtures, generates specs, runs everything
+npm run test:bdd:headed                       # same, but with a visible browser
+npm run test:bdd:report                       # opens the last HTML report
+```
+
+CI runs the same suite (`.github/workflows/test.yml`) on every push/PR to `staging` and `main`, inside
+the official Playwright Docker image (`mcr.microsoft.com/playwright:v1.62.0-noble`) so the exact same
+browser/OS/dependency versions are used every run. To get that same guarantee locally (instead of
+whatever Chromium build is installed on your machine) and avoid "works on my machine" drift, run the
+suite inside the same image with Docker:
+
+```powershell
+# Windows PowerShell
+docker run --rm --ipc=host -v "${PWD}:/work" -w /work mcr.microsoft.com/playwright:v1.62.0-noble `
+  bash -c "npm ci && npm test"
+```
+
+```bash
+# Linux / macOS
+docker run --rm --ipc=host -v "$PWD:/work" -w /work mcr.microsoft.com/playwright:v1.62.0-noble \
+  bash -c "npm ci && npm test"
+```
+
+The image tag (`v1.62.0-noble`) must match the `@playwright/test` version in `package.json` — bump both
+together when upgrading Playwright.
 
 ---
 
