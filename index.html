@@ -162,6 +162,16 @@
        "chapter" of Lígia's bio; js/index/about-carousel.js only syncs the dots
        and wires the prev/next buttons — swipe/scroll works with zero JS. -->
 <div class="relative">
+<!-- Prev / dots / next placed above the text on purpose: slides have
+       different lengths, and the grid row stretches to the tallest slide,
+       so controls placed after the text could land below the fold on short
+       viewports, forcing a scroll on every slide change. Keeping the nav
+       right under the heading means it's always visible without scrolling. -->
+<div class="flex items-center justify-center gap-4 mb-4">
+<button aria-label="Previous" class="w-8 h-8 rounded-full border border-warm-200 text-sage-700 flex items-center justify-center hover:bg-sage-50 transition" id="about-carousel-prev" type="button">‹</button>
+<div class="flex items-center gap-2" id="about-carousel-dots" role="tablist"></div>
+<button aria-label="Next" class="w-8 h-8 rounded-full border border-warm-200 text-sage-700 flex items-center justify-center hover:bg-sage-50 transition" id="about-carousel-next" type="button">›</button>
+</div>
 <!-- Grid (not flex) + grid-auto-columns:100% on purpose: Safari has a
        long-standing bug where percentage widths on flex children inside an
        overflow-x:auto flex container can resolve against the content's total
@@ -229,12 +239,6 @@
 <p class="en font-medium text-sage-700" data-i18n="about.bio_closing">I hope to meet you and your pet(s) soon, and develop a long-lasting friendship while doing my best in taking care of your best friend! 🖤</p>
 <p class="nl font-medium text-sage-700">Ik hoop jou en je huisdier(en) snel te ontmoeten, en een langdurige vriendschap op te bouwen terwijl ik mijn beste beentje voorzet om voor je beste vriend te zorgen! 🖤</p>
 </article>
-</div>
-<!-- Prev / dots / next, single row — keeps the layout minimal instead of overlaying arrows on the text -->
-<div class="flex items-center justify-center gap-4 mt-5">
-<button aria-label="Previous" class="w-8 h-8 rounded-full border border-warm-200 text-sage-700 flex items-center justify-center hover:bg-sage-50 transition" id="about-carousel-prev" type="button">‹</button>
-<div class="flex items-center gap-2" id="about-carousel-dots" role="tablist"></div>
-<button aria-label="Next" class="w-8 h-8 rounded-full border border-warm-200 text-sage-700 flex items-center justify-center hover:bg-sage-50 transition" id="about-carousel-next" type="button">›</button>
 </div>
 </div>
 <!-- Skill tags -->
