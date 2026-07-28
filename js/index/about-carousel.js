@@ -42,6 +42,10 @@
       dot.classList.toggle('w-2', !active);
       dot.setAttribute('aria-selected', active ? 'true' : 'false');
     });
+    // Hide the prev arrow on the first slide and the next arrow on the last —
+    // there's nowhere to go, so the control shouldn't be there.
+    if (prevBtn) prevBtn.classList.toggle('hidden', index <= 0);
+    if (nextBtn) nextBtn.classList.toggle('hidden', index >= slides.length - 1);
   }
 
   // Keeps the active dot in sync while the user swipes/drags the track

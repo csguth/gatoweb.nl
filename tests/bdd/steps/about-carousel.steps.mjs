@@ -30,6 +30,16 @@ Given('I use an iPhone-sized viewport', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
 });
 
+Then('the about carousel {word} button is hidden', async ({ page }, which) => {
+  const id = which === 'previous' ? 'prev' : which;
+  await expect(page.locator(`#about-carousel-${id}`)).toBeHidden();
+});
+
+Then('the about carousel {word} button is visible', async ({ page }, which) => {
+  const id = which === 'previous' ? 'prev' : which;
+  await expect(page.locator(`#about-carousel-${id}`)).toBeVisible();
+});
+
 Then('every about carousel slide exactly fills the track width', async ({ page }) => {
   // Regression guard for the bug where a gap-* utility between shrink-0
   // w-full slides made the track wider than slideCount * trackWidth,
