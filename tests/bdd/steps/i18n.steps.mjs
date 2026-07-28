@@ -42,6 +42,17 @@ Then('the nav shows {string} and hides {string}', async ({ page }, shownText, hi
     .toBe(false);
 });
 
+// Same assertion as "the nav shows ..." above, phrased generically for
+// content that lives outside the nav (e.g. the About section bio).
+Then('the page shows {string} and hides {string}', async ({ page }, shownText, hiddenText) => {
+  await expect
+    .poll(() => isAnyVisibleWithExactText(page, shownText))
+    .toBe(true);
+  await expect
+    .poll(() => isAnyVisibleWithExactText(page, hiddenText))
+    .toBe(false);
+});
+
 function isAnyVisibleWithExactText(page, text) {
   return page.evaluate((expected) => {
     const candidates = Array.from(document.querySelectorAll('.en, .nl, .pt'));
