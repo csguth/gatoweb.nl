@@ -17,7 +17,7 @@
     dot.type = 'button';
     dot.setAttribute('role', 'tab');
     dot.setAttribute('aria-label', 'Slide ' + (index + 1) + ' / ' + slides.length);
-    dot.className = 'rounded-full transition-all h-2 w-2 bg-sage-200';
+    dot.className = 'rounded-full transition-all h-2 w-2 bg-white/50 ring-1 ring-black/10';
     dot.addEventListener('click', () => scrollToSlide(index));
     dotsContainer.appendChild(dot);
     return dot;
@@ -36,9 +36,9 @@
   function setActiveDot(index) {
     dots.forEach((dot, i) => {
       const active = i === index;
-      dot.classList.toggle('bg-sage-600', active);
+      dot.classList.toggle('bg-white', active);
       dot.classList.toggle('w-6', active);
-      dot.classList.toggle('bg-sage-200', !active);
+      dot.classList.toggle('bg-white/50', !active);
       dot.classList.toggle('w-2', !active);
       dot.setAttribute('aria-selected', active ? 'true' : 'false');
     });
