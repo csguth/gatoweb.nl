@@ -30,3 +30,7 @@ Feature: About Lígia bio carousel
     When I click dot 4 of the about carousel
     Then the about carousel is on slide 4 of 7
     And the about carousel shows "Specialised, gentle care"
+
+  Scenario: Each slide exactly fills the viewport width on a mobile screen
+    Given I use an iPhone-sized viewport
+    Then every about carousel slide exactly fills the track width

@@ -3,7 +3,7 @@
 import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 
-const { When, Then } = createBdd();
+const { When, Then, Given } = createBdd();
 
 When('I click the about carousel next button', async ({ page }) => {
   await clickAndWaitForSettle(page, '#about-carousel-next');
@@ -22,6 +22,30 @@ When('I click the about carousel previous button', async ({ page }) => {
 When('I click dot {int} of the about carousel', async ({ page }, dotNumber) => {
   await page.locator('#about-carousel-dots button').nth(dotNumber - 1).click();
   await waitForSettle(page);
+});
+
+Given('I use an iPhone-sized viewport', async ({ page }) => {
+  // iPhone SE-ish width — the narrowest common viewport, most likely to
+  // expose any slide-width/gap mismatch from the carousel's CSS.
+  await page.setViewportSize({ width: 375, height: 812 });
+});
+
+Then('every about carousel slide exactly fills the track width', async ({ page }) => {
+  // Regression guard for the bug where a gap-* utility between shrink-0
+  // w-full slides made the track wider than slideCount * trackWidth,
+  // desyncing every scroll-snap point from the viewport edge (very visible
+  // on iOS Safari, where slides looked clipped/misaligned).
+  const { trackWidth, scrollWidth, slideCount } = await page.evaluate(() => {
+    const track = document.getElementById('about-carousel-track');
+    return {
+      trackWidth: track.clientWidth,
+      scrollWidth: track.scrollWidth,
+      slideCount: track.children.length,
+    };
+  });
+  // Sub-pixel layout rounding can differ by a fraction of a px per slide, so
+  // allow up to 1px of drift per slide rather than requiring exact equality.
+  expect(Math.abs(scrollWidth - trackWidth * slideCount)).toBeLessThanOrEqual(slideCount);
 });
 
 Then('the about carousel is on slide {int} of {int}', async ({ page }, slideNumber, totalSlides) => {

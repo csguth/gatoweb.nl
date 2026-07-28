@@ -162,15 +162,20 @@
        "chapter" of Lígia's bio; js/index/about-carousel.js only syncs the dots
        and wires the prev/next buttons — swipe/scroll works with zero JS. -->
 <div class="relative">
-<div class="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-1 px-1" id="about-carousel-track" tabindex="0">
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<!-- No gap here: each <article> is exactly 100% of the track's width so
+       every snap point lines up with the viewport edge. A gap-* utility would
+       add extra space between shrink-0 w-full items, pushing each snap point
+       past one screen-width and making slides look clipped/misaligned
+       (most visible on iOS Safari's scroll-snap implementation). -->
+<div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar" id="about-carousel-track" tabindex="0">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_intro">My story</span><span class="nl">Mijn verhaal</span>
 </h3>
 <p class="en" data-i18n="about.bio_intro">Hi, I'm Lígia! I'm a professional catsitter, cat rescuer, and feline behaviour enthusiast based in __CITY_NAME__.</p>
 <p class="nl">Hoi, ik ben Lígia! Ik ben een professionele kattenoppas, kattenredder en gedragsenthousiast, gevestigd in __CITY_NAME__.</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_origin">Where it all started</span><span class="nl">Waar het begon</span>
 </h3>
@@ -179,7 +184,7 @@
 <p class="en mt-3" data-i18n="about.bio_continuous_learning">My knowledge doesn't come only from experience, over the years I've studied feline behaviour, health, welfare and ethical handling, and I continue to do so because cat care is constantly evolving. The more I learn, the better I can care for the cats entrusted to me.</p>
 <p class="nl mt-3">Mijn kennis komt niet alleen uit ervaring — door de jaren heen heb ik kattengedrag, gezondheid, welzijn en ethische omgang gestudeerd, en dat blijf ik doen, want kattenverzorging blijft zich voortdurend ontwikkelen. Hoe meer ik leer, hoe beter ik kan zorgen voor de katten die aan mij worden toevertrouwd.</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_every_cat">Every cat is different</span><span class="nl">Elke kat is anders</span>
 </h3>
@@ -188,14 +193,14 @@
 <p class="en mt-3" data-i18n="about.bio_more_than_feeding">Catsitting is much more than feeding your cat and cleaning the litter box. During every visit I monitor their behaviour, appetite, litter box habits and overall wellbeing. Small changes can mean a lot, and having experience with thousands of cats helps me notice when something isn't quite right.</p>
 <p class="nl mt-3">Kattenoppas is veel meer dan voeren en de kattenbak schoonmaken. Tijdens elk bezoek houd ik hun gedrag, eetlust, kattenbakgewoonten en algeheel welzijn in de gaten. Kleine veranderingen kunnen veel betekenen, en ervaring met duizenden katten helpt mij te merken wanneer er iets niet helemaal klopt.</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_specialised">Specialised, gentle care</span><span class="nl">Gespecialiseerde, zachte zorg</span>
 </h3>
 <p class="en" data-i18n="about.bio_experienced_with">I'm experienced with senior cats, kittens, multi-cat households, shy cats, fearful cats, post-operative care, wound care and administering medication. I always work at the cat's pace, using low-stress and respectful handling.</p>
 <p class="nl">Ik heb ervaring met seniore katten, kittens, huishoudens met meerdere katten, schuwe katten, angstige katten, postoperatieve zorg, wondverzorging en het toedienen van medicatie. Ik werk altijd op het tempo van de kat, met stressvrije en respectvolle omgang.</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_away">While you're away</span><span class="nl">Terwijl je weg bent</span>
 </h3>
@@ -204,7 +209,7 @@
 <p class="en mt-3" data-i18n="about.bio_water_plants">And of course, I can water your plants🪴</p>
 <p class="nl mt-3">En natuurlijk kan ik ook je planten water geven🪴</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_more_than_cats">More than cats</span><span class="nl">Meer dan katten</span>
 </h3>
@@ -215,7 +220,7 @@
 <p class="en mt-3" data-i18n="about.bio_dog_walks">And yes, I also offer dog walks! I've had dogs my entire life and have plenty of experience handling them. I'm confident walking dogs of different sizes and personalities, paying close attention to leash manners, safety, and making each walk enjoyable and stress-free for both your dog and everyone else we meet.</p>
 <p class="nl mt-3">En jawel, ik bied ook hondenuitlaatservice aan! Ik heb mijn hele leven honden gehad en heb veel ervaring met de omgang met ze. Ik loop met vertrouwen met honden van verschillende formaten en persoonlijkheden, met veel aandacht voor lijngedrag, veiligheid en een prettige, stressvrije wandeling voor jouw hond en iedereen die we onderweg tegenkomen.</p>
 </article>
-<article class="snap-start shrink-0 w-full text-gray-600 leading-relaxed">
+<article class="snap-start shrink-0 w-full px-1 text-gray-600 leading-relaxed">
 <h3 class="font-serif text-lg font-semibold text-sage-700 mb-2">
 <span class="en" data-i18n="about.heading_lets_meet">Let's meet</span><span class="nl">Laten we kennismaken</span>
 </h3>
