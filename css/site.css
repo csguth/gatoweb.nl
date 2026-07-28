@@ -26,6 +26,12 @@ body.show-pt .nl-l { display: none; }
 .pt-l { display: none; }
 body.show-pt .pt-l { display: none; }
 
+/* About Lígia bio carousel — hides the native scroll bar so the CSS
+   scroll-snap track (js/index/about-carousel.js) reads as a carousel, not
+   a plain overflowing div. Scrolling/swiping itself needs no JS at all. */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Staging environment banner — only visible when built with ENV_LABEL=staging */
 #env-banner { display: none; }
 body[data-env="staging"] #env-banner { display: block; }

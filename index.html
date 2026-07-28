@@ -144,32 +144,104 @@
        ABOUT
   ══════════════════════════════════════════════════════════ -->
 <section class="py-20 bg-warm-50" id="about">
-<div class="max-w-5xl mx-auto px-5 grid md:grid-cols-5 gap-12 items-start">
-<!-- Photo collage -->
-<div class="md:col-span-2 grid grid-cols-2 gap-3">
-<img alt="Cat being cared for during a home visit" class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" src="images/gallery-1.jpg"/>
-<img alt="Happy cat during catsitting visit" class="rounded-2xl aspect-square object-cover shadow-md mt-6" loading="lazy" src="images/gallery-2.jpg"/>
-<img alt="Playtime during home visit" class="rounded-2xl aspect-square object-cover shadow-md -mt-6" loading="lazy" src="images/gallery-3.jpg"/>
-<img alt="Cat relaxed at home with Lígia" class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" src="images/gallery-4.jpg"/>
-</div>
-<!-- Bio text -->
-<div class="md:col-span-3">
-<h2 class="font-serif text-3xl font-bold text-sage-700 mb-6">
+<div class="max-w-5xl mx-auto px-5">
+<div class="text-center mb-10">
+<h2 class="font-serif text-3xl font-bold text-sage-700">
 <span class="en" data-i18n="about.about_l_gia">About Lígia</span>
 <span class="nl">Over Lígia</span>
 </h2>
-<div class="space-y-4 text-gray-600 leading-relaxed">
-<p class="en" data-i18n="about.hi_i_m_l_gia">Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in __CITY_NAME__.</p>
-<p class="nl">Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in __CITY_NAME__.</p>
-<p class="en" data-i18n="about.my_journey_started_12_years">My journey started 12 years ago with an independent rescue project in Brazil (<em>@gatosanonimosfloripa</em>) that helped more than 5,000 stray cats through rescue, rehabilitation, sterilisation and rehoming. Since then I've continuously studied feline behaviour, health and welfare — because cat care is always evolving.</p>
-<p class="nl">Mijn reis begon 12 jaar geleden met een reddingsproject in Brazilië (<em>@gatosanonimosfloripa</em>) dat meer dan 5.000 zwerfkatten hielp via redding, revalidatie, sterilisatie en herplaatsing. Sindsdien studeer ik doorlopend kattengedrag, gezondheid en welzijn — want kattenverzorging evolueert voortdurend.</p>
-<p class="en" data-i18n="about.every_cat_is_different_my">Every cat is different. My job is to respect their personality, read their body language, and adapt my approach to what makes them feel comfortable. During every visit I monitor behaviour, appetite, litter box habits and overall wellbeing — small changes can mean a lot.</p>
-<p class="nl">Elke kat is anders. Mijn taak is hun persoonlijkheid te respecteren, hun lichaamstaal te lezen en mijn aanpak aan te passen aan wat hen comfortabel maakt. Tijdens elk bezoek houd ik gedrag, eetlust, kattenbakgewoonten en algeheel welzijn in de gaten.</p>
-<p class="en font-medium text-sage-700" data-i18n="about.after_every_visit_you_ll">After every visit, you'll receive photos, videos and a detailed update. I know how hard it is to leave your cat — you deserve to feel informed and reassured. 📸</p>
-<p class="nl font-medium text-sage-700">Na elk bezoek ontvang je foto's, video's en een gedetailleerde update. Ik weet hoe moeilijk het is om je kat achter te laten — jij verdient het om goed geïnformeerd te zijn. 📸</p>
 </div>
-<!-- Skill tags -->
-<div class="mt-7 flex flex-wrap gap-2">
+<!-- Modern photo carousel: each slide is a full-bleed photo of Lígia with a
+       short, balanced piece of her story overlaid at the bottom over a dark
+       gradient for contrast. Grid (not flex) track + auto-cols-[100%] avoids a
+       Safari percentage-width bug; js/index/about-carousel.js wires the dots,
+       arrows and keyboard nav (native CSS scroll-snap does the swiping). -->
+<div class="relative rounded-3xl overflow-hidden shadow-lg">
+<div class="grid grid-flow-col auto-cols-[100%] overflow-x-auto snap-x snap-mandatory no-scrollbar" id="about-carousel-track" tabindex="0">
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia holding a fluffy cat" class="absolute inset-0 w-full h-full object-cover" loading="eager" src="images/ligia-profile.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s1_title">Hi, I'm Lígia</span><span class="nl">Hoi, ik ben Lígia</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s1_body">A professional catsitter, cat rescuer and feline behaviour enthusiast. Over twelve years I've helped rescue, treat and rehome more than 5,000 cats.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Professionele kattenoppas, kattenredder en gedragsenthousiast. In twaalf jaar heb ik meegeholpen meer dan 5.000 katten te redden, te behandelen en een thuis te geven.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia cheek to cheek with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-1.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s2_title">Care at your cat's pace</span><span class="nl">Zorg op het tempo van je kat</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s2_body">Senior cats, kittens, shy or fearful cats, post-op and medication — I always use low-stress, respectful handling and adapt to each cat's personality.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Seniore katten, kittens, schuwe of angstige katten, postoperatieve zorg en medicatie — altijd met stressvrije, respectvolle omgang, aangepast aan elke kat.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia at home with several cats" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-3.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s3_title">While you're away</span><span class="nl">Terwijl je weg bent</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s3_body">Every visit I check appetite, litter box and wellbeing — small changes matter. You'll get plenty of photos, videos and updates. And yes, I'll water your plants too. 🪴</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Bij elk bezoek let ik op eetlust, kattenbak en welzijn — kleine dingen tellen. Je krijgt volop foto’s, video’s en updates. En ja, ik geef ook je planten water. 🪴</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia close up with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/ligia-profile.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s4_title">Understanding your cat</span><span class="nl">Je kat begrijpen</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s4_body">I also offer feline behaviour consultations — scratching, litter box troubles, introductions between cats, or simply understanding your cat better. Let's figure it out together.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Ik bied ook gedragsconsulten voor katten aan — krabgedrag, kattenbakproblemen, het introduceren van katten, of gewoon je kat beter begrijpen. Dat zoeken we samen uit.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia with a pet snake" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-4.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s5_title">More than cats</span><span class="nl">Meer dan katten</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s5_body">Rabbits, guinea pigs, birds, snakes, lizards — I love getting to know every species and follow your care instructions closely so their routine stays the same.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Konijnen, cavia's, vogels, slangen, hagedissen — ik leer graag elke soort kennen en volg je instructies nauwkeurig, zodat hun routine hetzelfde blijft.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia with two dogs" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-2.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s6_title">Dogs are welcome too</span><span class="nl">Honden ook welkom</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s6_body">And yes, I also offer dog walks! I've had dogs my whole life and walk dogs of all sizes and personalities, with care for safety and leash manners. I hope to become a lasting friend to your best friend. 🖤</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">En ja, ik bied ook hondenuitlaatservice aan! Ik heb mijn hele leven honden gehad en loop met honden van alle formaten en karakters, met oog voor veiligheid en lijngedrag. Ik hoop een blijvende vriend te worden voor je beste vriend. 🖤</p>
+</div>
+</div>
+</article>
+</div>
+<button aria-label="Previous" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white text-xl flex items-center justify-center backdrop-blur-sm transition" id="about-carousel-prev" type="button">‹</button>
+<button aria-label="Next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white text-xl flex items-center justify-center backdrop-blur-sm transition" id="about-carousel-next" type="button">›</button>
+<div class="absolute inset-x-0 bottom-4 flex items-center justify-center gap-2" id="about-carousel-dots" role="tablist"></div>
+</div>
+<div class="mt-8 flex flex-wrap justify-center gap-2">
 <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
 <span class="en" data-i18n="about.senior_cats">Senior cats</span><span class="nl">Seniore katten</span>
 </span>
@@ -189,7 +261,6 @@
 <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
 <span class="en" data-i18n="about.behaviour_consultation">Behaviour consultation</span><span class="nl">Gedragsconsultatie</span>
 </span>
-</div>
 </div>
 </div>
 </section>
@@ -730,6 +801,7 @@
 </div>
 </div>
 <script src="js/index/whatsapp-toast.js"></script>
+<script src="js/index/about-carousel.js"></script>
 <script src="js/index/booking-form.js"></script>
 <!-- Client account (issue #12) + booking persistence to Supabase — see js/index/client-auth.js -->
 <script src="js/index/client-auth.js" type="module"></script>
