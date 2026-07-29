@@ -15,6 +15,7 @@
   "not_staff_error": "This account doesn't have access to the invoice dashboard.",
   "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the 'Done' column.",
   "reject_button_title": "Reject booking",
+  "tikkie_url_invalid": "Please enter a valid Tikkie link (starting with https://).",
   "invoice": {
     "title": "Invoice {{number}}",
     "date_label": "Date: {{date}}",
@@ -218,7 +219,8 @@
         "cancelled": "Cancelled",
         "dates": "Dates:",
         "pets": "Pets:",
-        "amount": "Amount:"
+        "amount": "Amount:",
+        "pay_with_tikkie": "💳 Pay with Tikkie"
       }
     },
     "facturen": {
@@ -254,6 +256,7 @@
         "amount_2": "Amount:",
         "print_invoice": "🖨️ Print invoice",
         "tikkie_sent": "✓ Tikkie sent",
+        "tikkie_url_label": "Tikkie payment link",
         "whatsapp_client": "WhatsApp client",
         "edit_client_info": "✏️ Client info",
         "edit_client_info_short": "✏️ Edit",

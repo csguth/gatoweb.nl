@@ -51,6 +51,15 @@ alter table public.bookings add column if not exists client_address text;
 alter table public.bookings add column if not exists adjustment_amount numeric(10,2) not null default 0;
 alter table public.bookings add column if not exists adjustment_note text;
 
+-- Idempotent for existing tables created before issue #63 (show Tikkie link to client):
+-- the actual Tikkie payment URL Lígia sends is now stored here (previously only the
+-- `tikkie_sent` boolean existed). Staff write it when marking a booking's Tikkie as sent
+-- (js/facturen/facturen-app.js markTikkieSent), and the client sees a "Pay with Tikkie"
+-- link for it on their own bookings page (account.html). Nullable, so bookings where no
+-- link was saved simply show no payment button. Covered by the existing staff-write /
+-- client-read-own RLS policies below (no per-column rules needed).
+alter table public.bookings add column if not exists tikkie_url text;
+
 create sequence if not exists public.factuur_number_seq start 1;
 
 -- Staff allow-list: authenticated users who can see/manage ALL bookings (as opposed to a

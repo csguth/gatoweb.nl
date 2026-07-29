@@ -15,6 +15,7 @@
   "not_staff_error": "Dit account heeft geen toegang tot het facturendashboard.",
   "reject_confirm": "Boekingsverzoek van {{client}} afwijzen? Dit kan later ongedaan worden gemaakt vanuit de kolom 'Klaar'.",
   "reject_button_title": "Boeking afwijzen",
+  "tikkie_url_invalid": "Voer een geldige Tikkie-link in (begint met https://).",
   "invoice": {
     "title": "Factuur {{number}}",
     "date_label": "Datum: {{date}}",
@@ -218,7 +219,8 @@
         "cancelled": "Geannuleerd",
         "dates": "Data:",
         "pets": "Huisdieren:",
-        "amount": "Bedrag:"
+        "amount": "Bedrag:",
+        "pay_with_tikkie": "💳 Betaal met Tikkie"
       }
     },
     "facturen": {
@@ -254,6 +256,7 @@
         "amount_2": "Bedrag:",
         "print_invoice": "🖨️ Factuur afdrukken",
         "tikkie_sent": "✓ Tikkie verstuurd",
+        "tikkie_url_label": "Tikkie-betaallink",
         "whatsapp_client": "WhatsApp klant",
         "edit_client_info": "✏️ Klantgegevens",
         "edit_client_info_short": "✏️ Bewerken",
