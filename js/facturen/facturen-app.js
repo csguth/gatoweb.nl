@@ -1,6 +1,7 @@
 // facturenApp() Alpine component for facturen.html (Ligia's staff-only invoicing tool).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { buildInvoiceLineItems } from './invoice-calc.js';
+import { isValidPaymentUrl } from './payment-url.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -48,17 +49,6 @@ const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 function petsText(pets) {
   if (!Array.isArray(pets)) return '-';
   return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
-}
-
-// Basic sanity check for the Tikkie payment link Lígia pastes in (issue #63): it must be
-// a well-formed absolute http(s) URL, so the client never gets a broken/relative link.
-function isValidPaymentUrl(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
 }
 
 function factuurNumberLabel(n, referenceDate) {
