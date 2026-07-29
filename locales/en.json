@@ -218,7 +218,8 @@
         "cancelled": "Cancelled",
         "dates": "Dates:",
         "pets": "Pets:",
-        "amount": "Amount:"
+        "amount": "Amount:",
+        "view_invoice": "🖨️ View / print invoice"
       }
     },
     "facturen": {

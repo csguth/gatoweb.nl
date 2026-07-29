@@ -218,7 +218,8 @@
         "cancelled": "Geannuleerd",
         "dates": "Data:",
         "pets": "Huisdieren:",
-        "amount": "Bedrag:"
+        "amount": "Bedrag:",
+        "view_invoice": "🖨️ Factuur bekijken / afdrukken"
       }
     },
     "facturen": {
