@@ -1,0 +1,85 @@
+name: Apply Supabase DB migration
+description: >-
+  Applies the idempotent supabase/schema.sql to a Supabase project via the
+  Management API (the same endpoint the dashboard SQL editor uses), so every
+  deploy keeps the target database's schema in sync with the repo. Because
+  schema.sql only uses idempotent statements (create ... if not exists,
+  alter table ... add column if not exists, create or replace ...), it is safe
+  to re-apply on every deploy.
+
+inputs:
+  supabase-url:
+    description: >-
+      The project's SUPABASE_URL (https://<ref>.supabase.co). The project ref is
+      derived from it, so the migration always targets the same project as the
+      deploy's runtime config.
+    required: true
+  access-token:
+    description: >-
+      A Supabase personal access token (PAT) with access to the project. Pass a
+      secret here (never a plaintext value).
+    required: true
+  schema-file:
+    description: Path to the SQL schema file to apply.
+    required: false
+    default: supabase/schema.sql
+
+runs:
+  using: composite
+  steps:
+    - name: Apply schema via Supabase Management API
+      shell: bash
+      env:
+        SUPABASE_URL: ${{ inputs.supabase-url }}
+        SUPABASE_ACCESS_TOKEN: ${{ inputs.access-token }}
+        SCHEMA_FILE: ${{ inputs.schema-file }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "${SUPABASE_URL}" ]; then
+          echo "::error::supabase-url input is empty"
+          exit 1
+        fi
+        if [ -z "${SUPABASE_ACCESS_TOKEN}" ]; then
+          echo "::error::access-token input is empty (is the SUPABASE_ACCESS_TOKEN secret set for this environment?)"
+          exit 1
+        fi
+        if [ ! -f "${SCHEMA_FILE}" ]; then
+          echo "::error::schema file not found: ${SCHEMA_FILE}"
+          exit 1
+        fi
+
+        # Derive the project ref from the URL (https://<ref>.supabase.co).
+        ref="$(printf '%s' "${SUPABASE_URL}" | sed -E 's#^https?://([^.]+)\.supabase\.(co|com|net).*#\1#')"
+        if [ -z "${ref}" ] || [ "${ref}" = "${SUPABASE_URL}" ]; then
+          echo "::error::could not derive project ref from SUPABASE_URL"
+          exit 1
+        fi
+        echo "Applying ${SCHEMA_FILE} to Supabase project ${ref}"
+
+        # Build the JSON request body from the file safely (handles quotes, $$, newlines).
+        payload="$(jq -Rs '{query: .}' "${SCHEMA_FILE}")"
+
+        response="$(mktemp)"
+        status="$(curl -sS -o "${response}" -w '%{http_code}' \
+          -X POST "https://api.supabase.com/v1/projects/${ref}/database/query" \
+          -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+          -H "Content-Type: application/json" \
+          --data-binary "${payload}")"
+
+        if [ "${status}" -ge 300 ]; then
+          echo "::error::Migration failed (HTTP ${status})"
+          cat "${response}"
+          exit 1
+        fi
+
+        echo "Migration applied (HTTP ${status})."
+
+        # Force PostgREST to reload its schema cache immediately so the API sees
+        # any new columns/tables right away instead of after its periodic refresh.
+        reload_payload="$(jq -Rn '{query: "notify pgrst, '"'"'reload schema'"'"';"}')"
+        curl -sS -o /dev/null -w 'schema reload: HTTP %{http_code}\n' \
+          -X POST "https://api.supabase.com/v1/projects/${ref}/database/query" \
+          -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+          -H "Content-Type: application/json" \
+          --data-binary "${reload_payload}" || true

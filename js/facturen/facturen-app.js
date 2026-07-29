@@ -1,6 +1,7 @@
 // facturenApp() Alpine component for facturen.html (Ligia's staff-only invoicing tool).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { buildInvoiceLineItems } from './invoice-calc.js';
+import { isValidPaymentUrl } from './payment-url.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -413,10 +414,16 @@ window.facturenApp = function () {
     },
 
     async markTikkieSent(b) {
+      // Store the actual Tikkie payment link (issue #63) so the client can pay from their
+      // own bookings page. Optional — Lígia can still just mark it sent — but if she pastes
+      // a link it must be a valid http(s) URL so the client never gets a broken button.
+      const url = (b.tikkie_url || '').trim();
+      if (url && !isValidPaymentUrl(url)) { alert(t('tikkie_url_invalid')); return; }
       b._busy = true;
-      const { error } = await supabase.from('bookings').update({ tikkie_sent: true }).eq('id', b.id);
+      const { error } = await supabase.from('bookings').update({ tikkie_sent: true, tikkie_url: url || null }).eq('id', b.id);
       b._busy = false;
       if (error) { alert(error.message); return; }
+      b.tikkie_url = url || null;
       b.tikkie_sent = true;
     },
 

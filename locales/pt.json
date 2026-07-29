@@ -15,6 +15,7 @@
   "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
   "reject_confirm": "Recusar o pedido de reserva de {{client}}? Isso pode ser desfeito depois na coluna 'Concluído'.",
   "reject_button_title": "Recusar reserva",
+  "tikkie_url_invalid": "Insira um link Tikkie válido (começando com https://).",
   "invoice": {
     "title": "Fatura {{number}}",
     "date_label": "Data: {{date}}",
@@ -218,7 +219,8 @@
         "cancelled": "Cancelado",
         "dates": "Datas:",
         "pets": "Animais:",
-        "amount": "Valor:"
+        "amount": "Valor:",
+        "pay_with_tikkie": "💳 Pagar com Tikkie"
       }
     },
     "facturen": {
@@ -254,6 +256,7 @@
         "amount_2": "Quantia:",
         "print_invoice": "🖨️ Imprimir fatura",
         "tikkie_sent": "✓ Tikkie enviado",
+        "tikkie_url_label": "Link de pagamento Tikkie",
         "whatsapp_client": "WhatsApp do cliente",
         "edit_client_info": "✏️ Cliente",
         "edit_client_info_short": "✏️ Editar",

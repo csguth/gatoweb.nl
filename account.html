@@ -120,6 +120,11 @@
 <div><span class="font-semibold en" data-i18n="account.amount">Amount:</span><span class="font-semibold nl">Bedrag:</span><span class="font-semibold pt">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
 </template>
 </div>
+<template x-if="b.status === 'approved' &amp;&amp; b.tikkie_url">
+<a :href="b.tikkie_url" class="block text-center bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold py-2.5 rounded-xl transition" rel="noopener noreferrer" target="_blank">
+<span class="en" data-i18n="account.pay_with_tikkie">💳 Pay with Tikkie</span><span class="nl">💳 Betaal met Tikkie</span><span class="pt">💳 Pagar com Tikkie</span>
+</a>
+</template>
 </div>
 </template>
 </div>
