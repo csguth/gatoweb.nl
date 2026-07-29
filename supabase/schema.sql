@@ -65,6 +65,20 @@ alter table public.bookings add column if not exists adjustment_note text;
 -- client-read-own RLS policies below (no per-column rules needed).
 alter table public.bookings add column if not exists tikkie_url text;
 
+-- Issue #62 follow-up: the official (sequentially-numbered) factuur is now only generated
+-- once the Tikkie has actually been PAID. Approving a booking produces a *proforma* instead
+-- (status 'approved' with factuur_number still NULL), which doesn't consume a number in the
+-- gap-free sequence. paid_at records when staff marked the Tikkie as paid; the real
+-- factuur_number is assigned atomically at that moment by mark_booking_paid() below.
+alter table public.bookings add column if not exists paid_at timestamptz;
+
+-- Backfill: bookings approved under the OLD flow already have a factuur_number (the invoice
+-- was effectively issued at approval time), so treat them as paid to keep them "final"
+-- instead of retroactively downgrading them to proforma.
+update public.bookings
+  set paid_at = coalesce(paid_at, approved_at, now())
+  where factuur_number is not null and paid_at is null;
+
 create sequence if not exists public.factuur_number_seq start 1;
 
 -- Staff allow-list: authenticated users who can see/manage ALL bookings (as opposed to a
@@ -130,8 +144,11 @@ revoke insert on public.bookings from anon;
 grant select, insert, update on public.bookings to authenticated;
 grant usage, select on sequence public.factuur_number_seq to authenticated;
 
--- Atomically approve a pending booking: assigns the next sequential factuur number and
--- locks in the final amount. Only callable by staff.
+-- Atomically approve a pending booking: locks in the final amount and moves it to
+-- 'approved'. As of issue #62 this NO LONGER assigns a factuur_number — approval only
+-- produces a proforma (factuur_number stays NULL). The real, sequential number is handed
+-- out later by mark_booking_paid() once the Tikkie is paid, so the numbering sequence has
+-- no gaps for bookings that are approved but never paid. Only callable by staff.
 --
 -- Issue #52: the final amount is no longer an arbitrary number typed by staff — it's
 -- always p_calculated_total (the sum of the invoice line items, computed client-side by
@@ -169,7 +186,6 @@ begin
         final_amount = round(coalesce(p_calculated_total, 0) + coalesce(p_adjustment_amount, 0), 2),
         adjustment_amount = coalesce(p_adjustment_amount, 0),
         adjustment_note = nullif(btrim(coalesce(p_adjustment_note, '')), ''),
-        factuur_number = nextval('public.factuur_number_seq'),
         approved_at = now()
     where id = p_booking_id and status = 'pending'
     returning * into v_row;
@@ -184,6 +200,56 @@ $$;
 
 revoke all on function public.approve_booking(uuid, numeric, numeric, text) from public;
 grant execute on function public.approve_booking(uuid, numeric, numeric, text) to authenticated;
+
+-- Issue #62: mark an approved booking's Tikkie as PAID. This is the moment the official
+-- factuur comes into existence: it assigns the next sequential factuur_number (only if the
+-- booking doesn't already have one, so re-marking is idempotent and never burns a number)
+-- and stamps paid_at. Marking as paid also implies the Tikkie was sent. Staff only.
+--
+-- SELECT ... FOR UPDATE locks the row first so two concurrent calls can't both pull a fresh
+-- nextval for the same booking; the coalesce keeps an already-issued number stable.
+create or replace function public.mark_booking_paid(
+  p_booking_id uuid
+)
+returns public.bookings
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_row public.bookings;
+  v_number integer;
+begin
+  if not public.is_staff() then
+    raise exception 'not authorized';
+  end if;
+
+  select factuur_number into v_number
+    from public.bookings
+    where id = p_booking_id and status = 'approved'
+    for update;
+
+  if not found then
+    raise exception 'booking not found or not approved';
+  end if;
+
+  if v_number is null then
+    v_number := nextval('public.factuur_number_seq');
+  end if;
+
+  update public.bookings
+    set factuur_number = v_number,
+        tikkie_sent = true,
+        paid_at = coalesce(paid_at, now())
+    where id = p_booking_id
+    returning * into v_row;
+
+  return v_row;
+end;
+$$;
+
+revoke all on function public.mark_booking_paid(uuid) from public;
+grant execute on function public.mark_booking_paid(uuid) to authenticated;
 
 -- Issue #52: client name/phone/address are normally read-only in facturen.html once a
 -- booking exists — they come from the client's own booking submission. When staff really
