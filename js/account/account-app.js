@@ -86,7 +86,14 @@ window.accountApp = function () {
       this.loading = true;
       this.errorMsg = '';
       this.infoMsg = '';
-      const { data, error } = await supabase.auth.signUp({ email: this.email, password: this.password });
+      // Without emailRedirectTo the confirmation link's redirect_to falls back to the
+      // Supabase project's "Site URL" (often localhost); pin it to the live origin the
+      // client actually signed up on so the link returns to gatoweb.nl (or staging).
+      const { data, error } = await supabase.auth.signUp({
+        email: this.email,
+        password: this.password,
+        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+      });
       this.loading = false;
       if (error) { this.errorMsg = error.message; return; }
       if (!data.session) {

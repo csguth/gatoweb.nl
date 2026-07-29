@@ -42,7 +42,14 @@ window.__gatoClientAuth = {
   },
   async signUp(email, password) {
     if (!supabase) return { session: null, error: t('auth.not_configured') };
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    // Without emailRedirectTo the confirmation link's redirect_to falls back to the
+    // Supabase project's "Site URL" (often localhost); pin it to the live origin the
+    // client actually signed up on so the link returns to gatoweb.nl (or staging).
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
     return { session: data.session, error: error ? error.message : null };
   },
   async signOut() {
