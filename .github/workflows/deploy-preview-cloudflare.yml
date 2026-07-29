@@ -1,0 +1,161 @@
+name: Deploy PR Preview (Cloudflare Pages)
+
+# Automatically deploys every pull request to its own isolated Cloudflare Pages
+# preview URL so a branch can be tested live before merging — without touching
+# staging.gatoweb.nl or main. Each PR gets a stable `pr-<number>` preview that is
+# re-deployed on every push, and the URL is posted back as a sticky PR comment.
+#
+# This mirrors the build of deploy-staging-cloudflare.yml and shares the same
+# `staging` environment config/secrets (Supabase project, price vars, etc.), so
+# test data created here is NOT fully isolated from other staging testing.
+#
+# Uses `pull_request` (not `pull_request_target`) so repository secrets are only
+# available to branches pushed to this repo, never to untrusted forks.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: cloudflare-preview-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate variables
+        env:
+          WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
+          BRAND_NAME: ${{ vars.BRAND_NAME }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          CITY_NAME: ${{ vars.CITY_NAME }}
+          PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }}
+          PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }}
+          DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
+        run: |
+          required_vars=(
+            WHATSAPP_NUMBER
+            BRAND_NAME
+            SITE_URL
+            CONTACT_EMAIL
+            CITY_NAME
+            PRICE_ONE_VISIT
+            PRICE_TWO_VISITS
+            DOG_WALK_PRICE_FROM
+          )
+
+          for var_name in "${required_vars[@]}"; do
+            if [ -z "${!var_name}" ]; then
+              echo "Missing environment variable: ${var_name}"
+              exit 1
+            fi
+          done
+
+          for n in PRICE_ONE_VISIT PRICE_TWO_VISITS DOG_WALK_PRICE_FROM; do
+            value="${!n}"
+            if ! [[ "$value" =~ ^[0-9]+$ ]]; then
+              echo "${n} must be numeric"
+              exit 1
+            fi
+          done
+
+      - name: Build site with injected variables
+        run: |
+          mkdir -p site
+          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
+
+          for f in site/index.html site/facturen.html site/account.html site/locales/en.json site/locales/nl.json site/locales/pt.json; do
+            sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" "$f"
+            sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" "$f"
+            sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" "$f"
+            sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" "$f"
+            sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" "$f"
+            sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" "$f"
+            sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" "$f"
+            sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" "$f"
+            sed -i "s|__ENV_LABEL__|${{ vars.ENV_LABEL }}|g" "$f"
+          done
+
+          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt
+          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/sitemap.xml
+
+      - name: Generate js/config.js with runtime constants
+        run: |
+          cat > site/js/config.js <<JSEOF
+          window.GATOWEB_CONFIG = {
+            SUPABASE_URL: $(jq -Rn --arg v "${{ vars.SUPABASE_URL }}" '$v'),
+            SUPABASE_ANON_KEY: $(jq -Rn --arg v "${{ vars.SUPABASE_ANON_KEY }}" '$v'),
+            BUSINESS_LEGAL_NAME: $(jq -Rn --arg v "${{ vars.BUSINESS_LEGAL_NAME }}" '$v'),
+            BUSINESS_ADDRESS: $(jq -Rn --arg v "${{ vars.BUSINESS_ADDRESS }}" '$v'),
+            KVK_NUMBER: $(jq -Rn --arg v "${{ vars.KVK_NUMBER }}" '$v'),
+            IBAN_NUMBER: $(jq -Rn --arg v "${{ vars.IBAN_NUMBER }}" '$v'),
+            BTW_EXEMPT: $(jq -Rn --arg v "${{ vars.BTW_EXEMPT }}" '$v'),
+            BRAND_NAME: $(jq -Rn --arg v "${{ vars.BRAND_NAME }}" '$v'),
+            PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
+            PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
+            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
+            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }},
+            WHATSAPP_NUMBER: $(jq -Rn --arg v "${{ vars.WHATSAPP_NUMBER }}" '$v')
+          };
+          JSEOF
+
+      - name: Deploy to Cloudflare Pages (staging project, PR preview)
+        id: deploy
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gatoweb-nl-staging
+          directory: site
+          # A stable, per-PR preview branch so every push to the PR re-deploys the
+          # same isolated preview (never the real `staging` branch/URL).
+          branch: pr-${{ github.event.pull_request.number }}
+
+      - name: Comment preview URL on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = ${{ toJSON(steps.deploy.outputs.url) }};
+            const marker = '<!-- cloudflare-pr-preview -->';
+            const body = [
+              marker,
+              '### 🚀 Cloudflare Pages preview',
+              '',
+              `Preview desta PR: ${url}`,
+              '',
+              `Commit: \`${context.sha.slice(0, 7)}\``,
+              '',
+              '> ⚠️ Compartilha o projeto/dados Supabase de **staging** — dados de teste criados aqui não ficam isolados de outros testes de staging.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
