@@ -45,6 +45,20 @@ create table if not exists public.staff_emails (
   email text primary key
 );
 
+alter table public.staff_emails enable row level security;
+
+-- Only staff members can read the allow-list directly. The is_staff() function is
+-- security definer (runs as its creator), so it bypasses RLS and always works regardless
+-- of these policies.
+drop policy if exists "staff can select staff_emails" on public.staff_emails;
+create policy "staff can select staff_emails"
+  on public.staff_emails for select
+  to authenticated
+  using (public.is_staff());
+
+revoke all on table public.staff_emails from anon;
+grant select on table public.staff_emails to authenticated;
+
 insert into public.staff_emails (email) values ('gatocatsit@gmail.com') on conflict do nothing;
 
 create or replace function public.is_staff()
