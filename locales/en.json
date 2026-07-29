@@ -10,6 +10,11 @@
     "account_created_check_email_login": "Account created! Check your email and click the confirmation link, then log in here.",
     "not_configured": "Service is not configured yet."
   },
+  "adjustment_note_required": "Please provide a reason for the amount adjustment.",
+  "client_edit_reason_required": "Please provide a reason for correcting the client info.",
+  "not_staff_error": "This account doesn't have access to the invoice dashboard.",
+  "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the 'Done' column.",
+  "reject_button_title": "Reject booking",
   "invoice": {
     "title": "Invoice {{number}}",
     "date_label": "Date: {{date}}",
@@ -28,8 +33,6 @@
     "recipient_label": "To:",
     "address_label": "Address: {{address}}",
     "contact_label": "Phone: {{contact}}",
-    "adjustment_note_required": "Please provide a reason for the amount adjustment.",
-    "client_edit_reason_required": "Please provide a reason for correcting the client info.",
     "table": {
       "description": "Description",
       "period": "Period",
@@ -48,11 +51,15 @@
       "frequency_2": "2x per day",
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} to {{to}}",
-      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}"
+      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}",
+      "adjustment": "Adjustment: {{note}}"
     },
     "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
     "print_button": "🖨️ Print invoice / save as PDF",
-    "popup_blocked": "Please allow pop-ups to view the invoice."
+    "popup_blocked": "Please allow pop-ups to view the invoice.",
+    "whatsapp_message": "Hi {{name}}! Your booking ({{dates}}) is confirmed. See you soon!",
+    "whatsapp_message_generic": "Hi! Your booking ({{dates}}) is confirmed. See you soon!",
+    "whatsapp_client": "WhatsApp client"
   },
   "static": {
     "index": {
@@ -155,6 +162,8 @@
         "logged_in_as": "Logged in as",
         "log_out": "Log out",
         "your_name_optional": "Your name <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
+        "address": "Address",
+        "whatsapp_phone_optional": "WhatsApp / phone <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
         "first_day": "First day",
         "last_day_optional": "Last day <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
         "pets": "Pets",
@@ -175,6 +184,7 @@
         "booking_request_sent": "Booking request sent!",
         "l_gia_will_confirm_availability": "Lígia will confirm availability within 24 hours.",
         "track_my_booking": "Track my booking →",
+        "message_ligia_whatsapp": "Message Lígia on WhatsApp",
         "send_booking_request": "Send booking request",
         "l_gia_will_confirm_availability_2": "Lígia will confirm availability within 24 hours.",
         "track_my_booking_2": "Track my booking →"
@@ -232,6 +242,7 @@
         "cancelled": "Cancelled",
         "client": "Client",
         "client_address": "Address",
+        "client_contact": "WhatsApp / phone",
         "dates": "Dates:",
         "pets": "Pets:",
         "preference": "Preference:",
@@ -242,7 +253,20 @@
         "pets_2": "Pets:",
         "amount_2": "Amount:",
         "print_invoice": "🖨️ Print invoice",
-        "tikkie_sent": "✓ Tikkie sent"
+        "tikkie_sent": "✓ Tikkie sent",
+        "whatsapp_client": "WhatsApp client",
+        "edit_client_info": "✏️ Client info",
+        "edit_client_info_short": "✏️ Edit",
+        "edit_client_info_title": "Edit client info",
+        "edit_client_info_help": "This info comes from the client's own booking. Only change it to correct a mistake, and always give a reason.",
+        "client_edit_reason": "Reason (required)",
+        "cancel": "Cancel",
+        "save": "Save",
+        "calculated_subtotal": "Calculated subtotal",
+        "adjustment_amount": "Adjustment (€)",
+        "final_total": "Total (€)",
+        "adjustment_note": "Adjustment reason (required)",
+        "restore_to_inbox": "↩️ Restore to inbox"
       }
     }
   }
