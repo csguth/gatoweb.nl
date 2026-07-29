@@ -21,3 +21,9 @@ Feature: Pay with Tikkie link on the client bookings page
     Given I am logged in on my bookings page
     When my bookings include a pending booking with the Tikkie link "https://tikkie.me/pay/abc123"
     Then I do not see a Pay with Tikkie button
+
+  @auth-required
+  Scenario: A paid booking does not show a Pay with Tikkie button anymore
+    Given I am logged in on my bookings page
+    When my bookings include a paid booking with the Tikkie link "https://tikkie.me/pay/abc123"
+    Then I do not see a Pay with Tikkie button

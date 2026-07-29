@@ -27,7 +27,7 @@ function makeBooking(overrides) {
     status: 'approved',
     tikkie_sent: true,
     tikkie_url: null,
-    factuur_number: 1,
+    factuur_number: null,
     approved_at: '2025-08-01T00:00:00Z',
     date_from: '2025-08-01',
     date_to: '2025-08-03',
@@ -74,6 +74,15 @@ When(
   async ({ page }, url) => {
     await seedBookings(page, [
       makeBooking({ status: 'pending', tikkie_sent: false, factuur_number: null, tikkie_url: url })
+    ]);
+  }
+);
+
+When(
+  'my bookings include a paid booking with the Tikkie link {string}',
+  async ({ page }, url) => {
+    await seedBookings(page, [
+      makeBooking({ status: 'approved', factuur_number: 1, tikkie_sent: true, tikkie_url: url })
     ]);
   }
 );
