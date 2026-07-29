@@ -1,5 +1,10 @@
 -- Gato Petsit — bookings & facturen (invoices) schema
--- Run this once in the Supabase project's SQL editor (Database > SQL Editor).
+-- This file is the single source of truth for the database schema and is applied
+-- automatically on every deploy (see .github/actions/apply-db-migration + the deploy
+-- workflows), which runs it against the target project via the Supabase Management API.
+-- Every statement here MUST stay idempotent (create ... if not exists, alter table ...
+-- add column if not exists, create or replace ...) so re-applying it on each deploy is a
+-- no-op when nothing changed. You can also still run it by hand in the SQL editor.
 --
 -- Design (see GitHub issues #5 and #12):
 --   * A client must have their own account (email+password, Supabase Auth) to create a
