@@ -1,5 +1,6 @@
 // accountApp() Alpine component for account.html (client self-service booking portal, issue #12).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -121,6 +122,21 @@ window.accountApp = function () {
 
     factuurLabel(b) {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
+    },
+
+    // Whether the client can open the invoice document for this booking. Any non-cancelled
+    // booking can be viewed (issue #62): while it's still awaiting confirmation (pending) or
+    // approved-but-unpaid it's a proforma (no factuur_number), and once paid it becomes the
+    // official numbered factuur — the same document generator handles all cases, computing
+    // line items straight from the booking (dates/pets/preference) + config rates. Cancelled
+    // bookings never show the button. RLS (supabase/schema.sql) guarantees the client only
+    // ever receives their own rows.
+    canViewInvoice(b) {
+      return b.status === 'pending' || b.status === 'approved';
+    },
+
+    viewInvoice(b) {
+      openInvoicePrintWindow(b);
     }
   };
 };
