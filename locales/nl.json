@@ -17,6 +17,8 @@
   "reject_button_title": "Boeking afwijzen",
   "invoice": {
     "title": "Factuur {{number}}",
+    "proforma_title": "Proforma factuur",
+    "proforma_notice": "Dit is een proforma en geen definitieve (fiscale) factuur, en heeft geen officieel factuurnummer. De definitieve factuur volgt zodra de Tikkie is betaald.",
     "date_label": "Datum: {{date}}",
     "client_label": "Klant: {{client}}",
     "description_label": "Omschrijving:",
@@ -219,7 +221,8 @@
         "dates": "Data:",
         "pets": "Huisdieren:",
         "amount": "Bedrag:",
-        "view_invoice": "🖨️ Factuur bekijken / afdrukken"
+        "view_invoice": "🖨️ Factuur bekijken / afdrukken",
+        "view_proforma": "🖨️ Proforma bekijken / afdrukken"
       }
     },
     "facturen": {
@@ -239,6 +242,7 @@
         "no_invoices": "Geen facturen 🎉",
         "awaiting_approval": "Wacht op goedkeuring",
         "send_tikkie": "Tikkie versturen",
+        "awaiting_payment": "Wacht op betaling",
         "completed": "Voltooid",
         "cancelled": "Geannuleerd",
         "client": "Klant",
@@ -248,13 +252,15 @@
         "pets": "Huisdieren:",
         "preference": "Voorkeur:",
         "amount": "Bedrag (€)",
-        "approve_generate_invoice": "Goedkeuren & Factuur genereren",
+        "approve_generate_invoice": "Goedkeuren & proforma genereren",
         "working_2": "Bezig...",
         "dates_2": "Data:",
         "pets_2": "Huisdieren:",
         "amount_2": "Bedrag:",
         "print_invoice": "🖨️ Factuur afdrukken",
+        "print_proforma": "🖨️ Proforma afdrukken",
         "tikkie_sent": "✓ Tikkie verstuurd",
+        "mark_paid": "✓ Markeer als betaald",
         "whatsapp_client": "WhatsApp klant",
         "edit_client_info": "✏️ Klantgegevens",
         "edit_client_info_short": "✏️ Bewerken",

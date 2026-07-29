@@ -17,6 +17,8 @@
   "reject_button_title": "Recusar reserva",
   "invoice": {
     "title": "Fatura {{number}}",
+    "proforma_title": "Fatura proforma",
+    "proforma_notice": "Esta é uma proforma, não uma fatura fiscal definitiva, e não tem número oficial de fatura. A fatura definitiva será emitida assim que o Tikkie for pago.",
     "date_label": "Data: {{date}}",
     "client_label": "Cliente: {{client}}",
     "description_label": "Descrição:",
@@ -219,7 +221,8 @@
         "dates": "Datas:",
         "pets": "Animais:",
         "amount": "Valor:",
-        "view_invoice": "🖨️ Ver / imprimir fatura"
+        "view_invoice": "🖨️ Ver / imprimir fatura",
+        "view_proforma": "🖨️ Ver / imprimir proforma"
       }
     },
     "facturen": {
@@ -239,6 +242,7 @@
         "no_invoices": "Sem faturas 🎉",
         "awaiting_approval": "Aguardando aprovação",
         "send_tikkie": "Enviar Tikkie",
+        "awaiting_payment": "Aguardando pagamento",
         "completed": "Concluído",
         "cancelled": "Cancelado",
         "client": "Cliente",
@@ -248,13 +252,15 @@
         "pets": "Animais de estimação:",
         "preference": "Preferência:",
         "amount": "Montante (€)",
-        "approve_generate_invoice": "Aprovar e gerar fatura",
+        "approve_generate_invoice": "Aprovar e gerar proforma",
         "working_2": "Trabalhando...",
         "dates_2": "Datas:",
         "pets_2": "Animais de estimação:",
         "amount_2": "Quantia:",
         "print_invoice": "🖨️ Imprimir fatura",
+        "print_proforma": "🖨️ Imprimir proforma",
         "tikkie_sent": "✓ Tikkie enviado",
+        "mark_paid": "✓ Marcar como pago",
         "whatsapp_client": "WhatsApp do cliente",
         "edit_client_info": "✏️ Cliente",
         "edit_client_info_short": "✏️ Editar",

@@ -182,7 +182,8 @@
 <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-orange-300">
 <div class="flex items-center justify-between gap-2">
 <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-orange-100 text-orange-700">
-<span class="nl-l">Tikkie versturen</span><span class="en-l" data-i18n="facturen.send_tikkie">Send Tikkie</span><span class="pt-l">Enviar Tikkie</span>
+<template x-if="!b.tikkie_sent"><span><span class="nl-l">Tikkie versturen</span><span class="en-l" data-i18n="facturen.send_tikkie">Send Tikkie</span><span class="pt-l">Enviar Tikkie</span></span></template>
+<template x-if="b.tikkie_sent"><span><span class="nl-l">Wacht op betaling</span><span class="en-l" data-i18n="facturen.awaiting_payment">Awaiting payment</span><span class="pt-l">Aguardando pagamento</span></span></template>
 </span>
 <span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
 </div>
@@ -203,11 +204,18 @@
 WhatsApp
 </a>
 <button @click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
-<span class="nl-l">🖨️ Factuur afdrukken</span><span class="en-l" data-i18n="facturen.print_invoice">🖨️ Print invoice</span><span class="pt-l">🖨️ Imprimir fatura</span>
+<span class="nl-l">🖨️ Proforma afdrukken</span><span class="en-l" data-i18n="facturen.print_proforma">🖨️ Print proforma</span><span class="pt-l">🖨️ Imprimir proforma</span>
 </button>
+<template x-if="!b.tikkie_sent">
 <button :disabled="b._busy" @click="markTikkieSent(b)" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
 <span class="nl-l">✓ Tikkie verstuurd</span><span class="en-l" data-i18n="facturen.tikkie_sent">✓ Tikkie sent</span><span class="pt-l">✓ Tikkie enviado</span>
 </button>
+</template>
+<template x-if="b.tikkie_sent">
+<button :disabled="b._busy" @click="markPaid(b)" class="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
+<span class="nl-l">✓ Markeer als betaald</span><span class="en-l" data-i18n="facturen.mark_paid">✓ Mark as paid</span><span class="pt-l">✓ Marcar como pago</span>
+</button>
+</template>
 </div>
 </div>
 </div>

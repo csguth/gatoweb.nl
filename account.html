@@ -122,7 +122,8 @@
 </div>
 <template x-if="canViewInvoice(b)">
 <button @click="viewInvoice(b)" class="w-full border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
-<span class="en" data-i18n="account.view_invoice">🖨️ View / print invoice</span><span class="nl">🖨️ Factuur bekijken / afdrukken</span><span class="pt">🖨️ Ver / imprimir fatura</span>
+<template x-if="b.factuur_number"><span><span class="en" data-i18n="account.view_invoice">🖨️ View / print invoice</span><span class="nl">🖨️ Factuur bekijken / afdrukken</span><span class="pt">🖨️ Ver / imprimir fatura</span></span></template>
+<template x-if="!b.factuur_number"><span><span class="en" data-i18n="account.view_proforma">🖨️ View / print proforma</span><span class="nl">🖨️ Proforma bekijken / afdrukken</span><span class="pt">🖨️ Ver / imprimir proforma</span></span></template>
 </button>
 </template>
 </div>

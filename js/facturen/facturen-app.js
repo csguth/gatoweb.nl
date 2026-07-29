@@ -114,14 +114,18 @@ window.facturenApp = function () {
       return sortInbox(this.bookings.filter(b => b.status === 'pending' && matchesSearch(b, term)));
     },
 
+    // "Confirmed" column: approved bookings that don't have an official factuur_number yet
+    // (i.e. the Tikkie hasn't been marked paid). This covers both "Tikkie not sent yet" and
+    // "sent, awaiting payment" — the card itself shows the right action for each (issue #62).
     get confirmedBookings() {
       const term = this.search.trim().toLowerCase();
-      return sortByDate(this.bookings.filter(b => b.status === 'approved' && !b.tikkie_sent && matchesSearch(b, term)));
+      return sortByDate(this.bookings.filter(b => b.status === 'approved' && b.factuur_number == null && matchesSearch(b, term)));
     },
 
+    // "Done" column: paid bookings (they now have a real factuur_number) and cancelled ones.
     get doneBookings() {
       const term = this.search.trim().toLowerCase();
-      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.tikkie_sent)) && matchesSearch(b, term)));
+      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.factuur_number != null)) && matchesSearch(b, term)));
     },
 
     async init() {
@@ -280,6 +284,19 @@ window.facturenApp = function () {
       b._busy = false;
       if (error) { alert(error.message); return; }
       b.tikkie_sent = true;
+    },
+
+    // Issue #62: marking the Tikkie as paid is what actually issues the official factuur —
+    // the mark_booking_paid() RPC atomically assigns the next sequential factuur_number
+    // (only now, never at approval) and stamps paid_at, moving the card to "Done".
+    async markPaid(b) {
+      b._busy = true;
+      const { data, error } = await supabase.rpc('mark_booking_paid', { p_booking_id: b.id });
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      const paid = Array.isArray(data) ? data[0] : data;
+      const idx = this.bookings.findIndex(x => x.id === b.id);
+      if (idx !== -1) this.bookings.splice(idx, 1, { ...b, ...paid, _busy: false });
     },
 
     // Rejects a still-pending booking (the "✕" button in the inbox column). Always asks

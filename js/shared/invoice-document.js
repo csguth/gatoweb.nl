@@ -72,8 +72,8 @@ export function buildInvoiceDocumentHtml(b) {
   const IBAN_NUMBER = c.IBAN_NUMBER;
   const BTW_EXEMPT = c.BTW_EXEMPT;
 
-  const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at);
-  const dateLabel = new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL');
+  const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at || b.paid_at);
+  const dateLabel = new Date(b.paid_at || b.approved_at || Date.now()).toLocaleDateString('nl-NL');
   const { items, total } = buildInvoiceLineItems(b, rates());
   const adjustment = Number(b.adjustment_amount || 0);
   // final_amount is always calculated total + adjustment (set atomically by the
@@ -81,6 +81,14 @@ export function buildInvoiceDocumentHtml(b) {
   // silently diverge from the line items shown below.
   const displayTotal = b.final_amount != null ? Number(b.final_amount) : total + adjustment;
   const hasHighSeasonItem = items.some(function (item) { return item.season === 'high'; });
+
+  // Issue #62: a booking has no factuur_number until its Tikkie is marked paid. Before then
+  // this document is a *proforma* — same figures, but explicitly not a fiscal invoice and
+  // without an official (sequence-consuming) number.
+  const isProforma = b.factuur_number == null;
+  const title = isProforma
+    ? escapeHtml(tNl('invoice.proforma_title'))
+    : escapeHtml(tNl('invoice.title', { number: numberLabel }));
 
   const rows = items.map(function (item) {
     return '<tr>' +
@@ -99,7 +107,6 @@ export function buildInvoiceDocumentHtml(b) {
     : '';
 
   const businessName = escapeHtml(BUSINESS_LEGAL_NAME || c.BRAND_NAME);
-  const title = escapeHtml(tNl('invoice.title', { number: numberLabel }));
 
   return '<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8">' +
     '<title>' + title + '</title>' +
@@ -115,6 +122,8 @@ export function buildInvoiceDocumentHtml(b) {
     'th.num, td.num { text-align: right; white-space: nowrap; }' +
     '.total-row td { border-top: 2px solid #333; border-bottom: none; font-weight: bold; font-size: 12pt; padding-top: 3mm; }' +
     '.notes { font-size: 8.5pt; color: #555; margin-top: 8mm; line-height: 1.5; }' +
+    '.proforma-notice { border: 1px solid #d9a441; background: #fdf6e9; color: #8a5a00; ' +
+      'padding: 3mm 4mm; border-radius: 2mm; font-size: 9.5pt; margin-bottom: 6mm; }' +
     '.no-print { margin-bottom: 8mm; }' +
     '@media print { .no-print { display: none; } }' +
     '</style></head><body>' +
@@ -124,6 +133,7 @@ export function buildInvoiceDocumentHtml(b) {
       (KVK_NUMBER ? '<br>KVK: ' + escapeHtml(KVK_NUMBER) : '') +
     '</div>' +
     '<h1>' + title + '</h1>' +
+    (isProforma ? '<div class="proforma-notice">' + escapeHtml(tNl('invoice.proforma_notice')) + '</div>' : '') +
     '<div class="meta">' +
       '<div>' + escapeHtml(tNl('invoice.date_label', { date: dateLabel })) + '</div>' +
     '</div>' +

@@ -124,12 +124,13 @@ window.accountApp = function () {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
     },
 
-    // Whether the client can open the factuur for this booking. Only approved bookings
-    // have a generated factuur_number, so pending/cancelled bookings never show the button
-    // (issue #62). The invoice document itself is rebuilt from the booking's own line items,
-    // and RLS (supabase/schema.sql) guarantees the client only ever receives their own rows.
+    // Whether the client can open the invoice document for this booking. Approved bookings
+    // can always be viewed (issue #62): before the Tikkie is paid it's a proforma (no
+    // factuur_number), and once paid it becomes the official numbered factuur — the same
+    // document generator handles both. Pending/cancelled bookings never show the button.
+    // RLS (supabase/schema.sql) guarantees the client only ever receives their own rows.
     canViewInvoice(b) {
-      return b.status === 'approved' && b.factuur_number != null;
+      return b.status === 'approved';
     },
 
     viewInvoice(b) {
