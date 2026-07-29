@@ -1,5 +1,6 @@
 // facturenApp() Alpine component for facturen.html (Ligia's staff-only invoicing tool).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { buildInvoiceLineItems } from './invoice-calc.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -8,8 +9,24 @@ const BUSINESS_ADDRESS = window.GATOWEB_CONFIG.BUSINESS_ADDRESS;
 const KVK_NUMBER = window.GATOWEB_CONFIG.KVK_NUMBER;
 const IBAN_NUMBER = window.GATOWEB_CONFIG.IBAN_NUMBER;
 const BTW_EXEMPT = window.GATOWEB_CONFIG.BTW_EXEMPT;
+const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
+const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
+const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
+const SEASONAL_SURCHARGE_PERCENT = Number(window.GATOWEB_CONFIG.SEASONAL_SURCHARGE_PERCENT) || 0;
 
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const t = (key, options) => window.t(key, options);
+
+// The invoice itself is always in Dutch (issue #32), regardless of which language
+// Ligia currently has the dashboard set to — getFixedT('nl') looks up the 'nl' bundle
+// directly instead of the currently active i18next language. All three locale bundles
+// are already loaded by js/i18n.js's init(), so this works even when the UI is in en/pt.
+function tNl(key, options) {
+  if (window.i18next && window.i18next.isInitialized) {
+    return window.i18next.getFixedT('nl')(key, options);
+  }
+  return key;
+}
 
 // Session persistence: this is a static site with no server, so there's no way to
 // set an httpOnly cookie — Supabase's own localStorage-backed session is the standard,
@@ -38,60 +55,183 @@ function factuurNumberLabel(n, referenceDate) {
   return year + '-' + String(n).padStart(4, '0');
 }
 
-// Priority order for the list: things Ligia still needs to act on come first —
-// 0) pending bookings waiting for approval, 1) approved invoices whose Tikkie
-// payment request still needs to be created/sent, 2) approved+Tikkie-sent
-// (done, informational only), 3) cancelled (informational only).
-function priorityOf(b) {
-  if (b.status === 'pending') return 0;
-  if (b.status === 'approved' && !b.tikkie_sent) return 1;
-  if (b.status === 'approved' && b.tikkie_sent) return 2;
-  return 3;
+// Kanban board columns: pending (inbox) → confirmed (send Tikkie) → done
+// (Tikkie sent, or cancelled). Each column is sorted independently.
+
+// Inbox: bookings still awaiting approval, oldest first.
+function sortInbox(list) {
+  return list.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 }
 
-function sortBookings(list) {
-  return list.slice().sort((a, b) => {
-    const pa = priorityOf(a), pb = priorityOf(b);
-    if (pa !== pb) return pa - pb;
-    return new Date(a.created_at) - new Date(b.created_at);
+// Calendar order (by stay start date) for the confirmed/done columns.
+function sortByDate(list) {
+  return list.slice().sort((a, b) => new Date(a.date_from) - new Date(b.date_from));
+}
+
+function matchesSearch(b, term) {
+  if (!term) return true;
+  const haystack = [
+    b.client_name,
+    b.client_email,
+    b.client_address,
+    b.client_contact,
+    petsText(b.pets),
+    b.preference
+  ].filter(Boolean).join(' ').toLowerCase();
+  return haystack.includes(term);
+}
+
+// Issue #52: the invoice total must always be traceable back to the booking's actual
+// line items — this bundles the pricing config once so invoiceItems()/calculatedTotal()
+// (used by the dashboard) and buildInvoiceLineItems() (used by the printed invoice) are
+// always computed from the exact same numbers.
+function rates() {
+  return {
+    priceOneVisit: PRICE_ONE_VISIT,
+    priceTwoVisits: PRICE_TWO_VISITS,
+    dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
+    seasonalSurchargePercent: SEASONAL_SURCHARGE_PERCENT
+  };
+}
+
+// Short on-screen summary for one invoice line item, in whatever language the dashboard
+// is currently set to (as opposed to lineItemDescription() above, which is always Dutch
+// for the printed invoice).
+function itemSummary(item) {
+  const service = t('invoice.line.service_' + item.service);
+  const period = t('invoice.line.period_' + item.period);
+  const frequency = t('invoice.line.frequency_' + item.visitsPerDay);
+  const dateRange = item.from === item.to
+    ? t('invoice.line.date_range_single', { date: item.from })
+    : t('invoice.line.date_range_multi', { from: item.from, to: item.to });
+  const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
+  if (item.type === 'surcharge') {
+    return t('invoice.line.surcharge_item', { percent: item.percent, description: base });
+  }
+  return base;
+}
+
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
 }
 
-function generatePdf(b) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  let y = 20;
-
-  doc.setFontSize(16);
-  doc.text(BUSINESS_LEGAL_NAME || window.GATOWEB_CONFIG.BRAND_NAME, 20, y); y += 8;
-  doc.setFontSize(10);
-  if (BUSINESS_ADDRESS) { doc.text(BUSINESS_ADDRESS, 20, y); y += 5; }
-  if (KVK_NUMBER) { doc.text('KVK: ' + KVK_NUMBER, 20, y); y += 5; }
-  y += 5;
-
-  doc.setFontSize(14);
-  doc.text('Factuur ' + factuurNumberLabel(b.factuur_number, b.approved_at), 20, y); y += 8;
-  doc.setFontSize(10);
-  doc.text('Datum: ' + new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL'), 20, y); y += 10;
-
-  doc.text('Klant: ' + (b.client_name || '-'), 20, y); y += 10;
-
-  doc.text('Omschrijving:', 20, y); y += 6;
-  doc.text('Catsitting/oppasdiensten ' + b.date_from + (b.date_to ? ' t/m ' + b.date_to : ''), 20, y); y += 6;
-  doc.text('Huisdieren: ' + petsText(b.pets), 20, y); y += 6;
-  if (b.preference) { doc.text('Voorkeur: ' + b.preference, 20, y); y += 6; }
-  y += 6;
-
-  doc.setFontSize(12);
-  doc.text('Totaal: € ' + Number(b.final_amount).toFixed(2), 20, y); y += 10;
-
-  doc.setFontSize(9);
-  if (BTW_EXEMPT === 'true') {
-    doc.text('Vrijgesteld van BTW op grond van de kleineondernemersregeling (KOR).', 20, y); y += 6;
+// Turns one structured line item (from invoice-calc.js) into the Dutch sentence shown
+// on the invoice, e.g. "Catsitting 's avonds — 2026-07-01 t/m 2026-07-02, 2x per dag".
+// Seasonal surcharges (item.type === 'surcharge') get their own separate line, so the
+// extra cost is explicit rather than folded into a higher unit price (issue #32 follow-up).
+function lineItemDescription(item) {
+  const service = tNl('invoice.line.service_' + item.service);
+  const period = tNl('invoice.line.period_' + item.period);
+  const frequency = tNl('invoice.line.frequency_' + item.visitsPerDay);
+  const dateRange = item.from === item.to
+    ? tNl('invoice.line.date_range_single', { date: item.from })
+    : tNl('invoice.line.date_range_multi', { from: item.from, to: item.to });
+  const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
+  if (item.type === 'surcharge') {
+    return tNl('invoice.line.surcharge_item', { percent: item.percent, description: base });
   }
-  if (IBAN_NUMBER) { doc.text('Betaling: via Tikkie (apart verzonden) — IBAN ' + IBAN_NUMBER, 20, y); y += 6; }
+  return base;
+}
 
-  doc.save('factuur-' + factuurNumberLabel(b.factuur_number, b.approved_at) + '.pdf');
+// Builds a standalone, self-contained HTML document for the invoice — always in Dutch,
+// laid out for A4 — so Ligia can print it (or "Save as PDF") straight from the browser's
+// own print dialog. This avoids adding a PDF-generation library: @media print + @page
+// is all standard CSS, supported by every modern browser.
+function buildInvoiceDocumentHtml(b) {
+  const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at);
+  const dateLabel = new Date(b.approved_at || Date.now()).toLocaleDateString('nl-NL');
+  const { items, total } = buildInvoiceLineItems(b, rates());
+  const adjustment = Number(b.adjustment_amount || 0);
+  // final_amount is always calculated total + adjustment (set atomically by the
+  // approve_booking() RPC — issue #52) — never a free-typed number, so it can never
+  // silently diverge from the line items shown below.
+  const displayTotal = b.final_amount != null ? Number(b.final_amount) : total + adjustment;
+  const hasHighSeasonItem = items.some(function (item) { return item.season === 'high'; });
+
+  const rows = items.map(function (item) {
+    return '<tr>' +
+      '<td>' + escapeHtml(lineItemDescription(item)) + '</td>' +
+      '<td class="num">' + item.dayCount + '</td>' +
+      '<td class="num">€ ' + item.unitPrice.toFixed(2) + '</td>' +
+      '<td class="num">€ ' + item.subtotal.toFixed(2) + '</td>' +
+      '</tr>';
+  }).join('');
+
+  const adjustmentRow = adjustment !== 0
+    ? '<tr>' +
+        '<td colspan="3">' + escapeHtml(tNl('invoice.line.adjustment', { note: b.adjustment_note || '' })) + '</td>' +
+        '<td class="num">€ ' + adjustment.toFixed(2) + '</td>' +
+      '</tr>'
+    : '';
+
+  const businessName = escapeHtml(BUSINESS_LEGAL_NAME || window.GATOWEB_CONFIG.BRAND_NAME);
+  const title = escapeHtml(tNl('invoice.title', { number: numberLabel }));
+
+  return '<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8">' +
+    '<title>' + title + '</title>' +
+    '<style>' +
+    '@page { size: A4; margin: 20mm; }' +
+    'body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #222; max-width: 170mm; margin: 0 auto; }' +
+    'h1 { font-size: 16pt; margin: 0 0 4mm; }' +
+    '.business { font-size: 9pt; color: #555; margin-bottom: 8mm; }' +
+    '.meta, .recipient { margin-bottom: 6mm; }' +
+    '.meta div, .recipient div { margin-bottom: 1mm; }' +
+    'table { width: 100%; border-collapse: collapse; margin: 6mm 0; }' +
+    'th, td { text-align: left; padding: 2mm 1mm; border-bottom: 1px solid #ddd; font-size: 10pt; }' +
+    'th.num, td.num { text-align: right; white-space: nowrap; }' +
+    '.total-row td { border-top: 2px solid #333; border-bottom: none; font-weight: bold; font-size: 12pt; padding-top: 3mm; }' +
+    '.notes { font-size: 8.5pt; color: #555; margin-top: 8mm; line-height: 1.5; }' +
+    '.no-print { margin-bottom: 8mm; }' +
+    '@media print { .no-print { display: none; } }' +
+    '</style></head><body>' +
+    '<div class="no-print"><button onclick="window.print()">' + escapeHtml(tNl('invoice.print_button')) + '</button></div>' +
+    '<div class="business">' + businessName +
+      (BUSINESS_ADDRESS ? '<br>' + escapeHtml(BUSINESS_ADDRESS) : '') +
+      (KVK_NUMBER ? '<br>KVK: ' + escapeHtml(KVK_NUMBER) : '') +
+    '</div>' +
+    '<h1>' + title + '</h1>' +
+    '<div class="meta">' +
+      '<div>' + escapeHtml(tNl('invoice.date_label', { date: dateLabel })) + '</div>' +
+    '</div>' +
+    '<div class="recipient">' +
+      '<div><strong>' + escapeHtml(tNl('invoice.recipient_label')) + '</strong></div>' +
+      '<div>' + escapeHtml(tNl('invoice.client_label', { client: b.client_name || '-' })) + '</div>' +
+      (b.client_address ? '<div>' + escapeHtml(tNl('invoice.address_label', { address: b.client_address })) + '</div>' : '') +
+      (b.client_contact ? '<div>' + escapeHtml(tNl('invoice.contact_label', { contact: b.client_contact })) + '</div>' : '') +
+    '</div>' +
+    '<table><thead><tr>' +
+      '<th>' + escapeHtml(tNl('invoice.table.description')) + '</th>' +
+      '<th class="num">' + escapeHtml(tNl('invoice.table.days')) + '</th>' +
+      '<th class="num">' + escapeHtml(tNl('invoice.table.unit_price')) + '</th>' +
+      '<th class="num">' + escapeHtml(tNl('invoice.table.subtotal')) + '</th>' +
+    '</tr></thead><tbody>' + rows + adjustmentRow +
+      '<tr class="total-row"><td colspan="3">' + escapeHtml(tNl('invoice.table.subtotal')) + '</td>' +
+      '<td class="num">€ ' + displayTotal.toFixed(2) + '</td></tr>' +
+    '</tbody></table>' +
+    '<div class="notes">' +
+      (hasHighSeasonItem ? '<div>' + escapeHtml(tNl('invoice.seasonal_note', { percent: SEASONAL_SURCHARGE_PERCENT })) + '</div>' : '') +
+      (BTW_EXEMPT === 'true' ? '<div>' + escapeHtml(tNl('invoice.vat_exempt_kor')) + '</div>' : '') +
+      (IBAN_NUMBER ? '<div>' + escapeHtml(tNl('invoice.payment_tikkie_iban', { iban: IBAN_NUMBER })) + '</div>' : '') +
+    '</div>' +
+    '</body></html>';
+}
+
+// Opens the invoice in a new tab as a standalone printable A4 document — Ligia uses the
+// browser's own "Print" / "Save as PDF" from there. Replaces the old jsPDF-based
+// generatePdf() (issue #32): no extra library, and a real A4-styled layout instead of
+// loose text lines.
+function openInvoicePrintWindow(b) {
+  const html = buildInvoiceDocumentHtml(b);
+  const win = window.open('', '_blank');
+  if (!win) {
+    alert(t('invoice.popup_blocked'));
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 }
 
 window.facturenApp = function () {
@@ -104,21 +244,63 @@ window.facturenApp = function () {
     loading: false,
     loadingList: false,
     bookings: [],
+    search: '',
+    clientEdit: null,
+
+    get inboxBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortInbox(this.bookings.filter(b => b.status === 'pending' && matchesSearch(b, term)));
+    },
+
+    get confirmedBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortByDate(this.bookings.filter(b => b.status === 'approved' && !b.tikkie_sent && matchesSearch(b, term)));
+    },
+
+    get doneBookings() {
+      const term = this.search.trim().toLowerCase();
+      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.tikkie_sent)) && matchesSearch(b, term)));
+    },
 
     async init() {
       if (!configured) return;
       const { data } = await supabase.auth.getSession();
-      this.session = data.session;
-      supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
+      if (data.session && await this.checkStaffAccess(data.session)) {
+        this.session = data.session;
+      }
+      supabase.auth.onAuthStateChange((_event, session) => {
+        // Only ever set this.session after a fresh staff check — otherwise a
+        // non-staff account could slip in through a token refresh event.
+        if (!session) this.session = null;
+      });
       if (this.session) this.loadBookings();
+    },
+
+    // Issue #52 follow-up: facturen.html is staff-only, but until now ANY authenticated
+    // Supabase user (e.g. a regular client account) could log in and see the dashboard
+    // shell — only individual actions (approve, edit client info) failed later with a
+    // cryptic "not authorized" error from the RPCs. This checks is_staff() right after
+    // login (and on session restore) and immediately signs the user back out if they
+    // aren't on the staff_emails allow-list, so non-staff accounts never see the board.
+    async checkStaffAccess(session) {
+      const { data: staff, error } = await supabase.rpc('is_staff');
+      if (error || !staff) {
+        await supabase.auth.signOut();
+        this.session = null;
+        this.loginError = t('not_staff_error');
+        return false;
+      }
+      return true;
     },
 
     async login() {
       this.loading = true;
       this.loginError = '';
       const { data, error } = await supabase.auth.signInWithPassword({ email: this.email, password: this.password });
+      if (error) { this.loading = false; this.loginError = error.message; return; }
+      const isStaff = await this.checkStaffAccess(data.session);
       this.loading = false;
-      if (error) { this.loginError = error.message; return; }
+      if (!isStaff) return;
       this.session = data.session;
       this.password = '';
       this.loadBookings();
@@ -138,7 +320,16 @@ window.facturenApp = function () {
         .order('created_at', { ascending: true });
       this.loadingList = false;
       if (error) { alert(error.message); return; }
-      this.bookings = sortBookings((data || []).map(b => ({ ...b, final_amount: b.final_amount ?? b.suggested_amount ?? 0, _busy: false })));
+      // _adjustmentAmount/_adjustmentNote are dashboard-only draft fields for a pending
+      // booking's approval (issue #52) — they seed from any previously-saved adjustment
+      // so re-opening a booking doesn't lose it, but are never sent anywhere until approve().
+      this.bookings = (data || []).map(b => ({
+        ...b,
+        final_amount: b.final_amount ?? b.suggested_amount ?? 0,
+        _adjustmentAmount: Number(b.adjustment_amount || 0),
+        _adjustmentNote: b.adjustment_note || '',
+        _busy: false
+      }));
     },
 
     petsSummary(pets) {
@@ -149,8 +340,76 @@ window.facturenApp = function () {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
     },
 
-    downloadPdf(b) {
-      generatePdf(b);
+    // Issue #52: the invoice line items are always derived from the booking's actual
+    // dates/pets/preference — never free-typed — so the printed invoice and the total
+    // shown on the dashboard can never drift apart.
+    invoiceItems(b) {
+      return buildInvoiceLineItems(b, rates()).items;
+    },
+
+    itemLabel(item) {
+      return itemSummary(item);
+    },
+
+    calculatedTotal(b) {
+      return buildInvoiceLineItems(b, rates()).total;
+    },
+
+    // The only way the final invoiced amount can differ from calculatedTotal(b) is via
+    // an explicit, reasoned adjustment (b._adjustmentAmount + b._adjustmentNote), which
+    // approve() enforces below and the printed invoice shows as its own line item.
+    finalTotal(b) {
+      return this.calculatedTotal(b) + Number(b._adjustmentAmount || 0);
+    },
+
+    printInvoice(b) {
+      openInvoicePrintWindow(b);
+    },
+
+    // Issue #52: client name/phone/address are read-only everywhere else in this
+    // dashboard — this is the ONLY path that can change them, and it always requires a
+    // reason, which edit_client_info() records in booking_client_edits for an audit trail.
+    openClientEdit(b) {
+      this.clientEdit = {
+        bookingId: b.id,
+        client_name: b.client_name || '',
+        client_contact: b.client_contact || '',
+        client_address: b.client_address || '',
+        reason: '',
+        error: '',
+        busy: false
+      };
+    },
+
+    closeClientEdit() {
+      this.clientEdit = null;
+    },
+
+    async saveClientEdit() {
+      const edit = this.clientEdit;
+      if (!edit) return;
+      if (!edit.reason || !edit.reason.trim()) {
+        edit.error = t('client_edit_reason_required');
+        return;
+      }
+      edit.busy = true;
+      edit.error = '';
+      const { data, error } = await supabase.rpc('edit_client_info', {
+        p_booking_id: edit.bookingId,
+        p_new_client_name: edit.client_name,
+        p_new_client_contact: edit.client_contact,
+        p_new_client_address: edit.client_address,
+        p_reason: edit.reason.trim()
+      });
+      edit.busy = false;
+      if (error) { edit.error = error.message; return; }
+
+      const updated = Array.isArray(data) ? data[0] : data;
+      const idx = this.bookings.findIndex(x => x.id === edit.bookingId);
+      if (idx !== -1) {
+        this.bookings.splice(idx, 1, { ...this.bookings[idx], ...updated });
+      }
+      this.clientEdit = null;
     },
 
     async markTikkieSent(b) {
@@ -159,35 +418,90 @@ window.facturenApp = function () {
       b._busy = false;
       if (error) { alert(error.message); return; }
       b.tikkie_sent = true;
-      this.bookings = sortBookings(this.bookings);
+    },
+
+    // Rejects a still-pending booking (the "✕" button in the inbox column). Always asks
+    // for confirmation first so an accidental click can never silently discard a request.
+    // Only flips status -> 'cancelled'; nothing else about the booking is touched, so it
+    // can be safely restored later (see restoreBooking()) without losing any data.
+    async rejectBooking(b) {
+      const confirmMsg = t('reject_confirm', {
+        client: b.client_name || t('invoice.this_client')
+      });
+      if (!confirm(confirmMsg)) return;
+
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', b.id)
+        .eq('status', 'pending');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'cancelled';
+    },
+
+    // Brings a rejected booking back into the inbox (pending) so it can be reconsidered —
+    // it does NOT need to go all the way through approval again immediately. No extra
+    // confirmation here since restoring is non-destructive (unlike rejecting).
+    async restoreBooking(b) {
+      b._busy = true;
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'pending' })
+        .eq('id', b.id)
+        .eq('status', 'cancelled');
+      b._busy = false;
+      if (error) { alert(error.message); return; }
+      b.status = 'pending';
     },
 
     async approve(b) {
-      const isNl = document.body.classList.contains('show-nl');
-      const confirmMsg = isNl
-        ? 'Factuur definitief goedkeuren voor ' + (b.client_name || 'deze klant') + '?'
-        : 'Permanently approve the invoice for ' + (b.client_name || 'this client') + '?';
+      const confirmMsg = t('invoice.confirm_approve', {
+        client: b.client_name || t('invoice.this_client')
+      });
       if (!confirm(confirmMsg)) return;
-      b._busy = true;
 
-      if (b.client_name) {
-        await supabase.from('bookings').update({ client_name: b.client_name }).eq('id', b.id);
+      const adjustmentAmount = Number(b._adjustmentAmount || 0);
+      const adjustmentNote = (b._adjustmentNote || '').trim();
+      if (adjustmentAmount !== 0 && !adjustmentNote) {
+        alert(t('adjustment_note_required'));
+        return;
       }
 
+      b._busy = true;
+
+      // Issue #52: the final amount is always the calculated line-items total plus this
+      // explicit, reasoned adjustment — client_name/client_address/client_contact are
+      // read-only here and are never written by this flow (use openClientEdit() instead).
       const { data, error } = await supabase.rpc('approve_booking', {
         p_booking_id: b.id,
-        p_final_amount: b.final_amount
+        p_calculated_total: this.calculatedTotal(b),
+        p_adjustment_amount: adjustmentAmount,
+        p_adjustment_note: adjustmentNote || null
       });
 
       b._busy = false;
       if (error) { alert(error.message); return; }
 
       const approved = Array.isArray(data) ? data[0] : data;
-      const merged = { ...b, ...approved, client_name: b.client_name, tikkie_sent: false, _busy: false };
+      const merged = { ...b, ...approved, tikkie_sent: false, _busy: false };
       const idx = this.bookings.findIndex(x => x.id === b.id);
       if (idx !== -1) this.bookings.splice(idx, 1, merged);
-      this.bookings = sortBookings(this.bookings);
-      generatePdf(merged);
+      openInvoicePrintWindow(merged);
+    },
+
+    // Builds the wa.me link Lígia uses to message the client directly (issue #39),
+    // pre-filled with a confirmation message. Returns '#' when there's no phone
+    // number saved so the button (hidden via x-show) never navigates anywhere.
+    whatsappLink(b) {
+      if (!b.client_contact) return '#';
+      const digits = String(b.client_contact).replace(/\D/g, '');
+      if (!digits) return '#';
+      const message = b.client_name
+        ? t('invoice.whatsapp_message', { name: b.client_name, dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') })
+        : t('invoice.whatsapp_message_generic', { dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') });
+      return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     }
   };
 };

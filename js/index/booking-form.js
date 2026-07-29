@@ -6,9 +6,12 @@ function bookingForm() {
   const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
   const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
   const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
+  const t = (key, options) => window.t(key, options);
 
   return {
     clientName: saved.clientName || '',
+    address: saved.address || '',
+    clientContact: saved.clientContact || '',
     from: '',
     to: '',
     pref: saved.pref || '',
@@ -28,10 +31,12 @@ function bookingForm() {
     authLoading: false,
 
     _save() {
-      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, pets: this.pets, pref: this.pref })); } catch(e) {}
+      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, clientContact: this.clientContact, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
     async init() {
       this.$watch('clientName', () => this._save());
+      this.$watch('address', () => this._save());
+      this.$watch('clientContact', () => this._save());
       this.$watch('pets', () => this._save());
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
@@ -53,7 +58,13 @@ function bookingForm() {
     },
     async send() {
       if (!this.from) {
-        alert('Selecteer een datum / Please select a start date');
+        alert(t('booking.start_date_required'));
+        return;
+      }
+      // Address is required on the invoice (issue #32) — validated client-side same as
+      // the date, since there's no server-side booking form validation on this static site.
+      if (!this.address || !this.address.trim()) {
+        alert(t('booking.address_required'));
         return;
       }
       // Client account required (issue #12) — if Supabase is configured and the client
@@ -70,6 +81,8 @@ function bookingForm() {
       if (window.__saveBookingToSupabase) {
         await window.__saveBookingToSupabase({
           clientName: this.clientName,
+          address: this.address,
+          clientContact: this.clientContact,
           from: this.from,
           to: this.to,
           pets: this.pets,
@@ -79,6 +92,14 @@ function bookingForm() {
       }
 
       this.sent = true;
+    },
+    // Lets the client message Lígia on WhatsApp right after sending the request,
+    // pre-filled with the dates just booked, mirroring the existing wa.me buttons.
+    whatsappConfirmLink() {
+      const toRange = this.to && this.to > this.from ? ' \u2192 ' + this.to : '';
+      const message = t('booking.whatsapp_confirm_message', { from: this.from, toRange });
+      const number = (window.GATOWEB_CONFIG && window.GATOWEB_CONFIG.WHATSAPP_NUMBER) || '';
+      return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
     },
     async authLogin() {
       this.authLoading = true;
@@ -99,9 +120,7 @@ function bookingForm() {
       this.authLoading = false;
       if (error) { this.authError = error; return; }
       if (!session) {
-        this.authInfo = (document.body.classList.contains('show-nl'))
-          ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.'
-          : 'Account created! Check your email and click the confirmation link, then log in here to send your booking.';
+        this.authInfo = t('booking.account_created_check_email_send');
         this.authMode = 'login';
         this.authPassword = '';
         return;

@@ -1,873 +1,812 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+
+<html class="scroll-smooth" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>__BRAND_NAME__ — __CITY_NAME__</title>
-  <meta name="description" content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="__SITE_URL__/" />
-  <meta property="og:title" content="__BRAND_NAME__ — __CITY_NAME__" />
-  <meta property="og:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="__SITE_URL__/" />
-  <meta property="og:image" content="__SITE_URL__/images/ligia-profile.jpg" />
-  <meta property="og:image:alt" content="Lígia from __BRAND_NAME__ caring for cats in __CITY_NAME__" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="__BRAND_NAME__ — __CITY_NAME__" />
-  <meta name="twitter:description" content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." />
-  <meta name="twitter:image" content="__SITE_URL__/images/ligia-profile.jpg" />
-  <meta name="theme-color" content="#221f19" />
-  <link rel="icon" href="images/favicon.png" type="image/png" />
-  <link rel="apple-touch-icon" href="images/favicon.png" />
-
-  <!-- Tailwind CSS (no build process needed) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-
-  <!-- Runtime config (Supabase URL/keys, prices) injected at deploy time -->
-  <script src="js/config.js"></script>
-  <script src="js/lang-toggle.js"></script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet" href="css/site.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>__BRAND_NAME__ — __CITY_NAME__</title>
+<meta content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." name="description"/>
+<meta content="index,follow,max-image-preview:large" name="robots"/>
+<link href="__SITE_URL__/" rel="canonical"/>
+<meta content="__BRAND_NAME__ — __CITY_NAME__" property="og:title"/>
+<meta content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="__SITE_URL__/" property="og:url"/>
+<meta content="__SITE_URL__/images/ligia-profile.jpg" property="og:image"/>
+<meta content="Lígia from __BRAND_NAME__ caring for cats in __CITY_NAME__" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="__BRAND_NAME__ — __CITY_NAME__" name="twitter:title"/>
+<meta content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." name="twitter:description"/>
+<meta content="__SITE_URL__/images/ligia-profile.jpg" name="twitter:image"/>
+<meta content="#221f19" name="theme-color"/>
+<link href="images/favicon.png" rel="icon" type="image/png"/>
+<link href="images/favicon.png" rel="apple-touch-icon"/>
+<!-- Tailwind CSS (no build process needed) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="js/tailwind-config.js"></script>
+<!-- Runtime config (Supabase URL/keys, prices) injected at deploy time -->
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/i18next@23.16.8/dist/umd/i18next.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/i18n-static.js"></script>
+<script src="js/lang-toggle.js"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="css/site.css" rel="stylesheet"/>
 </head>
-
 <!-- ─── All bilingual text: class="en" shows in English, class="nl" in Dutch ─── -->
-<body class="bg-warm-50 text-gray-800" data-env="__ENV_LABEL__"
-  x-data="langToggle()" x-init="init()">
-
-  <div id="env-banner" class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5">
-    🚧 STAGING — <span class="en">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════
+<body class="bg-warm-50 text-gray-800" data-env="__ENV_LABEL__" x-data="langToggle()" x-init="init()">
+<div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
+    🚧 STAGING — <span class="en" data-i18n="staging_banner.test_environment_not_the_live">test environment, not the live site</span><span class="nl">testomgeving, niet de live site</span>
+</div>
+<!-- ══════════════════════════════════════════════════════════
        NAV
   ══════════════════════════════════════════════════════════ -->
-  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-warm-100 shadow-sm">
-    <div class="max-w-5xl mx-auto px-5 h-24 md:h-32 flex items-center justify-between">
-
-      <a href="#" class="flex items-center gap-2 group">
-        <img src="images/logo.png" alt="__BRAND_NAME__" class="h-20 md:h-28 w-auto" />
-      </a>
-
-      <div class="flex items-center gap-3">
-        <!-- Language toggle -->
-        <button
-          @click="lang = lang === 'en' ? 'nl' : 'en'"
-          class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 hover:bg-sage-50 transition select-none"
-          aria-label="Switch language"
-        >
-          <span class="en">🇳🇱 NL</span>
-          <span class="nl">🇬🇧 EN</span>
-        </button>
-
-        <!-- Book CTA (desktop) -->
-        <a href="#booking"
-           class="hidden sm:inline-flex bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition">
-          <span class="en">Book a visit</span>
-          <span class="nl">Boek een bezoek</span>
-        </a>
-      </div>
-
-    </div>
-  </nav>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-warm-100 shadow-sm">
+<div class="max-w-5xl mx-auto px-5 h-24 md:h-32 flex items-center justify-between">
+<a class="flex items-center gap-2 group" href="#">
+<img alt="__BRAND_NAME__" class="h-20 md:h-28 w-auto" src="images/logo.png"/>
+</a>
+<div class="flex items-center gap-3">
+<!-- Language toggle -->
+<select aria-label="Switch language" class="text-xs font-semibold border border-sage-200 rounded-full px-3 py-1.5 text-sage-600 bg-white hover:bg-sage-50 transition" x-model="lang">
+<option value="en">🇬🇧 EN</option>
+<option value="nl">🇳🇱 NL</option>
+<option value="pt">🇵🇹 PT</option>
+</select>
+<!-- Book CTA (desktop) -->
+<a class="hidden sm:inline-flex bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition" href="#booking">
+<span class="en" data-i18n="nav.book_a_visit">Book a visit</span>
+<span class="nl">Boek een bezoek</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- ══════════════════════════════════════════════════════════
        HERO
   ══════════════════════════════════════════════════════════ -->
-  <header class="bg-sage-600 text-white overflow-hidden">
-    <div class="max-w-5xl mx-auto px-5 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
-
-      <!-- Text -->
-      <div class="flex-1 text-center md:text-left order-2 md:order-1">
-
-        <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-          <span>⭐⭐⭐⭐⭐</span>
-          <span>50+ verified reviews</span>
-        </div>
-
-        <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
-          <span class="en">Expert catsitting<br>in __CITY_NAME__</span>
-          <span class="nl">Professionele<br>kattenoppas in<br>__CITY_NAME__</span>
-        </h1>
-
-        <p class="text-white/80 text-lg mb-8 max-w-sm mx-auto md:mx-0">
-          <span class="en">Respect, love and fun for your cat — while you're away.</span>
-          <span class="nl">Respect, liefde en plezier voor jouw kat — terwijl jij weg bent.</span>
-        </p>
-
-        <div class="flex flex-wrap gap-3 justify-center md:justify-start">
-          <a href="#booking"
-             class="bg-warm-500 hover:bg-warm-600 text-white font-semibold px-6 py-3 rounded-full transition shadow-md">
-            <span class="en">📅 Book a visit</span>
-            <span class="nl">📅 Boek een bezoek</span>
-          </a>
-          <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia!"
-             onclick="markWhatsAppIntent()"
-             target="_blank" rel="noopener noreferrer"
-             class="bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition">
+<header class="bg-sage-600 text-white overflow-hidden">
+<div class="max-w-5xl mx-auto px-5 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
+<!-- Text -->
+<div class="flex-1 text-center md:text-left order-2 md:order-1">
+<div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+<span>⭐⭐⭐⭐⭐</span>
+<span class="en" data-i18n="hero.50_verified_reviews">50+ verified reviews</span>
+<span class="nl">50+ geverifieerde beoordelingen</span>
+</div>
+<h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
+<span class="en" data-i18n="hero.expert_catsitting_in_city_name">Expert catsitting<br/>in __CITY_NAME__</span>
+<span class="nl">Professionele<br/>kattenoppas in<br/>__CITY_NAME__</span>
+</h1>
+<p class="text-white/80 text-lg mb-8 max-w-sm mx-auto md:mx-0">
+<span class="en" data-i18n="hero.respect_love_and_fun_for">Respect, love and fun for your cat — while you're away.</span>
+<span class="nl">Respect, liefde en plezier voor jouw kat — terwijl jij weg bent.</span>
+</p>
+<div class="flex flex-wrap gap-3 justify-center md:justify-start">
+<a class="bg-warm-500 hover:bg-warm-600 text-white font-semibold px-6 py-3 rounded-full transition shadow-md" href="#booking">
+<span class="en" data-i18n="hero.book_a_visit">📅 Book a visit</span>
+<span class="nl">📅 Boek een bezoek</span>
+</a>
+<a class="bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition" href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia!" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
             💬 WhatsApp
           </a>
-        </div>
-
-      </div>
-
-      <!-- Profile photo -->
-      <div class="flex-shrink-0 order-1 md:order-2">
-        <div class="relative inline-block">
-          <img
-            src="images/ligia-profile.jpg"
-            alt="Lígia, professional catsitter in __CITY_NAME__"
-            class="w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white/25 shadow-2xl"
-            loading="eager"
-          />
-          <div class="absolute -bottom-2 -right-2 bg-warm-500 text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-lg whitespace-nowrap">
-            <span class="en">12+ yrs exp.</span>
-            <span class="nl">12+ jr ervaring</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+</div>
+</div>
+<!-- Profile photo -->
+<div class="flex-shrink-0 order-1 md:order-2">
+<div class="relative inline-block">
+<img alt="Lígia, professional catsitter in __CITY_NAME__" class="w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white/25 shadow-2xl" loading="eager" src="images/ligia-profile.jpg"/>
+<div class="absolute -bottom-2 -right-2 bg-warm-500 text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-lg whitespace-nowrap">
+<span class="en" data-i18n="hero.12_yrs_exp">12+ yrs exp.</span>
+<span class="nl">12+ jr ervaring</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- ══════════════════════════════════════════════════════════
        TRUST BAR
   ══════════════════════════════════════════════════════════ -->
-  <div class="bg-white border-b border-warm-100">
-    <div class="max-w-5xl mx-auto px-5 py-7 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-      <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">5.000+</div>
-        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
-          <span class="en">cats rescued</span>
-          <span class="nl">geredde katten</span>
-        </div>
-      </div>
-      <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
-        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
-          <span class="en">5-star reviews</span>
-          <span class="nl">5-ster beoordelingen</span>
-        </div>
-      </div>
-      <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">21</div>
-        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
-          <span class="en">returning clients</span>
-          <span class="nl">vaste klanten</span>
-        </div>
-      </div>
-      <div>
-        <div class="font-serif text-2xl font-bold text-sage-600">12+</div>
-        <div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
-          <span class="en">years experience</span>
-          <span class="nl">jaar ervaring</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<div class="bg-white border-b border-warm-100">
+<div class="max-w-5xl mx-auto px-5 py-7 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+<div>
+<div class="font-serif text-2xl font-bold text-sage-600">5.000+</div>
+<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<span class="en" data-i18n="misc.cats_rescued">cats rescued</span>
+<span class="nl">geredde katten</span>
+</div>
+</div>
+<div>
+<div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
+<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<span class="en" data-i18n="misc.5_star_reviews">5-star reviews</span>
+<span class="nl">5-ster beoordelingen</span>
+</div>
+</div>
+<div>
+<div class="font-serif text-2xl font-bold text-sage-600">21</div>
+<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<span class="en" data-i18n="misc.returning_clients">returning clients</span>
+<span class="nl">vaste klanten</span>
+</div>
+</div>
+<div>
+<div class="font-serif text-2xl font-bold text-sage-600">12+</div>
+<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<span class="en" data-i18n="misc.years_experience">years experience</span>
+<span class="nl">jaar ervaring</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ══════════════════════════════════════════════════════════
        ABOUT
   ══════════════════════════════════════════════════════════ -->
-  <section id="about" class="py-20 bg-warm-50">
-    <div class="max-w-5xl mx-auto px-5 grid md:grid-cols-5 gap-12 items-start">
-
-      <!-- Photo collage -->
-      <div class="md:col-span-2 grid grid-cols-2 gap-3">
-        <img src="images/gallery-1.jpg"
-             alt="Cat being cared for during a home visit"
-             class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" />
-        <img src="images/gallery-2.jpg"
-             alt="Happy cat during catsitting visit"
-             class="rounded-2xl aspect-square object-cover shadow-md mt-6" loading="lazy" />
-        <img src="images/gallery-3.jpg"
-             alt="Playtime during home visit"
-             class="rounded-2xl aspect-square object-cover shadow-md -mt-6" loading="lazy" />
-        <img src="images/gallery-4.jpg"
-             alt="Cat relaxed at home with Lígia"
-             class="rounded-2xl aspect-square object-cover shadow-md" loading="lazy" />
-      </div>
-
-      <!-- Bio text -->
-      <div class="md:col-span-3">
-        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-6">
-          <span class="en">About Lígia</span>
-          <span class="nl">Over Lígia</span>
-        </h2>
-
-        <div class="space-y-4 text-gray-600 leading-relaxed">
-
-          <p class="en">Hi, I'm Lígia — a professional catsitter, cat rescuer and feline behaviour enthusiast based in __CITY_NAME__.</p>
-          <p class="nl">Hoi, ik ben Lígia — een professionele kattenoppas, kattenredder en gedragsenthusiast gevestigd in __CITY_NAME__.</p>
-
-          <p class="en">My journey started 12 years ago with an independent rescue project in Brazil (<em>@gatosanonimosfloripa</em>) that helped more than 5,000 stray cats through rescue, rehabilitation, sterilisation and rehoming. Since then I've continuously studied feline behaviour, health and welfare — because cat care is always evolving.</p>
-          <p class="nl">Mijn reis begon 12 jaar geleden met een reddingsproject in Brazilië (<em>@gatosanonimosfloripa</em>) dat meer dan 5.000 zwerfkatten hielp via redding, revalidatie, sterilisatie en herplaatsing. Sindsdien studeer ik doorlopend kattengedrag, gezondheid en welzijn — want kattenverzorging evolueert voortdurend.</p>
-
-          <p class="en">Every cat is different. My job is to respect their personality, read their body language, and adapt my approach to what makes them feel comfortable. During every visit I monitor behaviour, appetite, litter box habits and overall wellbeing — small changes can mean a lot.</p>
-          <p class="nl">Elke kat is anders. Mijn taak is hun persoonlijkheid te respecteren, hun lichaamstaal te lezen en mijn aanpak aan te passen aan wat hen comfortabel maakt. Tijdens elk bezoek houd ik gedrag, eetlust, kattenbakgewoonten en algeheel welzijn in de gaten.</p>
-
-          <p class="en font-medium text-sage-700">After every visit, you'll receive photos, videos and a detailed update. I know how hard it is to leave your cat — you deserve to feel informed and reassured. 📸</p>
-          <p class="nl font-medium text-sage-700">Na elk bezoek ontvang je foto's, video's en een gedetailleerde update. Ik weet hoe moeilijk het is om je kat achter te laten — jij verdient het om goed geïnformeerd te zijn. 📸</p>
-
-        </div>
-
-        <!-- Skill tags -->
-        <div class="mt-7 flex flex-wrap gap-2">
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Senior cats</span><span class="nl">Seniore katten</span>
-          </span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">Kittens</span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Shy & fearful cats</span><span class="nl">Schuwe katten</span>
-          </span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Medication</span><span class="nl">Medicatie</span>
-          </span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Post-op care</span><span class="nl">Postop zorg</span>
-          </span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Multi-cat households</span><span class="nl">Meerdere katten</span>
-          </span>
-          <span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
-            <span class="en">Behaviour consultation</span><span class="nl">Gedragsconsultatie</span>
-          </span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<section class="py-20 bg-warm-50" id="about">
+<div class="max-w-5xl mx-auto px-5">
+<div class="text-center mb-10">
+<h2 class="font-serif text-3xl font-bold text-sage-700">
+<span class="en" data-i18n="about.about_l_gia">About Lígia</span>
+<span class="nl">Over Lígia</span>
+</h2>
+</div>
+<!-- Modern photo carousel: each slide is a full-bleed photo of Lígia with a
+       short, balanced piece of her story overlaid at the bottom over a dark
+       gradient for contrast. Grid (not flex) track + auto-cols-[100%] avoids a
+       Safari percentage-width bug; js/index/about-carousel.js wires the dots,
+       arrows and keyboard nav (native CSS scroll-snap does the swiping). -->
+<div class="relative rounded-3xl overflow-hidden shadow-lg">
+<div class="grid grid-flow-col auto-cols-[100%] overflow-x-auto snap-x snap-mandatory no-scrollbar" id="about-carousel-track" tabindex="0">
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia holding a fluffy cat" class="absolute inset-0 w-full h-full object-cover" loading="eager" src="images/ligia-profile.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s1_title">Hi, I'm Lígia</span><span class="nl">Hoi, ik ben Lígia</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s1_body">A professional catsitter, cat rescuer and feline behaviour enthusiast. Over twelve years I've helped rescue, treat and rehome more than 5,000 cats.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Professionele kattenoppas, kattenredder en gedragsenthousiast. In twaalf jaar heb ik meegeholpen meer dan 5.000 katten te redden, te behandelen en een thuis te geven.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia cheek to cheek with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-1.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s2_title">Care at your cat's pace</span><span class="nl">Zorg op het tempo van je kat</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s2_body">Senior cats, kittens, shy or fearful cats, post-op and medication — I always use low-stress, respectful handling and adapt to each cat's personality.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Seniore katten, kittens, schuwe of angstige katten, postoperatieve zorg en medicatie — altijd met stressvrije, respectvolle omgang, aangepast aan elke kat.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia at home with several cats" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-3.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s3_title">While you're away</span><span class="nl">Terwijl je weg bent</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s3_body">Every visit I check appetite, litter box and wellbeing — small changes matter. You'll get plenty of photos, videos and updates. And yes, I'll water your plants too. 🪴</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Bij elk bezoek let ik op eetlust, kattenbak en welzijn — kleine dingen tellen. Je krijgt volop foto’s, video’s en updates. En ja, ik geef ook je planten water. 🪴</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia close up with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/ligia-profile.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s4_title">Understanding your cat</span><span class="nl">Je kat begrijpen</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s4_body">I also offer feline behaviour consultations — scratching, litter box troubles, introductions between cats, or simply understanding your cat better. Let's figure it out together.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Ik bied ook gedragsconsulten voor katten aan — krabgedrag, kattenbakproblemen, het introduceren van katten, of gewoon je kat beter begrijpen. Dat zoeken we samen uit.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia with a pet snake" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-4.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s5_title">More than cats</span><span class="nl">Meer dan katten</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s5_body">Rabbits, guinea pigs, birds, snakes, lizards — I love getting to know every species and follow your care instructions closely so their routine stays the same.</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">Konijnen, cavia's, vogels, slangen, hagedissen — ik leer graag elke soort kennen en volg je instructies nauwkeurig, zodat hun routine hetzelfde blijft.</p>
+</div>
+</div>
+</article>
+<article class="snap-start [scroll-snap-stop:always] min-w-0 relative">
+<div class="relative aspect-[3/4] sm:aspect-[16/10] w-full">
+<img alt="Lígia with two dogs" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="images/gallery-2.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
+<div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
+<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<span class="en" data-i18n="about.s6_title">Dogs are welcome too</span><span class="nl">Honden ook welkom</span>
+</h3>
+<p class="en text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow" data-i18n="about.s6_body">And yes, I also offer dog walks! I've had dogs my whole life and walk dogs of all sizes and personalities, with care for safety and leash manners. I hope to become a lasting friend to your best friend. 🖤</p>
+<p class="nl text-white/90 text-sm sm:text-base leading-relaxed max-w-xl drop-shadow">En ja, ik bied ook hondenuitlaatservice aan! Ik heb mijn hele leven honden gehad en loop met honden van alle formaten en karakters, met oog voor veiligheid en lijngedrag. Ik hoop een blijvende vriend te worden voor je beste vriend. 🖤</p>
+</div>
+</div>
+</article>
+</div>
+<button aria-label="Previous" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white text-xl flex items-center justify-center backdrop-blur-sm transition" id="about-carousel-prev" type="button">‹</button>
+<button aria-label="Next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white text-xl flex items-center justify-center backdrop-blur-sm transition" id="about-carousel-next" type="button">›</button>
+<div class="absolute inset-x-0 bottom-4 flex items-center justify-center gap-2" id="about-carousel-dots" role="tablist"></div>
+</div>
+<div class="mt-8 flex flex-wrap justify-center gap-2">
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.senior_cats">Senior cats</span><span class="nl">Seniore katten</span>
+</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">Kittens</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.shy_fearful_cats">Shy &amp; fearful cats</span><span class="nl">Schuwe katten</span>
+</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.medication">Medication</span><span class="nl">Medicatie</span>
+</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.post_op_care">Post-op care</span><span class="nl">Postop zorg</span>
+</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.multi_cat_households">Multi-cat households</span><span class="nl">Meerdere katten</span>
+</span>
+<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="en" data-i18n="about.behaviour_consultation">Behaviour consultation</span><span class="nl">Gedragsconsultatie</span>
+</span>
+</div>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════════════════
        SERVICES
   ══════════════════════════════════════════════════════════ -->
-  <section id="services" class="py-20 bg-white">
-    <div class="max-w-5xl mx-auto px-5">
-
-      <div class="text-center mb-12">
-        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
-          <span class="en">Services & Pricing</span>
-          <span class="nl">Diensten & Prijzen</span>
-        </h2>
-        <p class="text-gray-500 text-sm">
-          <span class="en">All visits are at your home — no travel stress for your cat.</span>
-          <span class="nl">Alle bezoeken zijn bij jou thuis — geen resstress voor jouw kat.</span>
-        </p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6">
-
-        <!-- 1 visit/day -->
-        <div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
-          <div class="text-4xl mb-4">🐱</div>
-          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
-            <span class="en">1 Home Visit / day</span>
-            <span class="nl">1 Huisbezoek per dag</span>
-          </h3>
-          <div class="text-3xl font-bold text-warm-500 mb-4">
+<section class="py-20 bg-white" id="services">
+<div class="max-w-5xl mx-auto px-5">
+<div class="text-center mb-12">
+<h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+<span class="en" data-i18n="services.services_pricing">Services &amp; Pricing</span>
+<span class="nl">Diensten &amp; Prijzen</span>
+</h2>
+<p class="text-gray-500 text-sm">
+<span class="en" data-i18n="services.all_visits_are_at_your">All visits are at your home — no travel stress for your cat.</span>
+<span class="nl">Alle bezoeken zijn bij jou thuis — geen resstress voor jouw kat.</span>
+</p>
+</div>
+<div class="grid md:grid-cols-3 gap-6">
+<!-- 1 visit/day -->
+<div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+<div class="text-4xl mb-4">🐱</div>
+<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<span class="en" data-i18n="services.1_home_visit_day">1 Home Visit / day</span>
+<span class="nl">1 Huisbezoek per dag</span>
+</h3>
+<div class="text-3xl font-bold text-warm-500 mb-4">
             €__PRICE_ONE_VISIT__*<span class="text-sm font-normal text-gray-400"> /dag</span>
-          </div>
-          <ul class="text-sm text-gray-600 space-y-2 flex-1">
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Feeding & fresh water</span>
-              <span class="nl">Voeren & vers water</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Litter box cleaning</span>
-              <span class="nl">Kattenbak reinigen</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Playtime & attention</span>
-              <span class="nl">Spelen & aandacht</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Health monitoring</span>
-              <span class="nl">Gezondheidscheck</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Photo & video updates</span>
-              <span class="nl">Foto & video updates</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Plant watering</span>
-              <span class="nl">Planten water geven</span>
-            </li>
-          </ul>
-          <a href="#booking"
-             class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm">
-            <span class="en">Book now</span>
-            <span class="nl">Boek nu</span>
-          </a>
-        </div>
-
-        <!-- 2 visits/day (highlighted) -->
-        <div class="rounded-2xl border-2 border-sage-600 bg-white p-6 flex flex-col shadow-lg relative">
-          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-pink-600 text-white text-xs font-bold uppercase tracking-wide px-4 py-1 rounded-full shadow whitespace-nowrap">
-            <span class="en">Most popular</span>
-            <span class="nl">Meest gekozen</span>
-          </div>
-          <div class="text-4xl mb-4">🐾</div>
-          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
-            <span class="en">2 Home Visits / day</span>
-            <span class="nl">2 Huisbezoeken per dag</span>
-          </h3>
-          <div class="text-3xl font-bold text-warm-500 mb-4">
+</div>
+<ul class="text-sm text-gray-600 space-y-2 flex-1">
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.feeding_fresh_water">Feeding &amp; fresh water</span>
+<span class="nl">Voeren &amp; vers water</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.litter_box_cleaning">Litter box cleaning</span>
+<span class="nl">Kattenbak reinigen</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.playtime_attention">Playtime &amp; attention</span>
+<span class="nl">Spelen &amp; aandacht</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.health_monitoring">Health monitoring</span>
+<span class="nl">Gezondheidscheck</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.photo_video_updates">Photo &amp; video updates</span>
+<span class="nl">Foto &amp; video updates</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.plant_watering">Plant watering</span>
+<span class="nl">Planten water geven</span>
+</li>
+</ul>
+<a class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
+<span class="en" data-i18n="services.book_now">Book now</span>
+<span class="nl">Boek nu</span>
+</a>
+</div>
+<!-- 2 visits/day (highlighted) -->
+<div class="rounded-2xl border-2 border-sage-600 bg-white p-6 flex flex-col shadow-lg relative">
+<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-pink-600 text-white text-xs font-bold uppercase tracking-wide px-4 py-1 rounded-full shadow whitespace-nowrap">
+<span class="en" data-i18n="services.most_popular">Most popular</span>
+<span class="nl">Meest gekozen</span>
+</div>
+<div class="text-4xl mb-4">🐾</div>
+<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<span class="en" data-i18n="services.2_home_visits_day">2 Home Visits / day</span>
+<span class="nl">2 Huisbezoeken per dag</span>
+</h3>
+<div class="text-3xl font-bold text-warm-500 mb-4">
             €__PRICE_TWO_VISITS__*<span class="text-sm font-normal text-gray-400"> /dag</span>
-          </div>
-          <ul class="text-sm text-gray-600 space-y-2 flex-1">
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Everything in the 1-visit plan</span>
-              <span class="nl">Alles van het 1-bezoek plan</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Morning + evening visits</span>
-              <span class="nl">Ochtend- & avondbezoek</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Ideal for anxious cats</span>
-              <span class="nl">Ideaal voor angstige katten</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Medication administration</span>
-              <span class="nl">Medicatie toedienen</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Update after each visit</span>
-              <span class="nl">Update na elk bezoek</span>
-            </li>
-          </ul>
-          <a href="#booking"
-             class="mt-6 block text-center bg-warm-500 hover:bg-warm-600 text-white font-medium py-2.5 rounded-full transition text-sm">
-            <span class="en">Book now</span>
-            <span class="nl">Boek nu</span>
-          </a>
-        </div>
-
-        <!-- Behaviour consultation -->
-        <div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
-          <div class="text-4xl mb-4">🧠</div>
-          <h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
-            <span class="en">Behaviour Consultation</span>
-            <span class="nl">Gedragsconsultatie</span>
-          </h3>
-          <div class="text-xl font-semibold text-warm-500 mb-4">
-            <span class="en">On request</span>
-            <span class="nl">Op aanvraag</span>
-          </div>
-          <ul class="text-sm text-gray-600 space-y-2 flex-1">
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Litter box issues</span>
-              <span class="nl">Kattenbakproblemen</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Cat-to-cat introductions</span>
-              <span class="nl">Katten introduceren</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Scratching & aggression</span>
-              <span class="nl">Krabben & agressie</span>
-            </li>
-            <li class="flex gap-2"><span class="text-sage-500">✓</span>
-              <span class="en">Anxiety & fearfulness</span>
-              <span class="nl">Angst & schuwheid</span>
-            </li>
-          </ul>
-          <a href="mailto:__CONTACT_EMAIL__?subject=Feline%20Behaviour%20Consultation"
-             class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm">
-            <span class="en">Get in touch</span>
-            <span class="nl">Neem contact op</span>
-          </a>
-        </div>
-
-      </div>
-
-      <p class="text-center text-xs text-gray-400 mt-6">
-        <span class="en">Also available for dogs, rabbits, birds, reptiles & small animals &middot; Dog walks from €__DOG_WALK_PRICE_FROM__</span>
-        <span class="nl">Ook beschikbaar voor honden, konijnen, vogels, reptielen & kleine dieren &middot; Hondenwandelingen vanaf €__DOG_WALK_PRICE_FROM__</span>
-      </p>
-
-      <p class="text-center text-xs text-gray-400 mt-2">
-        <span class="en">* Seasonal surcharges may apply (e.g. public holidays or Sundays)</span>
-        <span class="nl">* Seizoensgebonden toeslagen kunnen van toepassing zijn (bijv. feestdagen of zondagen)</span>
-      </p>
-
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+</div>
+<ul class="text-sm text-gray-600 space-y-2 flex-1">
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.everything_in_the_1_visit">Everything in the 1-visit plan</span>
+<span class="nl">Alles van het 1-bezoek plan</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.morning_evening_visits">Morning + evening visits</span>
+<span class="nl">Ochtend- &amp; avondbezoek</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.ideal_for_anxious_cats">Ideal for anxious cats</span>
+<span class="nl">Ideaal voor angstige katten</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.medication_administration">Medication administration</span>
+<span class="nl">Medicatie toedienen</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.update_after_each_visit">Update after each visit</span>
+<span class="nl">Update na elk bezoek</span>
+</li>
+</ul>
+<a class="mt-6 block text-center bg-warm-500 hover:bg-warm-600 text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
+<span class="en" data-i18n="services.book_now_2">Book now</span>
+<span class="nl">Boek nu</span>
+</a>
+</div>
+<!-- Behaviour consultation -->
+<div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+<div class="text-4xl mb-4">🧠</div>
+<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<span class="en" data-i18n="services.behaviour_consultation">Behaviour Consultation</span>
+<span class="nl">Gedragsconsultatie</span>
+</h3>
+<div class="text-xl font-semibold text-warm-500 mb-4">
+<span class="en" data-i18n="services.on_request">On request</span>
+<span class="nl">Op aanvraag</span>
+</div>
+<ul class="text-sm text-gray-600 space-y-2 flex-1">
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.litter_box_issues">Litter box issues</span>
+<span class="nl">Kattenbakproblemen</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.cat_to_cat_introductions">Cat-to-cat introductions</span>
+<span class="nl">Katten introduceren</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.scratching_aggression">Scratching &amp; aggression</span>
+<span class="nl">Krabben &amp; agressie</span>
+</li>
+<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<span class="en" data-i18n="services.anxiety_fearfulness">Anxiety &amp; fearfulness</span>
+<span class="nl">Angst &amp; schuwheid</span>
+</li>
+</ul>
+<a class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm" href="mailto:__CONTACT_EMAIL__?subject=Feline%20Behaviour%20Consultation">
+<span class="en" data-i18n="services.get_in_touch">Get in touch</span>
+<span class="nl">Neem contact op</span>
+</a>
+</div>
+</div>
+<p class="text-center text-xs text-gray-400 mt-6">
+<span class="en" data-i18n="services.also_available_for_dogs_rabbits">Also available for dogs, rabbits, birds, reptiles &amp; small animals · Dog walks from €__DOG_WALK_PRICE_FROM__</span>
+<span class="nl">Ook beschikbaar voor honden, konijnen, vogels, reptielen &amp; kleine dieren · Hondenwandelingen vanaf €__DOG_WALK_PRICE_FROM__</span>
+</p>
+<p class="text-center text-xs text-gray-400 mt-2">
+<span class="en" data-i18n="services.seasonal_surcharges_may_apply_e">* Seasonal surcharges may apply (e.g. public holidays or Sundays)</span>
+<span class="nl">* Seizoensgebonden toeslagen kunnen van toepassing zijn (bijv. feestdagen of zondagen)</span>
+</p>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════════════════
        HOW IT WORKS
   ══════════════════════════════════════════════════════════ -->
-  <section class="py-20 bg-sage-600 text-white">
-    <div class="max-w-5xl mx-auto px-5">
-
-      <h2 class="font-serif text-3xl font-bold text-center mb-14">
-        <span class="en">How it works</span>
-        <span class="nl">Hoe het werkt</span>
-      </h2>
-
-      <div class="grid md:grid-cols-3 gap-10">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">💬</div>
-          <h3 class="font-semibold text-lg mb-2">
-            <span class="en">1. Get in touch</span>
-            <span class="nl">1. Neem contact op</span>
-          </h3>
-          <p class="text-white/70 text-sm leading-relaxed">
-            <span class="en">Book online or send a WhatsApp. Tell me about your cat(s) and the dates you need.</span>
-            <span class="nl">Boek online of stuur een WhatsApp. Vertel me over jouw kat(ten) en de gewenste data.</span>
-          </p>
-        </div>
-        <div class="text-center">
-          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">🤝</div>
-          <h3 class="font-semibold text-lg mb-2">
-            <span class="en">2. Free Meet & Greet</span>
-            <span class="nl">2. Gratis kennismaking</span>
-          </h3>
-          <p class="text-white/70 text-sm leading-relaxed">
-            <span class="en">I visit your home, meet your cat, and learn their routine before the sitting starts.</span>
-            <span class="nl">Ik kom langs, maak kennis met jouw kat en leer hun routine voordat de oppas begint.</span>
-          </p>
-        </div>
-        <div class="text-center">
-          <div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">📸</div>
-          <h3 class="font-semibold text-lg mb-2">
-            <span class="en">3. Relax & receive updates</span>
-            <span class="nl">3. Ontspannen & updates ontvangen</span>
-          </h3>
-          <p class="text-white/70 text-sm leading-relaxed">
-            <span class="en">I visit your home and send photos and a detailed report after every visit. Your cat is in good hands. 🖤</span>
-            <span class="nl">Ik bezoek jouw huis en stuur na elk bezoek foto's en een gedetailleerd verslag. Jouw kat is in goede handen. 🖤</span>
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<section class="py-20 bg-sage-600 text-white">
+<div class="max-w-5xl mx-auto px-5">
+<h2 class="font-serif text-3xl font-bold text-center mb-14">
+<span class="en" data-i18n="misc.how_it_works">How it works</span>
+<span class="nl">Hoe het werkt</span>
+</h2>
+<div class="grid md:grid-cols-3 gap-10">
+<div class="text-center">
+<div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">💬</div>
+<h3 class="font-semibold text-lg mb-2">
+<span class="en" data-i18n="misc.1_get_in_touch">1. Get in touch</span>
+<span class="nl">1. Neem contact op</span>
+</h3>
+<p class="text-white/70 text-sm leading-relaxed">
+<span class="en" data-i18n="misc.book_online_or_send_a">Book online or send a WhatsApp. Tell me about your cat(s) and the dates you need.</span>
+<span class="nl">Boek online of stuur een WhatsApp. Vertel me over jouw kat(ten) en de gewenste data.</span>
+</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">🤝</div>
+<h3 class="font-semibold text-lg mb-2">
+<span class="en" data-i18n="misc.2_free_meet_greet">2. Free Meet &amp; Greet</span>
+<span class="nl">2. Gratis kennismaking</span>
+</h3>
+<p class="text-white/70 text-sm leading-relaxed">
+<span class="en" data-i18n="misc.i_visit_your_home_meet">I visit your home, meet your cat, and learn their routine before the sitting starts.</span>
+<span class="nl">Ik kom langs, maak kennis met jouw kat en leer hun routine voordat de oppas begint.</span>
+</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center text-3xl mx-auto mb-5">📸</div>
+<h3 class="font-semibold text-lg mb-2">
+<span class="en" data-i18n="misc.3_relax_receive_updates">3. Relax &amp; receive updates</span>
+<span class="nl">3. Ontspannen &amp; updates ontvangen</span>
+</h3>
+<p class="text-white/70 text-sm leading-relaxed">
+<span class="en" data-i18n="misc.i_visit_your_home_and">I visit your home and send photos and a detailed report after every visit. Your cat is in good hands. 🖤</span>
+<span class="nl">Ik bezoek jouw huis en stuur na elk bezoek foto's en een gedetailleerd verslag. Jouw kat is in goede handen. 🖤</span>
+</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════════════════
        REVIEWS
   ══════════════════════════════════════════════════════════ -->
-  <section id="reviews" class="py-20 bg-warm-100">
-    <div class="max-w-5xl mx-auto px-5">
-
-      <div class="text-center mb-10">
-        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
-          <span class="en">50+ five-star reviews</span>
-          <span class="nl">50+ vijf-ster beoordelingen</span>
-        </h2>
-        <div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
-        <p class="text-gray-500 text-sm">
-          <span class="en">Verified reviews from cat owners in __CITY_NAME__</span>
-          <span class="nl">Geverifieerde beoordelingen van katteneigenaren in __CITY_NAME__</span>
-        </p>
-      </div>
-
-      <!-- Rating breakdown -->
-      <div class="max-w-xs mx-auto mb-12 space-y-3">
-        <div class="flex items-center gap-3 text-sm">
-          <span class="text-gray-500 w-36 text-right en">Communication</span>
-          <span class="text-gray-500 w-36 text-right nl">Communicatie</span>
-          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
-          </div>
-          <span class="font-bold text-sage-700 w-4">5</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="text-gray-500 w-36 text-right en">Reliability</span>
-          <span class="text-gray-500 w-36 text-right nl">Betrouwbaarheid</span>
-          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
-          </div>
-          <span class="font-bold text-sage-700 w-4">5</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="text-gray-500 w-36 text-right en">Pet care</span>
-          <span class="text-gray-500 w-36 text-right nl">Omgang met dieren</span>
-          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
-          </div>
-          <span class="font-bold text-sage-700 w-4">5</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm">
-          <span class="text-gray-500 w-36 text-right en">Value</span>
-          <span class="text-gray-500 w-36 text-right nl">Prijs-kwaliteit</span>
-          <div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-            <div class="bg-warm-500 h-2 w-full rounded-full"></div>
-          </div>
-          <span class="font-bold text-sage-700 w-4">5</span>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-5 mb-8">
-        <div class="bg-white rounded-2xl p-5 shadow-sm">
-          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-sm text-gray-600 italic mb-3 en">
+<section class="py-20 bg-warm-100" id="reviews">
+<div class="max-w-5xl mx-auto px-5">
+<div class="text-center mb-10">
+<h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
+<span class="en" data-i18n="reviews.50_five_star_reviews">50+ five-star reviews</span>
+<span class="nl">50+ vijf-ster beoordelingen</span>
+</h2>
+<div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
+<p class="text-gray-500 text-sm">
+<span class="en" data-i18n="reviews.verified_reviews_from_cat_owners">Verified reviews from cat owners in __CITY_NAME__</span>
+<span class="nl">Geverifieerde beoordelingen van katteneigenaren in __CITY_NAME__</span>
+</p>
+</div>
+<!-- Rating breakdown -->
+<div class="max-w-xs mx-auto mb-12 space-y-3">
+<div class="flex items-center gap-3 text-sm">
+<span class="text-gray-500 w-36 text-right en" data-i18n="reviews.communication">Communication</span>
+<span class="text-gray-500 w-36 text-right nl">Communicatie</span>
+<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+</div>
+<span class="font-bold text-sage-700 w-4">5</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="text-gray-500 w-36 text-right en" data-i18n="reviews.reliability">Reliability</span>
+<span class="text-gray-500 w-36 text-right nl">Betrouwbaarheid</span>
+<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+</div>
+<span class="font-bold text-sage-700 w-4">5</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="text-gray-500 w-36 text-right en" data-i18n="reviews.pet_care">Pet care</span>
+<span class="text-gray-500 w-36 text-right nl">Omgang met dieren</span>
+<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+</div>
+<span class="font-bold text-sage-700 w-4">5</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="text-gray-500 w-36 text-right en" data-i18n="reviews.value">Value</span>
+<span class="text-gray-500 w-36 text-right nl">Prijs-kwaliteit</span>
+<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
+<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+</div>
+<span class="font-bold text-sage-700 w-4">5</span>
+</div>
+</div>
+<div class="grid md:grid-cols-3 gap-5 mb-8">
+<div class="bg-white rounded-2xl p-5 shadow-sm">
+<div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+<p class="text-sm text-gray-600 italic mb-3 en" data-i18n="reviews.i_couldn_t_have_asked">
             "I couldn't have asked for a better cat sitter! Ligia took care of my baby as if it were her own, showing so much love, patience, and attention. She was incredibly attentive to my cat's needs and made sure Jazzy felt comfortable and safe. I received regular updates and could tell my cat was happy and relaxed. I highly recommend Ligia to anyone looking for a trustworthy, caring, and professional pet sitter."
           </p>
-          <p class="text-sm text-gray-600 italic mb-3 nl">
+<p class="text-sm text-gray-600 italic mb-3 nl">
             "Erg fijn thuiskomen! Ligia is erg goed voor mijn katten en het geeft mij een gerust gevoel als ik even weg ben. Ze stuurt ook elke keer leuke foto's om mij op de hoogte te houden. Mijn katten zijn helemaal gelukkig als ze langskomt. Bedankt voor de goede zorgen!"
           </p>
-          <div class="text-xs text-gray-400 font-medium en">— Alina · Catsitting · June 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Inke · Kattenoppas · __CITY_NAME__</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 shadow-sm">
-          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-sm text-gray-600 italic mb-3 en">
+<div class="text-xs text-gray-400 font-medium en" data-i18n="reviews.alina_catsitting_june_2026">— Alina · Catsitting · June 2026</div>
+<div class="text-xs text-gray-400 font-medium nl">— Inke · Kattenoppas · __CITY_NAME__</div>
+</div>
+<div class="bg-white rounded-2xl p-5 shadow-sm">
+<div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+<p class="text-sm text-gray-600 italic mb-3 en" data-i18n="reviews.she_is_a_great_sitter">
             "She is a great sitter who makes sure your cats are well taken care of. She sends pics/videos every visit and even though one of my cats is VERY shy, she was able to pet and bond with them a little. If you need an experienced and kind sitter, I would for sure recommend her!"
           </p>
-          <p class="text-sm text-gray-600 italic mb-3 nl">
+<p class="text-sm text-gray-600 italic mb-3 nl">
             "Lígia heeft echt een hart voor dieren. Mijn kat heeft de tijd van zijn leven gehad toen ik op vakantie was."
           </p>
-          <div class="text-xs text-gray-400 font-medium en">— Marel · Catsitting · April 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Anouk · Huisbezoeken · __CITY_NAME__</div>
-        </div>
-        <div class="bg-white rounded-2xl p-5 shadow-sm">
-          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-sm text-gray-600 italic mb-3 en">
+<div class="text-xs text-gray-400 font-medium en" data-i18n="reviews.marel_catsitting_april_2026">— Marel · Catsitting · April 2026</div>
+<div class="text-xs text-gray-400 font-medium nl">— Anouk · Huisbezoeken · __CITY_NAME__</div>
+</div>
+<div class="bg-white rounded-2xl p-5 shadow-sm">
+<div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+<p class="text-sm text-gray-600 italic mb-3 en" data-i18n="reviews.l_gia_was_great_with">
             "Lígia was great with my dog. She was very friendly, easy to communicate with, and always responsive. She took good care of her, spent time playing with her, and kept me updated with photos. It was so clear she gives real attention and care. I would happily book her again and definitely recommend her."
           </p>
-          <p class="text-sm text-gray-600 italic mb-3 nl">
+<p class="text-sm text-gray-600 italic mb-3 nl">
             "Ligia ervaar ik als zeer bekwaam in omgang met honden. Ze stelde serieuze vragen en stuurt ook foto's van de wandeling. Ik ben erg tevreden!"
           </p>
-          <div class="text-xs text-gray-400 font-medium en">— Kıvanç · Dog walking · January 2026</div>
-          <div class="text-xs text-gray-400 font-medium nl">— Nanda · Hondenuitlaatservice · __CITY_NAME__</div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<div class="text-xs text-gray-400 font-medium en" data-i18n="reviews.k_van_dog_walking_january">— Kıvanç · Dog walking · January 2026</div>
+<div class="text-xs text-gray-400 font-medium nl">— Nanda · Hondenuitlaatservice · __CITY_NAME__</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════════════════
        BOOKING
   ══════════════════════════════════════════════════════════ -->
-  <section id="booking" class="py-20 bg-white">
-    <div class="max-w-lg mx-auto px-5">
-
-      <div class="text-center mb-10">
-        <h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
-          <span class="en">Book a catsitting visit</span>
-          <span class="nl">Boek een kattenoppasbezoek</span>
-        </h2>
-        <p class="text-gray-500 text-sm">
-          <span class="en">Choose your dates and preference — Lígia will confirm within 24 h.</span>
-          <span class="nl">Kies jouw data en voorkeur — Lígia bevestigt binnen 24 uur.</span>
-        </p>
-      </div>
-
-      <!-- Booking form -->
-      <div x-data="bookingForm()" class="bg-warm-50 rounded-2xl p-8 space-y-6 shadow-sm">
-
-        <!-- Client account status -->
-        <div x-show="session" class="flex items-center justify-between text-xs text-gray-500">
-          <span>
-            <span class="en">Logged in as</span><span class="nl">Ingelogd als</span>
-            <span x-text="session && session.user.email"></span>
-          </span>
-          <button type="button" @click="logout()" class="text-gray-400 hover:text-red-400 font-semibold">
-            <span class="en">Log out</span><span class="nl">Uitloggen</span>
-          </button>
-        </div>
-
-        <!-- Name -->
-        <div>
-          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-            <span class="en">Your name <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
-            <span class="nl">Jouw naam <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
-          </label>
-          <input type="text" x-model="clientName"
-                 class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-        </div>
-
-        <!-- Dates -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-              <span class="en">First day</span>
-              <span class="nl">Eerste dag</span>
-            </label>
-            <input type="date" x-model="from" :min="today"
-                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-              <span class="en">Last day <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
-              <span class="nl">Laatste dag <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
-            </label>
-            <input type="date" x-model="to" :min="from || today"
-                   class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-          </div>
-        </div>
-
-        <!-- Pets -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              <span class="en">Pets</span>
-              <span class="nl">Huisdieren</span>
-            </p>
-            <button type="button" @click="pets.push({ name: '', type: 'cat', otherType: '' })"
-                    class="text-xs text-sage-600 hover:text-sage-700 font-semibold flex items-center gap-1 transition">
-              <span>+</span>
-              <span class="en">Add pet</span>
-              <span class="nl">Huisdier toevoegen</span>
-            </button>
-          </div>
-
-          <template x-for="(pet, i) in pets" :key="i">
-            <div class="bg-white rounded-xl border border-warm-200 p-3 space-y-2">
-              <div class="flex gap-2 items-center">
-                <input type="text" x-model="pet.name"
-                       class="flex-1 border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400 min-w-0"
-                       placeholder="Name / Naam" />
-                <button type="button" x-show="pets.length > 1" @click="pets.splice(i, 1)"
-                        class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-red-400 transition flex-shrink-0 text-xl leading-none">&times;</button>
-              </div>
-              <div class="flex gap-2 flex-wrap">
-                <button type="button" @click="pet.type = 'cat'"
-                        :class="pet.type === 'cat' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
-                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
+<section class="py-20 bg-white" id="booking">
+<div class="max-w-lg mx-auto px-5">
+<div class="text-center mb-10">
+<h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+<span class="en" data-i18n="booking.book_a_catsitting_visit">Book a catsitting visit</span>
+<span class="nl">Boek een kattenoppasbezoek</span>
+</h2>
+<p class="text-gray-500 text-sm">
+<span class="en" data-i18n="booking.choose_your_dates_and_preference">Choose your dates and preference — Lígia will confirm within 24 h.</span>
+<span class="nl">Kies jouw data en voorkeur — Lígia bevestigt binnen 24 uur.</span>
+</p>
+</div>
+<!-- Booking form -->
+<div class="bg-warm-50 rounded-2xl p-8 space-y-6 shadow-sm" x-data="bookingForm()">
+<!-- Client account status -->
+<div class="flex items-center justify-between text-xs text-gray-500" x-show="session">
+<span>
+<span class="en" data-i18n="booking.logged_in_as">Logged in as</span><span class="nl">Ingelogd als</span>
+<span x-text="session &amp;&amp; session.user.email"></span>
+</span>
+<button @click="logout()" class="text-gray-400 hover:text-red-400 font-semibold" type="button">
+<span class="en" data-i18n="booking.log_out">Log out</span><span class="nl">Uitloggen</span>
+</button>
+</div>
+<!-- Name -->
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.your_name_optional">Your name <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
+<span class="nl">Jouw naam <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientName"/>
+</div>
+<!-- Address (required — needed on the invoice per issue #32) -->
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.address">Address</span>
+<span class="nl">Adres</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="address" required=""/>
+</div>
+<!-- WhatsApp / phone (optional) — lets Ligia message the client directly (issue #39) -->
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.whatsapp_phone_optional">WhatsApp / phone <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
+<span class="nl">WhatsApp / telefoon <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="+31 6 12345678" type="tel" x-model="clientContact"/>
+</div>
+<!-- Dates -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.first_day">First day</span>
+<span class="nl">Eerste dag</span>
+</label>
+<input :min="today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" x-model="from"/>
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span class="en" data-i18n="booking.last_day_optional">Last day <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
+<span class="nl">Laatste dag <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+</label>
+<input :min="from || today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" x-model="to"/>
+</div>
+</div>
+<!-- Pets -->
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+<span class="en" data-i18n="booking.pets">Pets</span>
+<span class="nl">Huisdieren</span>
+</p>
+<button @click="pets.push({ name: '', type: 'cat', otherType: '' })" class="text-xs text-sage-600 hover:text-sage-700 font-semibold flex items-center gap-1 transition" type="button">
+<span>+</span>
+<span class="en" data-i18n="booking.add_pet">Add pet</span>
+<span class="nl">Huisdier toevoegen</span>
+</button>
+</div>
+<template :key="i" x-for="(pet, i) in pets">
+<div class="bg-white rounded-xl border border-warm-200 p-3 space-y-2">
+<div class="flex gap-2 items-center">
+<input class="flex-1 border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400 min-w-0" placeholder="Name / Naam" type="text" x-model="pet.name"/>
+<button @click="pets.splice(i, 1)" class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-red-400 transition flex-shrink-0 text-xl leading-none" type="button" x-show="pets.length &gt; 1">×</button>
+</div>
+<div class="flex gap-2 flex-wrap">
+<button :class="pet.type === 'cat' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" @click="pet.type = 'cat'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
                   🐱 Catsitting
                 </button>
-                <button type="button" @click="pet.type = 'dog'"
-                        :class="pet.type === 'dog' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
-                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
+<button :class="pet.type === 'dog' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" @click="pet.type = 'dog'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
                   🐶 Dogwalking
                 </button>
-                <button type="button" @click="pet.type = 'other'"
-                        :class="pet.type === 'other' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'"
-                        class="border rounded-lg px-3 py-1.5 text-xs font-medium transition">
-                  ✏️ <span class="en">Other</span><span class="nl">Anders</span>
-                </button>
-              </div>
-              <input x-show="pet.type === 'other'" type="text" x-model="pet.otherType"
-                     class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400"
-                     placeholder="e.g. rabbit, bird · bijv. konijn, vogel" />
-            </div>
-          </template>
-        </div>
-
-        <!-- Preference -->
-        <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            <span class="en">Visit preference</span>
-            <span class="nl">Bezoekvoorkeur</span>
-          </p>
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" @click="pref = 'morning'"
-                    :class="pref === 'morning' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
-                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
-              <div class="text-xl mb-1">🌅</div>
-              <span class="en">Morning <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-              <span class="nl">Ochtend <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-            </button>
-            <button type="button" @click="pref = 'evening'"
-                    :class="pref === 'evening' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
-                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
-              <div class="text-xl mb-1">🌙</div>
-              <span class="en">Evening <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-              <span class="nl">Avond <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-            </button>
-            <button type="button" @click="pref = 'both'"
-                    :class="pref === 'both' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
-                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
-              <div class="text-xl mb-1">🌅🌙</div>
-              <span class="en">Both <span class="font-normal opacity-70 text-xs">(2x/day)</span></span>
-              <span class="nl">Beide <span class="font-normal opacity-70 text-xs">(2x/dag)</span></span>
-            </button>
-            <button type="button" @click="pref = 'none'"
-                    :class="pref === 'none' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'"
-                    class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center">
-              <div class="text-xl mb-1">🐾</div>
-              <span class="en">No pref. <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-              <span class="nl">Geen voorkeur <span class="font-normal opacity-70 text-xs">(1x)</span></span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Inline login/signup gate — shown when the client isn't logged in yet and clicks send -->
-        <template x-if="showAuth">
-          <div class="bg-white rounded-xl border border-warm-200 p-4 space-y-3">
-            <p class="text-xs text-gray-500">
-              <span class="en">Create a free account (or log in) to send your booking — this lets you track its status anytime.</span>
-              <span class="nl">Maak een gratis account (of log in) om je boeking te versturen — zo kun je de status altijd volgen.</span>
-            </p>
-            <div class="flex gap-2 text-xs font-semibold">
-              <button type="button" @click="authMode = 'login'"
-                      :class="authMode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
-                      class="flex-1 border rounded-lg py-1.5 transition">
-                <span class="en">Log in</span><span class="nl">Inloggen</span>
-              </button>
-              <button type="button" @click="authMode = 'signup'"
-                      :class="authMode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'"
-                      class="flex-1 border rounded-lg py-1.5 transition">
-                <span class="en">Create account</span><span class="nl">Account aanmaken</span>
-              </button>
-            </div>
-            <form @submit.prevent="authMode === 'login' ? authLogin() : authSignup()" class="space-y-2">
-              <input type="email" x-model="authEmail" required autocomplete="username"
-                     :placeholder="lang === 'nl' ? 'E-mail' : 'Email'"
-                     class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-              <input type="password" x-model="authPassword" required
-                     :autocomplete="authMode === 'login' ? 'current-password' : 'new-password'"
-                     :placeholder="lang === 'nl' ? 'Wachtwoord' : 'Password'"
-                     class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" />
-              <p x-show="authError" x-text="authError" class="text-red-600 text-xs"></p>
-              <p x-show="authInfo" x-text="authInfo" class="text-sage-600 text-xs"></p>
-              <button type="submit" :disabled="authLoading"
-                      class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl text-sm transition">
-                <template x-if="!authLoading && authMode === 'login'"><span><span class="en">Log in &amp; send</span><span class="nl">Inloggen &amp; versturen</span></span></template>
-                <template x-if="!authLoading && authMode === 'signup'"><span><span class="en">Create account</span><span class="nl">Account aanmaken</span></span></template>
-                <template x-if="authLoading"><span><span class="en">Working...</span><span class="nl">Bezig...</span></span></template>
-              </button>
-              <button type="button" @click="showAuth = false" class="w-full text-xs text-gray-400 hover:text-gray-600">
-                <span class="en">Cancel</span><span class="nl">Annuleren</span>
-              </button>
-            </form>
-          </div>
-        </template>
-
-        <!-- Success message shown after the booking request is sent -->
-        <template x-if="sent">
-          <div class="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center space-y-2">
-            <div class="text-2xl">✅</div>
-            <p class="text-sm font-semibold text-sage-700">
-              <span class="en">Booking request sent!</span>
-              <span class="nl">Boekingsverzoek verstuurd!</span>
-            </p>
-            <p class="text-xs text-gray-500">
-              <span class="en">Lígia will confirm availability within 24 hours.</span>
-              <span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
-            </p>
-            <a href="account.html" class="inline-block text-xs text-sage-600 hover:text-sage-700 font-semibold">
-              <span class="en">Track my booking →</span>
-              <span class="nl">Mijn boeking volgen →</span>
-            </a>
-          </div>
-        </template>
-
-        <!-- Send button -->
-        <button type="button" x-show="!showAuth && !sent" @click="send()"
-                class="w-full flex items-center justify-center gap-2 bg-sage-600 hover:bg-sage-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow">
-          <span class="en">Send booking request</span>
-          <span class="nl">Boekingsverzoek versturen</span>
-        </button>
-
-        <p class="text-center text-xs text-gray-400" x-show="!showAuth && !sent">
-          <span class="en">Lígia will confirm availability within 24 hours.</span>
-          <span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
-        </p>
-
-        <p class="text-center text-xs" x-show="!showAuth && !sent">
-          <a href="account.html" class="text-sage-600 hover:text-sage-700 font-semibold">
-            <span class="en">Track my booking →</span>
-            <span class="nl">Mijn boeking volgen →</span>
-          </a>
-        </p>
-
-      </div>
-
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<button :class="pet.type === 'other' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" @click="pet.type = 'other'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
+                  ✏️ <span class="en" data-i18n="booking.other">Other</span><span class="nl">Anders</span>
+</button>
+</div>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="e.g. rabbit, bird · bijv. konijn, vogel" type="text" x-model="pet.otherType" x-show="pet.type === 'other'"/>
+</div>
+</template>
+</div>
+<!-- Preference -->
+<div>
+<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+<span class="en" data-i18n="booking.visit_preference">Visit preference</span>
+<span class="nl">Bezoekvoorkeur</span>
+</p>
+<div class="grid grid-cols-2 gap-2">
+<button :class="pref === 'morning' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" @click="pref = 'morning'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<div class="text-xl mb-1">🌅</div>
+<span class="en" data-i18n="booking.morning_1x">Morning <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+<span class="nl">Ochtend <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+</button>
+<button :class="pref === 'evening' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" @click="pref = 'evening'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<div class="text-xl mb-1">🌙</div>
+<span class="en" data-i18n="booking.evening_1x">Evening <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+<span class="nl">Avond <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+</button>
+<button :class="pref === 'both' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" @click="pref = 'both'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<div class="text-xl mb-1">🌅🌙</div>
+<span class="en" data-i18n="booking.both_2x_day">Both <span class="font-normal opacity-70 text-xs">(2x/day)</span></span>
+<span class="nl">Beide <span class="font-normal opacity-70 text-xs">(2x/dag)</span></span>
+</button>
+<button :class="pref === 'none' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" @click="pref = 'none'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<div class="text-xl mb-1">🐾</div>
+<span class="en" data-i18n="booking.no_pref_1x">No pref. <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+<span class="nl">Geen voorkeur <span class="font-normal opacity-70 text-xs">(1x)</span></span>
+</button>
+</div>
+</div>
+<!-- Inline login/signup gate — shown when the client isn't logged in yet and clicks send -->
+<template x-if="showAuth">
+<div class="bg-white rounded-xl border border-warm-200 p-4 space-y-3">
+<p class="text-xs text-gray-500">
+<span class="en" data-i18n="booking.create_a_free_account_or">Create a free account (or log in) to send your booking — this lets you track its status anytime.</span>
+<span class="nl">Maak een gratis account (of log in) om je boeking te versturen — zo kun je de status altijd volgen.</span>
+</p>
+<div class="flex gap-2 text-xs font-semibold">
+<button :class="authMode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" @click="authMode = 'login'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
+<span class="en" data-i18n="booking.log_in">Log in</span><span class="nl">Inloggen</span>
+</button>
+<button :class="authMode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" @click="authMode = 'signup'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
+<span class="en" data-i18n="booking.create_account">Create account</span><span class="nl">Account aanmaken</span>
+</button>
+</div>
+<form @submit.prevent="authMode === 'login' ? authLogin() : authSignup()" class="space-y-2">
+<input :placeholder="lang === 'nl' ? 'E-mail' : (lang === 'pt' ? 'E-mail' : 'Email')" autocomplete="username" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="email" x-model="authEmail"/>
+<input :autocomplete="authMode === 'login' ? 'current-password' : 'new-password'" :placeholder="lang === 'nl' ? 'Wachtwoord' : (lang === 'pt' ? 'Senha' : 'Password')" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="password" x-model="authPassword"/>
+<p class="text-red-600 text-xs" x-show="authError" x-text="authError"></p>
+<p class="text-sage-600 text-xs" x-show="authInfo" x-text="authInfo"></p>
+<button :disabled="authLoading" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl text-sm transition" type="submit">
+<template x-if="!authLoading &amp;&amp; authMode === 'login'"><span><span class="en" data-i18n="booking.log_in_send">Log in &amp; send</span><span class="nl">Inloggen &amp; versturen</span></span></template>
+<template x-if="!authLoading &amp;&amp; authMode === 'signup'"><span><span class="en" data-i18n="booking.create_account_2">Create account</span><span class="nl">Account aanmaken</span></span></template>
+<template x-if="authLoading"><span><span class="en" data-i18n="booking.working">Working...</span><span class="nl">Bezig...</span></span></template>
+</button>
+<button @click="showAuth = false" class="w-full text-xs text-gray-400 hover:text-gray-600" type="button">
+<span class="en" data-i18n="booking.cancel">Cancel</span><span class="nl">Annuleren</span>
+</button>
+</form>
+</div>
+</template>
+<!-- Success message shown after the booking request is sent -->
+<template x-if="sent">
+<div class="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center space-y-2">
+<div class="text-2xl">✅</div>
+<p class="text-sm font-semibold text-sage-700">
+<span class="en" data-i18n="booking.booking_request_sent">Booking request sent!</span>
+<span class="nl">Boekingsverzoek verstuurd!</span>
+</p>
+<p class="text-xs text-gray-500">
+<span class="en" data-i18n="booking.l_gia_will_confirm_availability">Lígia will confirm availability within 24 hours.</span>
+<span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
+</p>
+<a class="inline-block text-xs text-sage-600 hover:text-sage-700 font-semibold" href="account.html">
+<span class="en" data-i18n="booking.track_my_booking">Track my booking →</span>
+<span class="nl">Mijn boeking volgen →</span>
+</a>
+<div class="pt-2">
+<a :href="whatsappConfirmLink()" class="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-4 py-2 rounded-full transition" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
+💬 <span class="en" data-i18n="booking.message_ligia_whatsapp">Message Lígia on WhatsApp</span><span class="nl">Stuur Lígia een WhatsApp</span>
+</a>
+</div>
+</div>
+</template>
+<!-- Send button -->
+<button @click="send()" class="w-full flex items-center justify-center gap-2 bg-sage-600 hover:bg-sage-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow" type="button" x-show="!showAuth &amp;&amp; !sent">
+<span class="en" data-i18n="booking.send_booking_request">Send booking request</span>
+<span class="nl">Boekingsverzoek versturen</span>
+</button>
+<p class="text-center text-xs text-gray-400" x-show="!showAuth &amp;&amp; !sent">
+<span class="en" data-i18n="booking.l_gia_will_confirm_availability_2">Lígia will confirm availability within 24 hours.</span>
+<span class="nl">Lígia bevestigt beschikbaarheid binnen 24 uur.</span>
+</p>
+<p class="text-center text-xs" x-show="!showAuth &amp;&amp; !sent">
+<a class="text-sage-600 hover:text-sage-700 font-semibold" href="account.html">
+<span class="en" data-i18n="booking.track_my_booking_2">Track my booking →</span>
+<span class="nl">Mijn boeking volgen →</span>
+</a>
+</p>
+</div>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════════════════ -->
-  <footer class="bg-sage-700 text-white py-12">
-    <div class="max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-sm">
-
-      <div>
-        <div class="flex items-center gap-2 mb-2">
-          <span>🐾</span>
-          <span class="font-serif font-semibold text-base">__BRAND_NAME__</span>
-        </div>
-        <p class="text-white/60">__CITY_NAME__, Noord-Brabant</p>
-        <p class="text-white/60 mt-0.5 en">Speaks EN · PT · ES</p>
-        <p class="text-white/60 mt-0.5 nl">Spreekt EN · PT · ES</p>
-      </div>
-
-      <div class="text-center">
-        <p class="text-white/40 text-xs uppercase tracking-wide mb-2">Contact</p>
-        <a href="mailto:__CONTACT_EMAIL__" class="block text-white/80 hover:text-white transition mb-1">
+<footer class="bg-sage-700 text-white py-12">
+<div class="max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-sm">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span>🐾</span>
+<span class="font-serif font-semibold text-base">__BRAND_NAME__</span>
+</div>
+<p class="text-white/60">__CITY_NAME__, Noord-Brabant</p>
+<p class="text-white/60 mt-0.5 en" data-i18n="footer.speaks_en_pt_es">Speaks EN · PT · ES</p>
+<p class="text-white/60 mt-0.5 nl">Spreekt EN · PT · ES</p>
+</div>
+<div class="text-center">
+<p class="text-white/40 text-xs uppercase tracking-wide mb-2">Contact</p>
+<a class="block text-white/80 hover:text-white transition mb-1" href="mailto:__CONTACT_EMAIL__">
           __CONTACT_EMAIL__
         </a>
-
-      </div>
-
-      <div class="text-center md:text-right">
-        <p class="text-white/40 text-xs">
+</div>
+<div class="text-center md:text-right">
+<p class="text-white/40 text-xs">
           © <span id="footer-year"></span> __BRAND_NAME__
         </p>
-        <p class="text-white/30 text-xs mt-1 en">Made with 🖤 for cats</p>
-        <p class="text-white/30 text-xs mt-1 nl">Gemaakt met 🖤 voor katten</p>
-        <a href="__SITE_URL__" class="text-white/20 hover:text-white/40 text-xs mt-2 block transition">__SITE_URL__</a>
-      </div>
-
-    </div>
-  </footer>
-
-
-  <!-- ══════════════════════════════════════════════════════════
+<p class="text-white/30 text-xs mt-1 en" data-i18n="footer.made_with_for_cats">Made with 🖤 for cats</p>
+<p class="text-white/30 text-xs mt-1 nl">Gemaakt met 🖤 voor katten</p>
+<a class="text-white/20 hover:text-white/40 text-xs mt-2 block transition" href="__SITE_URL__">__SITE_URL__</a>
+</div>
+</div>
+</footer>
+<!-- ══════════════════════════════════════════════════════════
        FLOATING WHATSAPP BUTTON
   ══════════════════════════════════════════════════════════ -->
-  <a href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!"
-      onclick="markWhatsAppIntent()"
-     target="_blank" rel="noopener noreferrer"
-     class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95"
-     aria-label="Contact Lígia via WhatsApp">
-    <svg viewBox="0 0 24 24" class="w-7 h-7 fill-white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-  </a>
-
-  <div id="wa-return-toast"
-       class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(92vw,30rem)] bg-white border border-warm-200 rounded-2xl shadow-2xl p-4 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none"
-       role="status"
-       aria-live="polite"
-       aria-hidden="true">
-    <div class="flex items-start gap-3">
-      <div class="text-2xl leading-none">💚</div>
-      <div class="flex-1">
-        <p class="font-semibold text-sage-700 text-sm en">Thanks for contacting __BRAND_NAME__!</p>
-        <p class="font-semibold text-sage-700 text-sm nl">Bedankt voor je bericht aan __BRAND_NAME__!</p>
-        <p class="text-xs text-gray-500 mt-1 en">We'll reply as soon as possible. If needed, you can send another message.</p>
-        <p class="text-xs text-gray-500 mt-1 nl">We reageren zo snel mogelijk. Je kunt altijd nog een bericht sturen.</p>
-        <a href="#"
-           class="inline-flex mt-3 text-xs font-semibold text-sage-600 hover:text-sage-700 transition">
-          <span class="en">Back to home</span>
-          <span class="nl">Terug naar start</span>
-        </a>
-      </div>
-      <button type="button"
-              onclick="hideWhatsAppToast()"
-              class="text-gray-400 hover:text-gray-600 transition"
-              aria-label="Close">
+<a aria-label="Contact Lígia via WhatsApp" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95" href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
+<svg aria-hidden="true" class="w-7 h-7 fill-white" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
+</svg>
+</a>
+<div aria-hidden="true" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(92vw,30rem)] bg-white border border-warm-200 rounded-2xl shadow-2xl p-4 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none" id="wa-return-toast" role="status">
+<div class="flex items-start gap-3">
+<div class="text-2xl leading-none">💚</div>
+<div class="flex-1">
+<p class="font-semibold text-sage-700 text-sm en" data-i18n="misc.thanks_for_contacting_brand_name">Thanks for contacting __BRAND_NAME__!</p>
+<p class="font-semibold text-sage-700 text-sm nl">Bedankt voor je bericht aan __BRAND_NAME__!</p>
+<p class="text-xs text-gray-500 mt-1 en" data-i18n="misc.we_ll_reply_as_soon">We'll reply as soon as possible. If needed, you can send another message.</p>
+<p class="text-xs text-gray-500 mt-1 nl">We reageren zo snel mogelijk. Je kunt altijd nog een bericht sturen.</p>
+<a class="inline-flex mt-3 text-xs font-semibold text-sage-600 hover:text-sage-700 transition" href="#">
+<span class="en" data-i18n="misc.back_to_home">Back to home</span>
+<span class="nl">Terug naar start</span>
+</a>
+</div>
+<button aria-label="Close" class="text-gray-400 hover:text-gray-600 transition" onclick="hideWhatsAppToast()" type="button">
         ✕
       </button>
-    </div>
-  </div>
-
-  <script src="js/index/whatsapp-toast.js"></script>
-  <script src="js/index/booking-form.js"></script>
-
-  <!-- Client account (issue #12) + booking persistence to Supabase — see js/index/client-auth.js -->
-  <script type="module" src="js/index/client-auth.js"></script>
-
-  <!-- Alpine must load after the module script above so window.__gatoClientAuth already exists
+</div>
+</div>
+<script src="js/index/whatsapp-toast.js"></script>
+<script src="js/index/about-carousel.js"></script>
+<script src="js/index/booking-form.js"></script>
+<!-- Client account (issue #12) + booking persistence to Supabase — see js/index/client-auth.js -->
+<script src="js/index/client-auth.js" type="module"></script>
+<!-- Alpine must load after the module script above so window.__gatoClientAuth already exists
        when Alpine scans and evaluates x-data on the page (bookingForm()'s init() reads it). -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>
