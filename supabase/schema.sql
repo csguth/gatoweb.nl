@@ -1,5 +1,10 @@
 -- Gato Petsit — bookings & facturen (invoices) schema
--- Run this once in the Supabase project's SQL editor (Database > SQL Editor).
+-- This file is the single source of truth for the database schema and is applied
+-- automatically on every deploy (see .github/actions/apply-db-migration + the deploy
+-- workflows), which runs it against the target project via the Supabase Management API.
+-- Every statement here MUST stay idempotent (create ... if not exists, alter table ...
+-- add column if not exists, create or replace ...) so re-applying it on each deploy is a
+-- no-op when nothing changed. You can also still run it by hand in the SQL editor.
 --
 -- Design (see GitHub issues #5 and #12):
 --   * A client must have their own account (email+password, Supabase Auth) to create a
@@ -50,6 +55,15 @@ alter table public.bookings add column if not exists client_address text;
 -- can never silently drift apart. See approve_booking() below.
 alter table public.bookings add column if not exists adjustment_amount numeric(10,2) not null default 0;
 alter table public.bookings add column if not exists adjustment_note text;
+
+-- Idempotent for existing tables created before issue #63 (show Tikkie link to client):
+-- the actual Tikkie payment URL Lígia sends is now stored here (previously only the
+-- `tikkie_sent` boolean existed). Staff write it when marking a booking's Tikkie as sent
+-- (js/facturen/facturen-app.js markTikkieSent), and the client sees a "Pay with Tikkie"
+-- link for it on their own bookings page (account.html). Nullable, so bookings where no
+-- link was saved simply show no payment button. Covered by the existing staff-write /
+-- client-read-own RLS policies below (no per-column rules needed).
+alter table public.bookings add column if not exists tikkie_url text;
 
 -- Issue #62 follow-up: the official (sequentially-numbered) factuur is now only generated
 -- once the Tikkie has actually been PAID. Approving a booking produces a *proforma* instead

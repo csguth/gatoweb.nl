@@ -1,23 +1,32 @@
-name: Deploy GitHub Pages
+name: Deploy PR Preview (Cloudflare Pages)
 
+# Automatically deploys every pull request to its own isolated Cloudflare Pages
+# preview URL so a branch can be tested live before merging — without touching
+# staging.gatoweb.nl or main. Each PR gets a stable `pr-<number>` preview that is
+# re-deployed on every push, and the URL is posted back as a sticky PR comment.
+#
+# This mirrors the build of deploy-staging-cloudflare.yml and shares the same
+# `staging` environment config/secrets (Supabase project, price vars, etc.), so
+# test data created here is NOT fully isolated from other staging testing.
+#
+# Uses `pull_request` (not `pull_request_target`) so repository secrets are only
+# available to branches pushed to this repo, never to untrusted forks.
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  pull-requests: write
 
 concurrency:
-  group: pages
+  group: cloudflare-preview-pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    environment: github-pages
+    environment: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,7 +55,7 @@ jobs:
 
           for var_name in "${required_vars[@]}"; do
             if [ -z "${!var_name}" ]; then
-              echo "Missing repository/environment variable: ${var_name}"
+              echo "Missing environment variable: ${var_name}"
               exit 1
             fi
           done
@@ -99,27 +108,60 @@ jobs:
           };
           JSEOF
 
-      - name: Apply DB migration (production)
+      - name: Apply DB migration (staging project, shared by previews)
         uses: ./.github/actions/apply-db-migration
         with:
           supabase-url: ${{ vars.SUPABASE_URL }}
           access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to Cloudflare Pages (staging project, PR preview)
+        id: deploy
+        uses: cloudflare/pages-action@v1
         with:
-          path: site
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gatoweb-nl-staging
+          directory: site
+          # A stable, per-PR preview branch so every push to the PR re-deploys the
+          # same isolated preview (never the real `staging` branch/URL).
+          branch: pr-${{ github.event.pull_request.number }}
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Comment preview URL on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = ${{ toJSON(steps.deploy.outputs.url) }};
+            const marker = '<!-- cloudflare-pr-preview -->';
+            const body = [
+              marker,
+              '### 🚀 Cloudflare Pages preview',
+              '',
+              `Preview desta PR: ${url}`,
+              '',
+              `Commit: \`${context.sha.slice(0, 7)}\``,
+              '',
+              '> ⚠️ Compartilha o projeto/dados Supabase de **staging** — dados de teste criados aqui não ficam isolados de outros testes de staging.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

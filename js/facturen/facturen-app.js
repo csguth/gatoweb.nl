@@ -35,6 +35,17 @@ function petsText(pets) {
   return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
 }
 
+// Basic sanity check for the Tikkie payment link Lígia pastes in (issue #63): it must be
+// a well-formed absolute http(s) URL, so the client never gets a broken/relative link.
+function isValidPaymentUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 function factuurNumberLabel(n, referenceDate) {
   const year = new Date(referenceDate || Date.now()).getFullYear();
   return year + '-' + String(n).padStart(4, '0');
@@ -279,10 +290,16 @@ window.facturenApp = function () {
     },
 
     async markTikkieSent(b) {
+      // Store the actual Tikkie payment link (issue #63) so the client can pay from their
+      // own bookings page. Optional — Lígia can still just mark it sent — but if she pastes
+      // a link it must be a valid http(s) URL so the client never gets a broken button.
+      const url = (b.tikkie_url || '').trim();
+      if (url && !isValidPaymentUrl(url)) { alert(t('tikkie_url_invalid')); return; }
       b._busy = true;
-      const { error } = await supabase.from('bookings').update({ tikkie_sent: true }).eq('id', b.id);
+      const { error } = await supabase.from('bookings').update({ tikkie_sent: true, tikkie_url: url || null }).eq('id', b.id);
       b._busy = false;
       if (error) { alert(error.message); return; }
+      b.tikkie_url = url || null;
       b.tikkie_sent = true;
     },
 

@@ -97,6 +97,12 @@ jobs:
           };
           JSEOF
 
+      - name: Apply DB migration (staging)
+        uses: ./.github/actions/apply-db-migration
+        with:
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
       - name: Deploy to Cloudflare Pages (staging project)
         uses: cloudflare/pages-action@v1
         with:

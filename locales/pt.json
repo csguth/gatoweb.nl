@@ -15,6 +15,7 @@
   "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
   "reject_confirm": "Recusar o pedido de reserva de {{client}}? Isso pode ser desfeito depois na coluna 'Concluído'.",
   "reject_button_title": "Recusar reserva",
+  "tikkie_url_invalid": "Insira um link Tikkie válido (começando com https://).",
   "invoice": {
     "title": "Fatura {{number}}",
     "proforma_title": "Fatura proforma",
@@ -222,7 +223,8 @@
         "pets": "Animais:",
         "amount": "Valor:",
         "view_invoice": "🖨️ Ver / imprimir fatura",
-        "view_proforma": "🖨️ Ver / imprimir proforma"
+        "view_proforma": "🖨️ Ver / imprimir proforma",
+        "pay_with_tikkie": "💳 Pagar com Tikkie"
       }
     },
     "facturen": {
@@ -261,6 +263,7 @@
         "print_proforma": "🖨️ Imprimir proforma",
         "tikkie_sent": "✓ Tikkie enviado",
         "mark_paid": "✓ Marcar como pago",
+        "tikkie_url_label": "Link de pagamento Tikkie",
         "whatsapp_client": "WhatsApp do cliente",
         "edit_client_info": "✏️ Cliente",
         "edit_client_info_short": "✏️ Editar",

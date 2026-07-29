@@ -15,6 +15,7 @@
   "not_staff_error": "This account doesn't have access to the invoice dashboard.",
   "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the 'Done' column.",
   "reject_button_title": "Reject booking",
+  "tikkie_url_invalid": "Please enter a valid Tikkie link (starting with https://).",
   "invoice": {
     "title": "Invoice {{number}}",
     "proforma_title": "Proforma invoice",
@@ -222,7 +223,8 @@
         "pets": "Pets:",
         "amount": "Amount:",
         "view_invoice": "🖨️ View / print invoice",
-        "view_proforma": "🖨️ View / print proforma"
+        "view_proforma": "🖨️ View / print proforma",
+        "pay_with_tikkie": "💳 Pay with Tikkie"
       }
     },
     "facturen": {
@@ -261,6 +263,7 @@
         "print_proforma": "🖨️ Print proforma",
         "tikkie_sent": "✓ Tikkie sent",
         "mark_paid": "✓ Mark as paid",
+        "tikkie_url_label": "Tikkie payment link",
         "whatsapp_client": "WhatsApp client",
         "edit_client_info": "✏️ Client info",
         "edit_client_info_short": "✏️ Edit",
