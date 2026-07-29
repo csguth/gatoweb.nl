@@ -198,6 +198,12 @@
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <div><span class="font-semibold nl-l">Bedrag:</span><span class="font-semibold en-l" data-i18n="facturen.amount_2">Amount:</span><span class="font-semibold pt-l">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
 </div>
+<div>
+<label class="block text-[11px] font-semibold text-gray-500 mb-1">
+<span class="nl-l">Tikkie-betaallink</span><span class="en-l" data-i18n="facturen.tikkie_url_label">Tikkie payment link</span><span class="pt-l">Link de pagamento Tikkie</span>
+</label>
+<input type="url" x-model="b.tikkie_url" placeholder="https://tikkie.me/pay/..." class="w-full text-xs border border-warm-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-sage-400" />
+</div>
 <div class="flex gap-2 pt-1">
 <a :href="whatsappLink(b)" :title="t('invoice.whatsapp_client')" class="flex-none flex items-center justify-center border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold px-3 rounded-xl transition" rel="noopener noreferrer" target="_blank" x-show="whatsappLink(b) !== '#'">
 WhatsApp
