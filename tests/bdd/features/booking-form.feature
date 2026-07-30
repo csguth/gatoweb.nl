@@ -24,6 +24,9 @@ Feature: Booking form
     And the WhatsApp confirmation link includes the phone number "31699999999"
     And the WhatsApp confirmation link mentions "2025-08-10"
 
+  Scenario: No estimated price is shown before a start date is chosen
+    Then the estimated price is not shown
+
   Scenario: Suggested price for a single cat with one visit a day
     Given I fill in the first day as "2025-08-10" and the last day as "2025-08-12"
     And I add a pet of type "cat"
@@ -36,6 +39,12 @@ Feature: Booking form
     And I add a pet of type "dog"
     And I choose the "both" visit preference
     Then the suggested price is €70.00
+
+  Scenario: Suggested price does not include the seasonal surcharge
+    Given I fill in the first day as "2025-07-01" and the last day as "2025-07-02"
+    And I add a pet of type "cat"
+    And I choose the "morning" visit preference
+    Then the suggested price is €30.00
 
   @auth-required
   Scenario: Sending a booking requires logging in first when accounts are enabled

@@ -177,6 +177,8 @@
         "evening_1x": "Evening <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
         "both_2x_day": "Both <span class=\"font-normal opacity-70 text-xs\">(2x/day)</span>",
         "no_pref_1x": "No pref. <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "estimated_price": "Estimated price",
+        "estimated_price_note": "Confirmed by Lígia when your booking is approved",
         "create_a_free_account_or": "Create a free account (or log in) to send your booking — this lets you track its status anytime.",
         "log_in": "Log in",
         "create_account": "Create account",
