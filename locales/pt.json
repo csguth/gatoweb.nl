@@ -55,6 +55,7 @@
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} até {{to}}",
       "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Gato adicional (+{{count}}) — {{description}}",
       "adjustment": "Ajuste: {{note}}"
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",

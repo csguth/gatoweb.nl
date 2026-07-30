@@ -20,9 +20,34 @@ Given(
 );
 
 Given(
+  'the price rates are one-visit €{float}, two-visits €{float}, dog-walk €{float}, seasonal surcharge {int}%, extra cat €{float} per day',
+  async ({}, oneVisit, twoVisits, dogWalk, surchargePercent, extraCatPricePerDay) => {
+    world.rates = {
+      priceOneVisit: oneVisit,
+      priceTwoVisits: twoVisits,
+      dogWalkPriceFrom: dogWalk,
+      seasonalSurchargePercent: surchargePercent,
+      extraCatPricePerDay: extraCatPricePerDay
+    };
+  }
+);
+
+Given(
   'a booking from {string} to {string} for a cat with {string} preference',
   async ({}, from, to, preference) => {
     world.booking = { date_from: from, date_to: to, pets: [{ type: 'cat' }], preference };
+  }
+);
+
+Given(
+  'a booking from {string} to {string} for {int} cats with {string} preference',
+  async ({}, from, to, catCount, preference) => {
+    world.booking = {
+      date_from: from,
+      date_to: to,
+      pets: Array.from({ length: catCount }, () => ({ type: 'cat' })),
+      preference
+    };
   }
 );
 

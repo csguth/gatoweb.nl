@@ -168,6 +168,10 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
   generated invoices when set; the invoice just omits those lines if unset
 - `SEASONAL_SURCHARGE_PERCENT` — optional numeric percentage (default `0`) added to the unit price
   for booking days in July, August, December and January (issue #32)
+- `PRICE_EXTRA_CAT_PER_DAY` — optional flat amount per day (default `0`) charged for each cat
+  beyond the first one in the same booking. Unlike `SEASONAL_SURCHARGE_PERCENT`, this is also
+  included in the public price estimate shown on the booking form (`index.html`), not just the
+  final factuur, since it's known upfront
 
 ### Internal / infra
 
@@ -202,8 +206,8 @@ public site, disallowed in `robots.txt`):
   table (anon insert-only, see RLS policies in `supabase/schema.sql`). It also shows the client a
   live price estimate as soon as a start date is chosen, computed via the shared
   `buildInvoiceLineItems()` (`js/facturen/invoice-calc.js`) — the same logic used for the final
-  factuur — but always excluding the seasonal surcharge, which only appears once Ligia issues the
-  actual factuur.
+  factuur — including the flat extra-cat-per-day charge (`PRICE_EXTRA_CAT_PER_DAY`), but always
+  excluding the seasonal surcharge, which only appears once Ligia issues the actual factuur.
 - Ligia logs in (Supabase Auth) and sees all bookings sorted by what needs action: pending (needs
   approval) → approved but Tikkie not sent yet → done → cancelled.
 - Approving a booking calls the `approve_booking()` Postgres function, which atomically assigns

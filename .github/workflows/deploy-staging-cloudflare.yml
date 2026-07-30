@@ -93,6 +93,7 @@ jobs:
             PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
             DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
             SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }},
+            PRICE_EXTRA_CAT_PER_DAY: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }},
             WHATSAPP_NUMBER: $(jq -Rn --arg v "${{ vars.WHATSAPP_NUMBER }}" '$v')
           };
           JSEOF

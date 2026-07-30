@@ -46,6 +46,13 @@ Feature: Booking form
     And I choose the "morning" visit preference
     Then the suggested price is €30.00
 
+  Scenario: Suggested price includes the extra-cat charge for a second cat
+    Given I fill in the first day as "2025-08-10" and the last day as "2025-08-12"
+    And I add a pet of type "cat"
+    And I add a pet of type "cat"
+    And I choose the "morning" visit preference
+    Then the suggested price is €60.00
+
   @auth-required
   Scenario: Sending a booking requires logging in first when accounts are enabled
     Given I fill in the first day as "2025-08-10"

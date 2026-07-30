@@ -31,13 +31,15 @@ const CONFIG_BY_ENV = {
     // own fixture variant (see 'production-auth' below).
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
-    SEASONAL_SURCHARGE_PERCENT: '20'
+    SEASONAL_SURCHARGE_PERCENT: '20',
+    PRICE_EXTRA_CAT_PER_DAY: '5'
   },
   staging: {
     ENV_LABEL: 'staging',
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
-    SEASONAL_SURCHARGE_PERCENT: '20'
+    SEASONAL_SURCHARGE_PERCENT: '20',
+    PRICE_EXTRA_CAT_PER_DAY: '5'
   },
   'production-auth': {
     ENV_LABEL: 'production',
@@ -46,7 +48,8 @@ const CONFIG_BY_ENV = {
     // localStorage (no network call), so no real backend is needed for this.
     SUPABASE_URL: 'https://gatoweb-test-fixture.supabase.co',
     SUPABASE_ANON_KEY: 'test-fixture-anon-key',
-    SEASONAL_SURCHARGE_PERCENT: '20'
+    SEASONAL_SURCHARGE_PERCENT: '20',
+    PRICE_EXTRA_CAT_PER_DAY: '5'
   }
 };
 
@@ -100,6 +103,7 @@ async function buildVariant(name, vars) {
     PRICE_TWO_VISITS: Number(BASE_VARS.__PRICE_TWO_VISITS__),
     DOG_WALK_PRICE_FROM: Number(BASE_VARS.__DOG_WALK_PRICE_FROM__),
     SEASONAL_SURCHARGE_PERCENT: Number(vars.SEASONAL_SURCHARGE_PERCENT),
+    PRICE_EXTRA_CAT_PER_DAY: Number(vars.PRICE_EXTRA_CAT_PER_DAY),
     WHATSAPP_NUMBER: BASE_VARS.__WHATSAPP_NUMBER__
   };
   const configJs = `window.GATOWEB_CONFIG = ${JSON.stringify(config, null, 2)};\n`;
