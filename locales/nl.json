@@ -55,6 +55,7 @@
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} t/m {{to}}",
       "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Extra kat (+{{count}}) — {{description}}",
       "adjustment": "Correctie: {{note}}"
     },
     "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",

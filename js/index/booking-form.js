@@ -8,6 +8,7 @@ window.bookingForm = function bookingForm() {
   const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
   const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
   const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
+  const PRICE_EXTRA_CAT_PER_DAY = Number(window.GATOWEB_CONFIG.PRICE_EXTRA_CAT_PER_DAY) || 0;
   const t = (key, options) => window.t(key, options);
 
   return {
@@ -50,14 +51,17 @@ window.bookingForm = function bookingForm() {
     // with the very same pricing logic used for the final factuur
     // (js/facturen/invoice-calc.js) so the two numbers never drift apart. Per the
     // decision in issue #32/#43, the seasonal surcharge is intentionally NOT included
-    // here — it only ever appears once Lígia issues the actual factuur.
+    // here — it only ever appears once Lígia issues the actual factuur. The extra-cat
+    // per-day charge, however, IS included: it's known upfront (not a seasonal
+    // surprise), so the client should see it before sending the booking request.
     _suggestedAmount() {
       if (!this.from) return 0;
       const rates = {
         priceOneVisit: PRICE_ONE_VISIT,
         priceTwoVisits: PRICE_TWO_VISITS,
         dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
-        seasonalSurchargePercent: 0
+        seasonalSurchargePercent: 0,
+        extraCatPricePerDay: PRICE_EXTRA_CAT_PER_DAY
       };
       const booking = { date_from: this.from, date_to: this.to, pets: this.pets, preference: this.pref };
       return buildInvoiceLineItems(booking, rates).total;

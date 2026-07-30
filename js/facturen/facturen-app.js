@@ -10,6 +10,7 @@ const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
 const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
 const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
 const SEASONAL_SURCHARGE_PERCENT = Number(window.GATOWEB_CONFIG.SEASONAL_SURCHARGE_PERCENT) || 0;
+const PRICE_EXTRA_CAT_PER_DAY = Number(window.GATOWEB_CONFIG.PRICE_EXTRA_CAT_PER_DAY) || 0;
 
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 const t = (key, options) => window.t(key, options);
@@ -76,7 +77,8 @@ function rates() {
     priceOneVisit: PRICE_ONE_VISIT,
     priceTwoVisits: PRICE_TWO_VISITS,
     dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
-    seasonalSurchargePercent: SEASONAL_SURCHARGE_PERCENT
+    seasonalSurchargePercent: SEASONAL_SURCHARGE_PERCENT,
+    extraCatPricePerDay: PRICE_EXTRA_CAT_PER_DAY
   };
 }
 
@@ -93,6 +95,9 @@ function itemSummary(item) {
   const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
   if (item.type === 'surcharge') {
     return t('invoice.line.surcharge_item', { percent: item.percent, description: base });
+  }
+  if (item.type === 'extra-cat') {
+    return t('invoice.line.extra_cat_item', { count: item.extraCatCount, description: base });
   }
   return base;
 }

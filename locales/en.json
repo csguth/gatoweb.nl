@@ -55,6 +55,7 @@
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} to {{to}}",
       "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Extra cat (+{{count}}) — {{description}}",
       "adjustment": "Adjustment: {{note}}"
     },
     "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",

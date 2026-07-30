@@ -37,3 +37,26 @@ Feature: Invoice calculation
     Then the invoice has 1 line item
     And line item 1 is a "high" season "service" for "cat" covering 2 days at €15.00 per day
     And the invoice total is €30.00
+
+  Scenario: A second cat in the same booking adds an extra-cat line item
+    Given the price rates are one-visit €15, two-visits €25, dog-walk €10, seasonal surcharge 0%, extra cat €5 per day
+    And a booking from "2025-03-10" to "2025-03-12" for 2 cats with "morning" preference
+    When the invoice line items are calculated
+    Then the invoice has 2 line items
+    And line item 1 is a "normal" season "service" for "cat" covering 3 days at €15.00 per day
+    And line item 2 is a "normal" season "extra-cat" for "cat" covering 3 days at €5.00 per day
+    And the invoice total is €60.00
+
+  Scenario: No extra-cat line item is added for a single-cat booking
+    Given the price rates are one-visit €15, two-visits €25, dog-walk €10, seasonal surcharge 0%, extra cat €5 per day
+    And a booking from "2025-03-10" to "2025-03-12" for a cat with "morning" preference
+    When the invoice line items are calculated
+    Then the invoice has 1 line item
+    And the invoice total is €45.00
+
+  Scenario: No extra-cat line item is added when the extra-cat rate is 0
+    Given the price rates are one-visit €15, two-visits €25, dog-walk €10, seasonal surcharge 0%, extra cat €0 per day
+    And a booking from "2025-03-10" to "2025-03-12" for 2 cats with "morning" preference
+    When the invoice line items are calculated
+    Then the invoice has 1 line item
+    And the invoice total is €45.00
