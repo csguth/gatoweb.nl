@@ -64,13 +64,14 @@ function round2(n) {
   return Math.round(n * 100) / 100;
 }
 
-// `rates` = { priceOneVisit, priceTwoVisits, dogWalkPriceFrom, seasonalSurchargePercent }
-// — all numbers, already resolved from window.GATOWEB_CONFIG by the caller.
+// `rates` = { priceOneVisit, priceTwoVisits, dogWalkPriceFrom, seasonalSurchargePercent,
+// extraCatPricePerDay } — all numbers, already resolved from window.GATOWEB_CONFIG by the caller.
 export function buildInvoiceLineItems(booking, rates) {
   const days = dateRange(booking.date_from, booking.date_to);
   const seasonGroups = groupBySeason(days);
   const pets = Array.isArray(booking.pets) ? booking.pets : [];
-  const hasCat = pets.some(p => p.type !== 'dog');
+  const catCount = pets.filter(p => p.type !== 'dog').length;
+  const hasCat = catCount > 0;
   const hasDog = pets.some(p => p.type === 'dog');
   const { period, visitsPerDay } = frequencyOf(booking.preference);
 
@@ -79,6 +80,11 @@ export function buildInvoiceLineItems(booking, rates) {
 
   const items = [];
   const surchargePercent = Number(rates.seasonalSurchargePercent) || 0;
+  // Extra cats (beyond the first one) are charged a flat per-day amount — unlike the
+  // seasonal surcharge, this is known upfront and is also shown on the public price
+  // estimate (js/index/booking-form.js), not just the final invoice.
+  const extraCatCount = Math.max(0, catCount - 1);
+  const extraCatPricePerDay = Number(rates.extraCatPricePerDay) || 0;
 
   // Each service line is always billed at the plain base rate — the seasonal surcharge
   // (if any) is pushed as its own separate line item right after it, instead of being
@@ -116,6 +122,23 @@ export function buildInvoiceLineItems(booking, rates) {
         dayCount: dayCount,
         unitPrice: round2(surchargePerDay),
         subtotal: round2(surchargePerDay * dayCount)
+      });
+    }
+
+    if (service === 'cat' && extraCatCount > 0 && extraCatPricePerDay > 0) {
+      const extraCatPerDay = extraCatPricePerDay * extraCatCount;
+      items.push({
+        type: 'extra-cat',
+        service: service,
+        period: period,
+        visitsPerDay: visitsPerDay,
+        season: group.season,
+        extraCatCount: extraCatCount,
+        from: from,
+        to: to,
+        dayCount: dayCount,
+        unitPrice: round2(extraCatPerDay),
+        subtotal: round2(extraCatPerDay * dayCount)
       });
     }
   }

@@ -105,16 +105,16 @@ Then('the WhatsApp confirmation link mentions {string}', async ({ page }, text) 
 });
 
 Then('the suggested price is €{float}', async ({ page }, expected) => {
-  // _suggestedAmount() isn't rendered anywhere in the UI (only used
-  // internally when persisting to Supabase), so this reaches into the
-  // Alpine component's reactive state directly via Alpine.$data() — the
-  // same bridge Alpine devtools use — rather than duplicating the pricing
-  // logic in the test itself.
-  const amount = await page.evaluate(() => {
-    const el = document.querySelector('[x-data="bookingForm()"]');
-    return window.Alpine.$data(el)._suggestedAmount();
-  });
-  expect(amount).toBe(expected);
+  // The estimate is now rendered directly in the form (issue #43), computed via
+  // buildInvoiceLineItems() (js/facturen/invoice-calc.js) — the same logic used for
+  // the final factuur — so this reads the visible text instead of duplicating the
+  // pricing math in the test.
+  const text = await page.locator('#estimated-price-value').innerText();
+  expect(text).toBe(`€ ${expected.toFixed(2)}`);
+});
+
+Then('the estimated price is not shown', async ({ page }) => {
+  await expect(page.locator('#estimated-price-value')).toBeHidden();
 });
 
 Then('I see the login or signup gate instead of a sent confirmation', async ({ page }) => {

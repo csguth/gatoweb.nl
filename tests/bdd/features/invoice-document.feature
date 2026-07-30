@@ -22,3 +22,8 @@ Feature: Invoice document — proforma vs final factuur
     Then the document title is "Factuur 2025-0007"
     And the document does not show the proforma notice
     And the document total is €45.00
+
+  Scenario: A booking with two cats includes the extra-cat line in the total
+    Given a booking from "2025-03-10" to "2025-03-12" for 2 cats with "morning" preference
+    When the invoice document is built
+    Then the document total is €60.00

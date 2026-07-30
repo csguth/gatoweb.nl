@@ -35,6 +35,7 @@ Given('the Dutch invoice translations and business config are loaded', async () 
       PRICE_TWO_VISITS: 25,
       DOG_WALK_PRICE_FROM: 10,
       SEASONAL_SURCHARGE_PERCENT: 20,
+      PRICE_EXTRA_CAT_PER_DAY: 5,
       BRAND_NAME: 'Gato Petsit',
       BUSINESS_LEGAL_NAME: 'Gato Petsit',
       BUSINESS_ADDRESS: 'Teststraat 1, Den Bosch',

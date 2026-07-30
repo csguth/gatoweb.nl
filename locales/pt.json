@@ -55,6 +55,7 @@
       "date_range_single": "{{date}}",
       "date_range_multi": "{{from}} até {{to}}",
       "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Gato adicional (+{{count}}) — {{description}}",
       "adjustment": "Ajuste: {{note}}"
     },
     "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
@@ -177,6 +178,8 @@
         "evening_1x": "Noite <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
         "both_2x_day": "Ambos <span class=\"font-normal opacity-70 text-xs\">(2x/dia)</span>",
         "no_pref_1x": "Sem preferência. <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "estimated_price": "Preço estimado",
+        "estimated_price_note": "Confirmado pela Lígia quando sua reserva for aprovada",
         "create_a_free_account_or": "Crie uma conta gratuita (ou faça login) para enviar sua reserva – isso permite que você acompanhe seu status a qualquer momento.",
         "log_in": "Conecte-se",
         "create_account": "Criar uma conta",

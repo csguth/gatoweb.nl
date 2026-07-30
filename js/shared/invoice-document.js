@@ -39,7 +39,8 @@ function rates() {
     priceOneVisit: Number(c.PRICE_ONE_VISIT) || 0,
     priceTwoVisits: Number(c.PRICE_TWO_VISITS) || 0,
     dogWalkPriceFrom: Number(c.DOG_WALK_PRICE_FROM) || 0,
-    seasonalSurchargePercent: Number(c.SEASONAL_SURCHARGE_PERCENT) || 0
+    seasonalSurchargePercent: Number(c.SEASONAL_SURCHARGE_PERCENT) || 0,
+    extraCatPricePerDay: Number(c.PRICE_EXTRA_CAT_PER_DAY) || 0
   };
 }
 
@@ -56,6 +57,9 @@ function lineItemDescription(item) {
   const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
   if (item.type === 'surcharge') {
     return tNl('invoice.line.surcharge_item', { percent: item.percent, description: base });
+  }
+  if (item.type === 'extra-cat') {
+    return tNl('invoice.line.extra_cat_item', { count: item.extraCatCount, description: base });
   }
   return base;
 }
