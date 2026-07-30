@@ -177,6 +177,8 @@
         "evening_1x": "Avond <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
         "both_2x_day": "Beide <span class=\"font-normal opacity-70 text-xs\">(2x/dag)</span>",
         "no_pref_1x": "Geen voorkeur <span class=\"font-normal opacity-70 text-xs\">(1x)</span>",
+        "estimated_price": "Geschatte prijs",
+        "estimated_price_note": "Wordt door Lígia bevestigd zodra je boeking is goedgekeurd",
         "create_a_free_account_or": "Maak een gratis account (of log in) om je boeking te versturen — zo kun je de status altijd volgen.",
         "log_in": "Inloggen",
         "create_account": "Account aanmaken",
