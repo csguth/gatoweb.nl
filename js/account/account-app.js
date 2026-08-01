@@ -1,9 +1,11 @@
 // accountApp() Alpine component for account.html (client self-service booking portal, issue #12).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const t = (key, options) => window.t(key, options);
 
 // Same storageKey as index.html's client auth ('gatoweb-client-auth') so a client who
 // logged in from the booking form on / stays logged in here, and vice versa. Kept
@@ -84,13 +86,18 @@ window.accountApp = function () {
       this.loading = true;
       this.errorMsg = '';
       this.infoMsg = '';
-      const { data, error } = await supabase.auth.signUp({ email: this.email, password: this.password });
+      // Without emailRedirectTo the confirmation link's redirect_to falls back to the
+      // Supabase project's "Site URL" (often localhost); pin it to the live origin the
+      // client actually signed up on so the link returns to gatoweb.nl (or staging).
+      const { data, error } = await supabase.auth.signUp({
+        email: this.email,
+        password: this.password,
+        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+      });
       this.loading = false;
       if (error) { this.errorMsg = error.message; return; }
       if (!data.session) {
-        this.infoMsg = document.body.classList.contains('show-nl')
-          ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.'
-          : 'Account created! Check your email and click the confirmation link, then log in here.';
+        this.infoMsg = t('auth.account_created_check_email_login');
         this.mode = 'login';
         this.password = '';
         return;
@@ -122,6 +129,21 @@ window.accountApp = function () {
 
     factuurLabel(b) {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
+    },
+
+    // Whether the client can open the invoice document for this booking. Any non-cancelled
+    // booking can be viewed (issue #62): while it's still awaiting confirmation (pending) or
+    // approved-but-unpaid it's a proforma (no factuur_number), and once paid it becomes the
+    // official numbered factuur — the same document generator handles all cases, computing
+    // line items straight from the booking (dates/pets/preference) + config rates. Cancelled
+    // bookings never show the button. RLS (supabase/schema.sql) guarantees the client only
+    // ever receives their own rows.
+    canViewInvoice(b) {
+      return b.status === 'pending' || b.status === 'approved';
+    },
+
+    viewInvoice(b) {
+      openInvoicePrintWindow(b);
     }
   };
 };

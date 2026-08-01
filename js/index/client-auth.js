@@ -10,6 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+const t = (key, options) => window.t(key, options);
 // detectSessionInUrl is true here (unlike facturen.html) because clients may land on /
 // after clicking the email-confirmation link, which appends the session tokens as a URL
 // fragment that supabase-js needs to pick up automatically to log them in.
@@ -35,13 +36,20 @@ window.__gatoClientAuth = {
     supabase.auth.onAuthStateChange((_event, session) => cb(session));
   },
   async signIn(email, password) {
-    if (!supabase) return { session: null, error: 'not configured' };
+    if (!supabase) return { session: null, error: t('auth.not_configured') };
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     return { session: data.session, error: error ? error.message : null };
   },
   async signUp(email, password) {
-    if (!supabase) return { session: null, error: 'not configured' };
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (!supabase) return { session: null, error: t('auth.not_configured') };
+    // Without emailRedirectTo the confirmation link's redirect_to falls back to the
+    // Supabase project's "Site URL" (often localhost); pin it to the live origin the
+    // client actually signed up on so the link returns to gatoweb.nl (or staging).
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
     return { session: data.session, error: error ? error.message : null };
   },
   async signOut() {
@@ -60,6 +68,8 @@ window.__saveBookingToSupabase = async function (booking) {
       user_id: session.user.id,
       client_email: session.user.email,
       client_name: booking.clientName || null,
+      client_address: booking.address || null,
+      client_contact: booking.clientContact || null,
       date_from: booking.from,
       date_to: booking.to || null,
       pets: booking.pets,

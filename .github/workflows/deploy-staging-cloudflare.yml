@@ -62,7 +62,7 @@ jobs:
           mkdir -p site
           rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
 
-          for f in site/index.html site/facturen.html site/account.html; do
+          for f in site/index.html site/facturen.html site/account.html site/locales/en.json site/locales/nl.json site/locales/pt.json; do
             sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" "$f"
             sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" "$f"
             sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" "$f"
@@ -91,9 +91,18 @@ jobs:
             BRAND_NAME: $(jq -Rn --arg v "${{ vars.BRAND_NAME }}" '$v'),
             PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
             PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
-            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }}
+            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
+            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }},
+            PRICE_EXTRA_CAT_PER_DAY: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }},
+            WHATSAPP_NUMBER: $(jq -Rn --arg v "${{ vars.WHATSAPP_NUMBER }}" '$v')
           };
           JSEOF
+
+      - name: Apply DB migration (staging)
+        uses: ./.github/actions/apply-db-migration
+        with:
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy to Cloudflare Pages (staging project)
         uses: cloudflare/pages-action@v1

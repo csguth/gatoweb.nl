@@ -1,14 +1,20 @@
 // bookingForm() Alpine component for index.html's booking form.
-function bookingForm() {
+import { buildInvoiceLineItems } from '../facturen/invoice-calc.js';
+
+window.bookingForm = function bookingForm() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem('gatoweb_booking') || '{}'); } catch(e) {}
 
   const PRICE_ONE_VISIT = Number(window.GATOWEB_CONFIG.PRICE_ONE_VISIT) || 0;
   const PRICE_TWO_VISITS = Number(window.GATOWEB_CONFIG.PRICE_TWO_VISITS) || 0;
   const DOG_WALK_PRICE_FROM = Number(window.GATOWEB_CONFIG.DOG_WALK_PRICE_FROM) || 0;
+  const PRICE_EXTRA_CAT_PER_DAY = Number(window.GATOWEB_CONFIG.PRICE_EXTRA_CAT_PER_DAY) || 0;
+  const t = (key, options) => window.t(key, options);
 
   return {
     clientName: saved.clientName || '',
+    address: saved.address || '',
+    clientContact: saved.clientContact || '',
     from: '',
     to: '',
     pref: saved.pref || '',
@@ -28,10 +34,12 @@ function bookingForm() {
     authLoading: false,
 
     _save() {
-      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, pets: this.pets, pref: this.pref })); } catch(e) {}
+      try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, clientContact: this.clientContact, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
     async init() {
       this.$watch('clientName', () => this._save());
+      this.$watch('address', () => this._save());
+      this.$watch('clientContact', () => this._save());
       this.$watch('pets', () => this._save());
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
@@ -39,21 +47,34 @@ function bookingForm() {
         window.__gatoClientAuth.onChange((session) => { this.session = session; });
       }
     },
+    // Estimate shown to the client on the booking form itself (issue #43), computed
+    // with the very same pricing logic used for the final factuur
+    // (js/facturen/invoice-calc.js) so the two numbers never drift apart. Per the
+    // decision in issue #32/#43, the seasonal surcharge is intentionally NOT included
+    // here — it only ever appears once Lígia issues the actual factuur. The extra-cat
+    // per-day charge, however, IS included: it's known upfront (not a seasonal
+    // surprise), so the client should see it before sending the booking request.
     _suggestedAmount() {
-      const start = new Date(this.from);
-      const end = this.to && this.to > this.from ? new Date(this.to) : start;
-      const days = Math.max(1, Math.round((end - start) / 86400000) + 1);
-      const hasDog = this.pets.some(p => p.type === 'dog');
-      const hasCat = this.pets.some(p => p.type !== 'dog');
-      const perDay = this.pref === 'both' ? PRICE_TWO_VISITS : PRICE_ONE_VISIT;
-      let total = 0;
-      if (hasCat) total += perDay * days;
-      if (hasDog) total += DOG_WALK_PRICE_FROM * days;
-      return total;
+      if (!this.from) return 0;
+      const rates = {
+        priceOneVisit: PRICE_ONE_VISIT,
+        priceTwoVisits: PRICE_TWO_VISITS,
+        dogWalkPriceFrom: DOG_WALK_PRICE_FROM,
+        seasonalSurchargePercent: 0,
+        extraCatPricePerDay: PRICE_EXTRA_CAT_PER_DAY
+      };
+      const booking = { date_from: this.from, date_to: this.to, pets: this.pets, preference: this.pref };
+      return buildInvoiceLineItems(booking, rates).total;
     },
     async send() {
       if (!this.from) {
-        alert('Selecteer een datum / Please select a start date');
+        alert(t('booking.start_date_required'));
+        return;
+      }
+      // Address is required on the invoice (issue #32) — validated client-side same as
+      // the date, since there's no server-side booking form validation on this static site.
+      if (!this.address || !this.address.trim()) {
+        alert(t('booking.address_required'));
         return;
       }
       // Client account required (issue #12) — if Supabase is configured and the client
@@ -70,6 +91,8 @@ function bookingForm() {
       if (window.__saveBookingToSupabase) {
         await window.__saveBookingToSupabase({
           clientName: this.clientName,
+          address: this.address,
+          clientContact: this.clientContact,
           from: this.from,
           to: this.to,
           pets: this.pets,
@@ -79,6 +102,14 @@ function bookingForm() {
       }
 
       this.sent = true;
+    },
+    // Lets the client message Lígia on WhatsApp right after sending the request,
+    // pre-filled with the dates just booked, mirroring the existing wa.me buttons.
+    whatsappConfirmLink() {
+      const toRange = this.to && this.to > this.from ? ' \u2192 ' + this.to : '';
+      const message = t('booking.whatsapp_confirm_message', { from: this.from, toRange });
+      const number = (window.GATOWEB_CONFIG && window.GATOWEB_CONFIG.WHATSAPP_NUMBER) || '';
+      return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
     },
     async authLogin() {
       this.authLoading = true;
@@ -99,9 +130,7 @@ function bookingForm() {
       this.authLoading = false;
       if (error) { this.authError = error; return; }
       if (!session) {
-        this.authInfo = (document.body.classList.contains('show-nl'))
-          ? 'Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.'
-          : 'Account created! Check your email and click the confirmation link, then log in here to send your booking.';
+        this.authInfo = t('booking.account_created_check_email_send');
         this.authMode = 'login';
         this.authPassword = '';
         return;
@@ -115,4 +144,4 @@ function bookingForm() {
       this.session = null;
     }
   };
-}
+};

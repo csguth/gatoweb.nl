@@ -1,0 +1,30 @@
+{
+  "name": "gatoweb-nl",
+  "version": "1.0.0",
+  "description": "Professional catsitting service by Lígia in 's-Hertogenbosch.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test:build-fixtures": "node tests/bdd/support/build-fixtures.mjs",
+    "test:bdd": "npm run test:build-fixtures && bddgen && playwright test",
+    "test": "npm run test:bdd",
+    "test:bdd:headed": "npm run test:build-fixtures && bddgen && playwright test --headed",
+    "test:bdd:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csguth/gatoweb.nl.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csguth/gatoweb.nl/issues"
+  },
+  "homepage": "https://github.com/csguth/gatoweb.nl#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "http-server": "^14.1.1",
+    "playwright-bdd": "^9.2.0"
+  }
+}

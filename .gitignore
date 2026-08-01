@@ -1,0 +1,8 @@
+supabase/.temp/
+
+# BDD test tooling (tests/bdd/support/build-fixtures.mjs, playwright.config.js)
+node_modules/
+tests/bdd/.features-gen/
+test-results/
+playwright-report/
+.test-site/
