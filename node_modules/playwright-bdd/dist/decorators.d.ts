@@ -1,0 +1,7 @@
+import { Fixture } from './steps/decorators/fixture';
+export { Fixture };
+export declare const Given: (pattern: import("./steps/stepDefinition").StepPattern, providedOptions?: import("./steps/stepDefinition").ProvidedStepOptions) => (method: import("./steps/stepDefinition").StepDefinitionOptions["fn"], _context: ClassMethodDecoratorContext) => void;
+export declare const When: (pattern: import("./steps/stepDefinition").StepPattern, providedOptions?: import("./steps/stepDefinition").ProvidedStepOptions) => (method: import("./steps/stepDefinition").StepDefinitionOptions["fn"], _context: ClassMethodDecoratorContext) => void;
+export declare const Then: (pattern: import("./steps/stepDefinition").StepPattern, providedOptions?: import("./steps/stepDefinition").ProvidedStepOptions) => (method: import("./steps/stepDefinition").StepDefinitionOptions["fn"], _context: ClassMethodDecoratorContext) => void;
+export declare const Step: (pattern: import("./steps/stepDefinition").StepPattern, providedOptions?: import("./steps/stepDefinition").ProvidedStepOptions) => (method: import("./steps/stepDefinition").StepDefinitionOptions["fn"], _context: ClassMethodDecoratorContext) => void;
+//# sourceMappingURL=decorators.d.ts.map

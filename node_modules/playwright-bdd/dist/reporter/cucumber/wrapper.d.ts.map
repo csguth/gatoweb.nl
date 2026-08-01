@@ -1,0 +1,1 @@
+{"version":3,"file":"wrapper.d.ts","sourceRoot":"","sources":["../../../src/reporter/cucumber/wrapper.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,gBAAgB,EAAE,uBAAuB,EAAE,MAAM,GAAG,CAAC;AAEnE,wBAAgB,gBAAgB,CAAC,CAAC,SAAS,MAAM,gBAAgB,GAAG,MAAM,EACxE,IAAI,EAAE,CAAC,EACP,WAAW,CAAC,EAAE,uBAAuB,CAAC,CAAC,CAAC,GACvC,CAAC,MAAM,EAAE,OAAO,CAAC,CAEnB"}

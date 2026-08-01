@@ -1,0 +1,1 @@
+{"version":3,"file":"skip.d.ts","sourceRoot":"","sources":["../../../../src/reporter/cucumber/attachments/skip.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,OAAO,EAAE,kBAAkB,EAAE,MAAM,0BAA0B,CAAC;AAE9D,MAAM,MAAM,eAAe,GAAG,OAAO,GAAG,CAAC,WAAW,GAAG,YAAY,GAAG,iBAAiB,GAAG,MAAM,CAAC,EAAE,CAAC;AAEpG,wBAAgB,oBAAoB,CAClC,QAAQ,EAAE,kBAAkB,EAC5B,eAAe,CAAC,EAAE,eAAe,WAKlC"}

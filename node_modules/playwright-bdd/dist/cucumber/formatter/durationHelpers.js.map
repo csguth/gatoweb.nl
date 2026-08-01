@@ -1,0 +1,1 @@
+{"version":3,"file":"durationHelpers.js","sourceRoot":"","sources":["../../../src/cucumber/formatter/durationHelpers.ts"],"names":[],"mappings":";AAAA;;GAEG;;AAMH,sDAEC;AAJD,MAAM,eAAe,GAAG,aAAa,CAAC;AAEtC,SAAgB,qBAAqB,CAAC,QAAkB;IACtD,OAAO,IAAI,CAAC,KAAK,CAAC,QAAQ,CAAC,OAAO,GAAG,eAAe,GAAG,QAAQ,CAAC,KAAK,CAAC,CAAC;AACzE,CAAC"}

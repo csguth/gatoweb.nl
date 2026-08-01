@@ -1,0 +1,1 @@
+{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../../src/gherkin/types.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,eAAe,EAAE,QAAQ,EAAE,MAAM,oBAAoB,CAAC;AAEvE,MAAM,MAAM,0BAA0B,GAAG,eAAe,GAAG;IACzD,OAAO,EAAE,kBAAkB,EAAE,CAAC;CAC/B,CAAC;AAEF,MAAM,MAAM,kBAAkB,GAAG,MAAM,GAAG;IACxC,QAAQ,EAAE,QAAQ,CAAC;CACpB,CAAC"}

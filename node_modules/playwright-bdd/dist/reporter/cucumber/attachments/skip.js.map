@@ -1,0 +1,1 @@
+{"version":3,"file":"skip.js","sourceRoot":"","sources":["../../../../src/reporter/cucumber/attachments/skip.ts"],"names":[],"mappings":";;AAOA,oDAOC;AAPD,SAAgB,oBAAoB,CAClC,QAA4B,EAC5B,eAAiC;IAEjC,OAAO,KAAK,CAAC,OAAO,CAAC,eAAe,CAAC;QACnC,CAAC,CAAC,eAAe,CAAC,QAAQ,CAAC,QAAQ,CAAC,UAAU,CAAC,SAAS,CAAC;QACzD,CAAC,CAAC,OAAO,CAAC,eAAe,CAAC,CAAC;AAC/B,CAAC"}
