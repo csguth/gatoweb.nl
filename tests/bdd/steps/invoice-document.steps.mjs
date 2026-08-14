@@ -77,6 +77,14 @@ Then('the document total is €{float}', async ({}, total) => {
   assertIncludes(world.document, '€ ' + total.toFixed(2) + '</td></tr>', 'invoice total row');
 });
 
+Then('the document shows the invoice date {string}', async ({}, date) => {
+  assertIncludes(world.document, 'Datum: ' + date, 'invoice date label');
+});
+
+Then('the document shows the line item date range {string}', async ({}, range) => {
+  assertIncludes(world.document, range, 'line item date range');
+});
+
 function assertIncludes(haystack, needle, label) {
   if (!haystack.includes(needle)) {
     throw new Error(`Expected ${label} to contain ${JSON.stringify(needle)}`);

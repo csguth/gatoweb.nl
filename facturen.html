@@ -117,7 +117,7 @@
 </button>
 </div>
 <div class="text-sm text-gray-600 space-y-0.5">
-<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="formatDate(b.date_from)"></span><template x-if="b.date_to"><span> → <span x-text="formatDate(b.date_to)"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <div><span class="font-semibold nl-l">Voorkeur:</span><span class="font-semibold en-l" data-i18n="facturen.preference">Preference:</span><span class="font-semibold pt-l">Preferência:</span> <span x-text="b.preference || '-'"></span></div>
 </div>
@@ -195,7 +195,7 @@
 </button>
 </div>
 <div class="text-sm text-gray-600 space-y-0.5">
-<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="formatDate(b.date_from)"></span><template x-if="b.date_to"><span> → <span x-text="formatDate(b.date_to)"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <div><span class="font-semibold nl-l">Bedrag:</span><span class="font-semibold en-l" data-i18n="facturen.amount_2">Amount:</span><span class="font-semibold pt-l">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
 </div>
@@ -260,7 +260,7 @@ WhatsApp
 </button>
 </div>
 <div class="text-sm text-gray-600 space-y-0.5">
-<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold nl-l">Data:</span><span class="font-semibold en-l" data-i18n="facturen.dates_2">Dates:</span><span class="font-semibold pt-l">Datas:</span> <span x-text="formatDate(b.date_from)"></span><template x-if="b.date_to"><span> → <span x-text="formatDate(b.date_to)"></span></span></template></div>
 <div><span class="font-semibold nl-l">Huisdieren:</span><span class="font-semibold en-l" data-i18n="facturen.pets_2">Pets:</span><span class="font-semibold pt-l">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <div><span class="font-semibold nl-l">Bedrag:</span><span class="font-semibold en-l" data-i18n="facturen.amount_2">Amount:</span><span class="font-semibold pt-l">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
 </div>

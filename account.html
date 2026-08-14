@@ -114,7 +114,7 @@
 <span class="text-[11px] text-gray-400" x-show="b.factuur_number" x-text="'#' + factuurLabel(b)"></span>
 </div>
 <div class="text-sm text-gray-600 space-y-0.5">
-<div><span class="font-semibold en" data-i18n="account.dates">Dates:</span><span class="font-semibold nl">Data:</span><span class="font-semibold pt">Datas:</span> <span x-text="b.date_from"></span><template x-if="b.date_to"><span> → <span x-text="b.date_to"></span></span></template></div>
+<div><span class="font-semibold en" data-i18n="account.dates">Dates:</span><span class="font-semibold nl">Data:</span><span class="font-semibold pt">Datas:</span> <span x-text="formatDate(b.date_from)"></span><template x-if="b.date_to"><span> → <span x-text="formatDate(b.date_to)"></span></span></template></div>
 <div><span class="font-semibold en" data-i18n="account.pets">Pets:</span><span class="font-semibold nl">Huisdieren:</span><span class="font-semibold pt">Animais:</span> <span x-text="petsSummary(b.pets)"></span></div>
 <template x-if="b.status === 'approved' || b.status === 'cancelled'">
 <div><span class="font-semibold en" data-i18n="account.amount">Amount:</span><span class="font-semibold nl">Bedrag:</span><span class="font-semibold pt">Valor:</span> € <span x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>

@@ -1,6 +1,7 @@
 // accountApp() Alpine component for account.html (client self-service booking portal, issue #12).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { openInvoicePrintWindow } from '../shared/invoice-document.js';
+import { formatDateDDMMYYYY } from '../shared/format-date.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -125,6 +126,12 @@ window.accountApp = function () {
 
     petsSummary(pets) {
       return petsText(pets);
+    },
+
+    // Formats a stay's DD/MM/YYYY date range for display (issue #78) — bookings
+    // store date_from/date_to as raw 'YYYY-MM-DD' strings.
+    formatDate(dateStr) {
+      return formatDateDDMMYYYY(dateStr);
     },
 
     factuurLabel(b) {
