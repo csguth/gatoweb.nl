@@ -6,7 +6,9 @@
 // There's no real backend, so instead of logging in for real we seed a fake
 // session + bookings straight into the Alpine component's reactive state (the
 // same Alpine.$data() bridge booking-form.steps.mjs uses), then assert on the
-// rendered cards.
+// rendered cards. makeBooking()/seedBookings() are exported for reuse by
+// date-format.steps.mjs (issue #78), which needs the same "logged in with
+// seeded bookings" setup to assert on the rendered date range.
 import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 
@@ -20,7 +22,7 @@ function payLink(page) {
   return app(page).getByRole('link', { name: /Pay with Tikkie/ });
 }
 
-function makeBooking(overrides) {
+export function makeBooking(overrides) {
   return {
     id: 'test-booking-1',
     created_at: '2025-08-01T00:00:00Z',
@@ -37,7 +39,7 @@ function makeBooking(overrides) {
   };
 }
 
-async function seedBookings(page, bookings) {
+export async function seedBookings(page, bookings) {
   await page.evaluate((bookings) => {
     const el = document.querySelector('[x-data="accountApp()"]');
     const data = window.Alpine.$data(el);
