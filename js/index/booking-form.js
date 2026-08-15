@@ -83,6 +83,12 @@ window.bookingForm = function bookingForm() {
         alert(t('booking.name_required'));
         return;
       }
+      // WhatsApp/phone is required so Lígia can reach the client directly (issue #108) —
+      // the field used to be optional.
+      if (!this.clientContact || !this.clientContact.trim()) {
+        alert(t('booking.contact_required'));
+        return;
+      }
       // Client account required (issue #12) — if Supabase is configured and the client
       // isn't logged in yet, show the inline login/signup gate instead of sending.
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured && !this.session) {
