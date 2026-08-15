@@ -36,6 +36,9 @@ window.bookingForm = function bookingForm() {
     // that was waiting on email confirmation, rather than by the user clicking
     // "Send booking request" just now — lets the success panel explain what happened.
     resumedFromPending: false,
+    // Guards _tryResumePendingBooking() against being entered twice concurrently
+    // (see its comment for why that can happen).
+    _resuming: false,
     showAuth: false,
     authMode: 'login',
     authEmail: '',
@@ -76,10 +79,17 @@ window.bookingForm = function bookingForm() {
     // asynchronously, so the session may not be ready yet the first time). If the
     // client just confirmed their email and a booking was left pending, restore it
     // and send it automatically instead of making them start over.
+    //
+    // supabase-js's onAuthStateChange ALWAYS fires once immediately with the current
+    // session ("INITIAL_SESSION"), so this can be entered again by the onChange
+    // listener while the first call is still awaiting _completeSend() (before `sent`
+    // becomes true) — `_resuming` is set synchronously (before any await) to serialize
+    // the two calls and guarantee the booking is only ever sent once.
     async _tryResumePendingBooking() {
-      if (!this.session || this.sent) return;
+      if (!this.session || this.sent || this._resuming) return;
       const pending = this._loadPendingBooking();
       if (!pending) return;
+      this._resuming = true;
       this.clientName = pending.clientName || '';
       this.address = pending.address || '';
       this.clientContact = pending.clientContact || '';
@@ -90,6 +100,11 @@ window.bookingForm = function bookingForm() {
       this.resumedFromPending = true;
       this._clearPendingBooking();
       await this._completeSend();
+      // The client lands on '/' (not '/#booking') after clicking the email
+      // confirmation link, so without this the "sent" confirmation renders off-screen
+      // and looks like nothing happened unless they scroll down manually.
+      const section = document.getElementById('booking');
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
     async init() {
       this.$watch('clientName', () => this._save());
@@ -99,6 +114,12 @@ window.bookingForm = function bookingForm() {
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
         this.session = await window.__gatoClientAuth.getSession();
+        // The auto-resume flow below renders translated text (t()) as soon as it runs;
+        // without this, on a slow connection it can race ahead of i18next's own async
+        // init() (still fetching locale JSON) and briefly/permanently render raw
+        // translation keys instead of real copy. init() is idempotent/cached, so
+        // awaiting it here is always safe and never blocks longer than necessary.
+        if (window.__gatoI18n) await window.__gatoI18n.init();
         await this._tryResumePendingBooking();
         window.__gatoClientAuth.onChange((session) => {
           this.session = session;
