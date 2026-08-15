@@ -3,6 +3,7 @@
     "start_date_required": "Selecteer een startdatum",
     "address": "Adres",
     "address_required": "Vul je adres in (nodig voor de factuur)",
+    "name_required": "Vul je volledige naam in",
     "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.",
     "whatsapp_confirm_message": "Hoi Lígia! Ik heb net een boekingsverzoek verstuurd voor {{from}}{{toRange}}. Ik hoor graag van je!"
   },
@@ -166,7 +167,7 @@
         "choose_your_dates_and_preference": "Kies jouw data en voorkeur — Lígia bevestigt binnen 24 uur.",
         "logged_in_as": "Ingelogd als",
         "log_out": "Uitloggen",
-        "your_name_optional": "Jouw naam <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
+        "full_name": "Volledige naam",
         "address": "Adres",
         "whatsapp_phone_optional": "WhatsApp / telefoon <span class=\"font-normal text-gray-400 normal-case\">(optioneel)</span>",
         "first_day": "Eerste dag",

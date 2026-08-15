@@ -34,10 +34,15 @@ Given('I fill in the first day as {string} and the last day as {string}', async 
 });
 
 Given('I fill in the address as {string}', async ({ page }, address) => {
-  // The 2nd `input[type=text]` in the form is Address (1st is the optional
-  // client name field) — there's no `for`/`id` label association to hook
-  // into with getByLabel, so we rely on this stable DOM position instead.
+  // The 2nd `input[type=text]` in the form is Address (1st is the full-name
+  // field, required since issue #107) — there's no `for`/`id` label
+  // association to hook into with getByLabel, so we rely on this stable DOM
+  // position instead.
   await form(page).locator('input[type="text"]').nth(1).fill(address);
+});
+
+Given('I fill in the name as {string}', async ({ page }, name) => {
+  await form(page).locator('input[type="text"]').nth(0).fill(name);
 });
 
 Given('I add a pet of type {string}', async ({ page }, type) => {
@@ -64,6 +69,10 @@ When('I click {string} without filling in an address', async ({ page }, buttonTe
   await clickSendAndCaptureAlert(page, buttonText);
 });
 
+When('I click {string} without filling in a name', async ({ page }, buttonText) => {
+  await clickSendAndCaptureAlert(page, buttonText);
+});
+
 When('I click {string}', async ({ page }, buttonText) => {
   await clickSendAndCaptureAlert(page, buttonText);
 });
@@ -84,6 +93,10 @@ Then('I see an alert asking for the start date', async () => {
 
 Then('I see an alert asking for the address', async () => {
   expect(world.alertMessage).toBe('Please enter your address (required for the invoice)');
+});
+
+Then('I see an alert asking for the name', async () => {
+  expect(world.alertMessage).toBe('Please enter your full name');
 });
 
 Then('the booking is not marked as sent', async ({ page }) => {

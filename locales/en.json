@@ -3,6 +3,7 @@
     "start_date_required": "Please select a start date",
     "address": "Address",
     "address_required": "Please enter your address (required for the invoice)",
+    "name_required": "Please enter your full name",
     "account_created_check_email_send": "Account created! Check your email and click the confirmation link, then log in here to send your booking.",
     "whatsapp_confirm_message": "Hi Lígia! I just sent a booking request for {{from}}{{toRange}}. Looking forward to hearing from you!"
   },
@@ -166,7 +167,7 @@
         "choose_your_dates_and_preference": "Choose your dates and preference — Lígia will confirm within 24 h.",
         "logged_in_as": "Logged in as",
         "log_out": "Log out",
-        "your_name_optional": "Your name <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
+        "full_name": "Full name",
         "address": "Address",
         "whatsapp_phone_optional": "WhatsApp / phone <span class=\"font-normal text-gray-400 normal-case\">(optional)</span>",
         "first_day": "First day",
