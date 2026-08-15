@@ -1,0 +1,59 @@
+name: Keep Supabase Alive
+
+# Supabase may pause Free Plan projects after ~7 days of low database activity
+# (see https://supabase.com/docs/guides/deployment/going-into-prod#availability).
+# This is a best-effort mitigation, not a guarantee (the only official guarantee
+# against pausing is upgrading to Pro) — see issue #121 for the full context and
+# accepted residual risks.
+#
+# Pings both Supabase projects (staging + production are separate projects, see
+# README > Environments) daily via a real REST API SELECT against the dedicated
+# public.keepalive table (supabase/schema.sql), which Supabase counts as activity.
+# Running daily (rather than the 2x/week some guides suggest) leaves a wide safety
+# margin, since GitHub Actions' `schedule` trigger is best-effort and can be
+# delayed or occasionally skipped.
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [staging, github-pages]
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Ping Supabase (${{ matrix.environment }})
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
+            echo "::error::SUPABASE_URL/SUPABASE_ANON_KEY not configured for the '${{ matrix.environment }}' environment"
+            exit 1
+          fi
+
+          response="$(mktemp)"
+          status="$(curl -sS -o "${response}" -w '%{http_code}' \
+            "${SUPABASE_URL}/rest/v1/keepalive?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")"
+
+          echo "Response (HTTP ${status}):"
+          cat "${response}"
+          echo
+
+          # Fail loudly (not silently) so a broken ping surfaces via GitHub's
+          # scheduled-workflow-failure email well before the 7-day pause window.
+          if [ "${status}" -ge 300 ]; then
+            echo "::error::Keep-alive ping failed for '${{ matrix.environment }}' (HTTP ${status})"
+            exit 1
+          fi

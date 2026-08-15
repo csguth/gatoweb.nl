@@ -420,3 +420,35 @@ create trigger bookings_gcal_sync_status_update
   for each row
   when (old.status is distinct from new.status)
   execute function public.notify_gcal_sync();
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- Keep-alive heartbeat (issue #121)
+--
+-- Supabase may pause Free Plan projects after ~7 days of low database activity.
+-- .github/workflows/keep-alive.yml pings this table daily via the anon key
+-- (GET .../rest/v1/keepalive) for both the staging and production projects, which
+-- is enough real DB activity to avoid an automatic pause. This table intentionally
+-- holds no meaningful data — it exists ONLY as a safe, non-sensitive SELECT target
+-- for the anon key. bookings/staff_emails must NOT be used for this: bookings
+-- revokes anon access entirely (see above) and staff_emails is being locked down
+-- (see "Fix Supabase RLS security vulnerabilities" issue), so pinging either would
+-- fail with 401/403 instead of keeping the project active.
+-- ─────────────────────────────────────────────────────────────────────────
+create table if not exists public.keepalive (
+  id int primary key generated always as identity,
+  pinged_at timestamptz not null default now()
+);
+
+insert into public.keepalive (pinged_at)
+  select now()
+  where not exists (select 1 from public.keepalive);
+
+alter table public.keepalive enable row level security;
+
+drop policy if exists "anon can select keepalive" on public.keepalive;
+create policy "anon can select keepalive"
+  on public.keepalive for select
+  to anon
+  using (true);
+
+grant select on public.keepalive to anon;
