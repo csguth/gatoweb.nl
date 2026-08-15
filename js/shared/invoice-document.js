@@ -8,6 +8,7 @@
 // window.i18next (all three locale bundles loaded by js/i18n.js), both of which are present
 // on facturen.html and account.html.
 import { buildInvoiceLineItems } from '../facturen/invoice-calc.js';
+import { formatDateDDMMYYYY } from './format-date.js';
 
 function cfg() {
   return window.GATOWEB_CONFIG || {};
@@ -52,8 +53,8 @@ function lineItemDescription(item) {
   const period = tNl('invoice.line.period_' + item.period);
   const frequency = tNl('invoice.line.frequency_' + item.visitsPerDay);
   const dateRange = item.from === item.to
-    ? tNl('invoice.line.date_range_single', { date: item.from })
-    : tNl('invoice.line.date_range_multi', { from: item.from, to: item.to });
+    ? tNl('invoice.line.date_range_single', { date: formatDateDDMMYYYY(item.from) })
+    : tNl('invoice.line.date_range_multi', { from: formatDateDDMMYYYY(item.from), to: formatDateDDMMYYYY(item.to) });
   const base = (service + ' ' + period).trim() + ' — ' + dateRange + ', ' + frequency;
   if (item.type === 'surcharge') {
     return tNl('invoice.line.surcharge_item', { percent: item.percent, description: base });
@@ -77,7 +78,7 @@ export function buildInvoiceDocumentHtml(b) {
   const BTW_EXEMPT = c.BTW_EXEMPT;
 
   const numberLabel = factuurNumberLabel(b.factuur_number, b.approved_at || b.paid_at);
-  const dateLabel = new Date(b.paid_at || b.approved_at || Date.now()).toLocaleDateString('nl-NL');
+  const dateLabel = formatDateDDMMYYYY(b.paid_at || b.approved_at || Date.now());
   const { items, total } = buildInvoiceLineItems(b, rates());
   const adjustment = Number(b.adjustment_amount || 0);
   // final_amount is always calculated total + adjustment (set atomically by the

@@ -27,3 +27,10 @@ Feature: Invoice document — proforma vs final factuur
     Given a booking from "2025-03-10" to "2025-03-12" for 2 cats with "morning" preference
     When the invoice document is built
     Then the document total is €60.00
+
+  Scenario: The invoice date and line-item date range use DD/MM/YYYY (issue #78)
+    Given a booking from "2025-03-10" to "2025-03-12" for a cat with "morning" preference
+    And the booking is paid as factuur number 7 on "2025-03-01"
+    When the invoice document is built
+    Then the document shows the invoice date "01/03/2025"
+    And the document shows the line item date range "10/03/2025 t/m 12/03/2025"

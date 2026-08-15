@@ -31,3 +31,12 @@ Feature: Language toggle (EN/NL/PT)
     Given I open the site with browser language "en-US" and no saved preference
     When I switch the language to "nl"
     Then the page shows "Konijnen, cavia's, vogels, slangen, hagedissen — ik leer graag elke soort kennen en volg je instructies nauwkeurig, zodat hun routine hetzelfde blijft." and hides "Rabbits, guinea pigs, birds, snakes, lizards — I love getting to know every species and follow your care instructions closely so their routine stays the same."
+
+  Scenario: Pricing "/day" suffix stays in English by default (issue #77)
+    Given I open the site with browser language "en-US" and no saved preference
+    Then the page shows "/day" and hides "/dag"
+
+  Scenario: Pricing "/day" suffix translates to Dutch after switching language (issue #77)
+    Given I open the site with browser language "en-US" and no saved preference
+    When I switch the language to "nl"
+    Then the page shows "/dag" and hides "/day"

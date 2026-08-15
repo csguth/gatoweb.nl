@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { buildInvoiceLineItems } from './invoice-calc.js';
 import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 import { isValidPaymentUrl } from './payment-url.js';
+import { formatDateDDMMYYYY } from '../shared/format-date.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -208,6 +209,12 @@ window.facturenApp = function () {
       return petsText(pets);
     },
 
+    // Formats a stay's DD/MM/YYYY date range for display (issue #78) — bookings
+    // store date_from/date_to as raw 'YYYY-MM-DD' strings.
+    formatDate(dateStr) {
+      return formatDateDDMMYYYY(dateStr);
+    },
+
     factuurLabel(b) {
       return factuurNumberLabel(b.factuur_number, b.approved_at);
     },
@@ -389,9 +396,10 @@ window.facturenApp = function () {
       if (!b.client_contact) return '#';
       const digits = String(b.client_contact).replace(/\D/g, '');
       if (!digits) return '#';
+      const dates = formatDateDDMMYYYY(b.date_from) + (b.date_to ? ' \u2192 ' + formatDateDDMMYYYY(b.date_to) : '');
       const message = b.client_name
-        ? t('invoice.whatsapp_message', { name: b.client_name, dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') })
-        : t('invoice.whatsapp_message_generic', { dates: b.date_from + (b.date_to ? ' \u2192 ' + b.date_to : '') });
+        ? t('invoice.whatsapp_message', { name: b.client_name, dates })
+        : t('invoice.whatsapp_message_generic', { dates });
       return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     }
   };
