@@ -1,4 +1,4 @@
--- Gato Petsit — bookings & facturen (invoices) schema
+-- Gato Catsit — bookings & facturen (invoices) schema
 -- This file is the single source of truth for the database schema and is applied
 -- automatically on every deploy (see .github/actions/apply-db-migration + the deploy
 -- workflows), which runs it against the target project via the Supabase Management API.

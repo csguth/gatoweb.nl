@@ -14,7 +14,7 @@ import { repoRoot, fixturesRoot as outRoot } from './paths.mjs';
 // tests without touching any real business/production data.
 const BASE_VARS = {
   __WHATSAPP_NUMBER__: '31699999999',
-  __BRAND_NAME__: 'Gato Petsit (Test)',
+  __BRAND_NAME__: 'Gato Catsit (Test)',
   __SITE_URL__: 'http://localhost',
   __CONTACT_EMAIL__: 'test@example.com',
   __CITY_NAME__: "'s-Hertogenbosch",
@@ -93,7 +93,7 @@ async function buildVariant(name, vars) {
   const config = {
     SUPABASE_URL: vars.SUPABASE_URL,
     SUPABASE_ANON_KEY: vars.SUPABASE_ANON_KEY,
-    BUSINESS_LEGAL_NAME: 'Gato Petsit Test BV',
+    BUSINESS_LEGAL_NAME: 'Gato Catsit Test BV',
     BUSINESS_ADDRESS: 'Teststraat 1, 5211 AB \'s-Hertogenbosch',
     KVK_NUMBER: '12345678',
     IBAN_NUMBER: 'NL00TEST0123456789',
