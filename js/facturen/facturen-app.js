@@ -4,6 +4,7 @@ import { buildInvoiceLineItems } from './invoice-calc.js';
 import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 import { isValidPaymentUrl } from './payment-url.js';
 import { formatDateDDMMYYYY } from '../shared/format-date.js';
+import { sortInbox, sortByDate, sortDoneByCompletionDesc } from './booking-sort.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -44,17 +45,9 @@ function factuurNumberLabel(n, referenceDate) {
 }
 
 // Kanban board columns: pending (inbox) → confirmed (send Tikkie) → done
-// (Tikkie sent, or cancelled). Each column is sorted independently.
+// (Tikkie sent, or cancelled). Each column is sorted independently — see
+// js/facturen/booking-sort.js for the sorting logic (kept pure/testable there).
 
-// Inbox: bookings still awaiting approval, oldest first.
-function sortInbox(list) {
-  return list.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-}
-
-// Calendar order (by stay start date) for the confirmed/done columns.
-function sortByDate(list) {
-  return list.slice().sort((a, b) => new Date(a.date_from) - new Date(b.date_from));
-}
 
 function matchesSearch(b, term) {
   if (!term) return true;
@@ -129,10 +122,11 @@ window.facturenApp = function () {
       return sortByDate(this.bookings.filter(b => b.status === 'approved' && b.factuur_number == null && matchesSearch(b, term)));
     },
 
-    // "Done" column: paid bookings (they now have a real factuur_number) and cancelled ones.
+    // "Done" column: paid bookings (they now have a real factuur_number) and cancelled ones,
+    // most recently completed first (issue #101).
     get doneBookings() {
       const term = this.search.trim().toLowerCase();
-      return sortByDate(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.factuur_number != null)) && matchesSearch(b, term)));
+      return sortDoneByCompletionDesc(this.bookings.filter(b => (b.status === 'cancelled' || (b.status === 'approved' && b.factuur_number != null)) && matchesSearch(b, term)));
     },
 
     async init() {
