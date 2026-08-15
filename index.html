@@ -723,6 +723,9 @@
 <template x-if="sent">
 <div class="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center space-y-2">
 <div class="text-2xl">✅</div>
+<!-- Issue #95: shown instead of just clicking send, when the booking was auto-resumed
+     after the client confirmed their email and came back logged in. -->
+<p class="text-xs text-sage-600" x-show="resumedFromPending" x-text="t('booking.resumed_after_confirmation')"></p>
 <p class="text-sm font-semibold text-sage-700">
 <span class="en" data-i18n="booking.booking_request_sent">Booking request sent!</span>
 <span class="nl">Boekingsverzoek verstuurd!</span>

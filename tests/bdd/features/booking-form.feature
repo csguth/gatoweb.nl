@@ -79,3 +79,16 @@ Feature: Booking form
     When I click "Send booking request"
     Then I see the login or signup gate instead of a sent confirmation
     And the booking is not marked as sent
+
+  @auth-required
+  Scenario: A booking started before email confirmation is resumed and sent automatically (issue #95)
+    # Simulates the round trip: client signs up mid-booking, Supabase requires email
+    # confirmation (no session yet, so the booking is stashed as "pending"), the client
+    # clicks the confirmation link in their email, and lands back on the site already
+    # logged in (Supabase's detectSessionInUrl). The booking they started should be sent
+    # automatically instead of forcing them to fill in everything again.
+    Given a booking is pending confirmation with the first day "2025-08-10" and the last day "2025-08-12"
+    When I return to the site already logged in as "jane@example.com" after confirming my email
+    Then the booking is marked as sent
+    And I see the welcome-back note about the resumed booking
+    And the WhatsApp confirmation link mentions "2025-08-10"

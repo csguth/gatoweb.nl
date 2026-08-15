@@ -6,6 +6,7 @@
     "name_required": "Por favor, informe seu nome completo",
     "contact_required": "Por favor, informe seu WhatsApp ou telefone",
     "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva.",
+    "resumed_after_confirmation": "Bem-vindo de volta! O pedido de reserva que você iniciou antes de confirmar seu e-mail acabou de ser enviado.",
     "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo seu retorno!"
   },
   "auth": {

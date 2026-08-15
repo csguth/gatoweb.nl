@@ -303,7 +303,7 @@ DNS propagation: 5-60 minutes.
 - **Auto-detection:** `navigator.language.startsWith('nl')` → defaults to NL
 - **Persistence:** Language choice saved in `localStorage.gatoweb_lang` (shared across both pages)
 - **JS translation check:** run `node scripts/i18n-check.mjs` to validate that all `t('...')` keys used in JS exist in locale files
-- **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates)
+- **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates). A separate `localStorage.gatoweb_pending_booking` key (issue #95) stashes a FULL booking (incl. dates) when signup requires email confirmation, so it can be resumed and sent automatically once the client confirms and returns with a session — instead of losing the in-progress request
 - **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
 - **Fonts:** Playfair Display (serif) + Inter (sans-serif)
 - **Staging banner:** pure CSS, no JS — `body[data-env="staging"] #env-banner { display: block; }`,

@@ -6,6 +6,7 @@
     "name_required": "Vul je volledige naam in",
     "contact_required": "Vul je WhatsApp-nummer of telefoonnummer in",
     "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.",
+    "resumed_after_confirmation": "Welkom terug! De boeking die je startte voor het bevestigen van je e-mail is zojuist verstuurd.",
     "whatsapp_confirm_message": "Hoi Lígia! Ik heb net een boekingsverzoek verstuurd voor {{from}}{{toRange}}. Ik hoor graag van je!"
   },
   "auth": {
