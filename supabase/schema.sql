@@ -90,6 +90,21 @@ create table if not exists public.staff_emails (
 
 insert into public.staff_emails (email) values ('gatocatsit@gmail.com') on conflict do nothing;
 
+alter table public.staff_emails enable row level security;
+
+-- Only staff members can read the allow-list. Writes are admin-only (no client-side
+-- insert/update/delete policies). The is_staff() function below uses security definer
+-- so it reads this table as its owner, bypassing RLS — enabling RLS here does not
+-- break the function.
+drop policy if exists "staff can select staff_emails" on public.staff_emails;
+create policy "staff can select staff_emails"
+  on public.staff_emails for select
+  to authenticated
+  using (public.is_staff());
+
+revoke all on public.staff_emails from anon;
+grant select on public.staff_emails to authenticated;
+
 create or replace function public.is_staff()
 returns boolean
 language sql
@@ -102,7 +117,10 @@ as $$
   );
 $$;
 
-revoke all on function public.is_staff() from public;
+-- Lock down execution: only authenticated users may call is_staff(). We revoke from
+-- `anon` explicitly (not just PUBLIC) so the Supabase security advisor's
+-- "anon can execute SECURITY DEFINER function" lint stays clear.
+revoke all on function public.is_staff() from public, anon;
 grant execute on function public.is_staff() to authenticated;
 
 alter table public.bookings enable row level security;
@@ -198,7 +216,7 @@ begin
 end;
 $$;
 
-revoke all on function public.approve_booking(uuid, numeric, numeric, text) from public;
+revoke all on function public.approve_booking(uuid, numeric, numeric, text) from public, anon;
 grant execute on function public.approve_booking(uuid, numeric, numeric, text) to authenticated;
 
 -- Issue #62: mark an approved booking's Tikkie as PAID. This is the moment the official
@@ -248,7 +266,7 @@ begin
 end;
 $$;
 
-revoke all on function public.mark_booking_paid(uuid) from public;
+revoke all on function public.mark_booking_paid(uuid) from public, anon;
 grant execute on function public.mark_booking_paid(uuid) to authenticated;
 
 -- Issue #52: client name/phone/address are normally read-only in facturen.html once a
@@ -338,7 +356,7 @@ begin
 end;
 $$;
 
-revoke all on function public.edit_client_info(uuid, text, text, text, text) from public;
+revoke all on function public.edit_client_info(uuid, text, text, text, text) from public, anon;
 grant execute on function public.edit_client_info(uuid, text, text, text, text) to authenticated;
 
 -- Manual step after running this file:
@@ -406,7 +424,10 @@ begin
 end;
 $$;
 
-revoke all on function public.notify_gcal_sync() from public;
+-- Trigger-only function: nobody calls it directly, so revoke from every client role
+-- (it still runs as its definer inside the trigger). This keeps the security advisor
+-- lint clear for both anon and authenticated.
+revoke all on function public.notify_gcal_sync() from public, anon, authenticated;
 
 -- Fires only when status actually changes (e.g. pending -> approved), not on every
 -- update — this also avoids a loop when the Edge Function writes google_event_id
