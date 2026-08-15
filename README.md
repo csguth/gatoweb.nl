@@ -35,6 +35,7 @@ scripts/i18n-check.mjs  Checks that all JS t('...') keys exist in locale files
   deploy-pages.yml               Production deploy -> GitHub Pages (push to main)
   deploy-staging-cloudflare.yml  Staging deploy -> Cloudflare Pages (push to staging)
   guard-main-merges.yml          Enforces the staging -> main promotion order (see below)
+  keep-alive.yml                 Daily ping to keep both Supabase projects from auto-pausing (see below)
 ```
 
 ---
@@ -194,6 +195,28 @@ Notes:
 Changes go live automatically:
 - push/merge to `staging` → deploys to `staging.gatoweb.nl` in ~1-2 minutes
 - push/merge to `main` → deploys to `gatoweb.nl` in ~1-2 minutes
+
+---
+
+## Keeping Supabase awake (Free Tier)
+
+Supabase may pause Free Plan projects after ~7 days of low database activity (this is a
+discretionary heuristic, **not** a documented guarantee — the only official guarantee against
+pausing is upgrading to Pro, see
+[Production Checklist > Availability](https://supabase.com/docs/guides/deployment/going-into-prod#availability)).
+Since staging (`gato-petsit-staging`) and production (`gato-petsit`) are separate Supabase
+projects, each can pause independently.
+
+`.github/workflows/keep-alive.yml` mitigates this with a daily (`workflow_dispatch`-triggerable)
+ping to both projects: a real `GET /rest/v1/keepalive?select=id&limit=1` REST call using each
+environment's `SUPABASE_URL`/`SUPABASE_ANON_KEY`, which Supabase counts as genuine database
+activity (just loading the site's homepage does not, if it doesn't trigger a DB read). It targets
+a small dedicated `public.keepalive` table (`supabase/schema.sql`) — RLS-enabled with an explicit
+anon `SELECT` policy and no meaningful data — rather than `bookings`/`staff_emails`, since the
+anon key can't (and shouldn't) read either of those. The job fails loudly (not silently) on a
+non-2xx response so a broken ping surfaces via GitHub's scheduled-workflow-failure email with
+enough runway before the 7-day pause window. See issue #121 for the full rationale and accepted
+residual risks (this is a best-effort mitigation, not a guaranteed fix).
 
 ---
 
