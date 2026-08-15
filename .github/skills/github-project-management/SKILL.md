@@ -1,10 +1,10 @@
 ---
 name: github-project-management
-description: 'Triage and manage issues on the "Gato Petsit — Website Roadmap" GitHub Project (owner csguth, project #1). Use when creating issues, adding items to the project board, setting Status/Priority, applying labels, or reviewing/reporting on the roadmap board.'
+description: 'Triage and manage issues on the "Gato Catsit — Website Roadmap" GitHub Project (owner csguth, project #1). Use when creating issues, adding items to the project board, setting Status/Priority, applying labels, or reviewing/reporting on the roadmap board.'
 argument-hint: '[issue title or task description]'
 ---
 
-# GitHub Project Management (Gato Petsit — Website Roadmap)
+# GitHub Project Management (Gato Catsit — Website Roadmap)
 
 ## When to Use
 - Creating a new issue and triaging it onto the project board
@@ -24,7 +24,7 @@ argument-hint: '[issue title or task description]'
 | Repo | `csguth/gatoweb.nl` |
 | Project owner | `csguth` |
 | Project number | `1` |
-| Project title | Gato Petsit — Website Roadmap |
+| Project title | Gato Catsit — Website Roadmap |
 | Project node ID | `PVT_kwHOABmUcs4BeDiN` |
 
 ### Status field (`ProjectV2SingleSelectField`)
