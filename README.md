@@ -1,4 +1,4 @@
-# gatoweb.nl — Gato Petsit
+# gatoweb.nl — Gato Catsit
 
 Professional catsitting service by Lígia in 's-Hertogenbosch.
 
@@ -62,7 +62,7 @@ scripts/i18n-check.mjs  Checks that all JS t('...') keys exist in locale files
 | Hosting | GitHub Pages | Cloudflare Pages (project `gatoweb-nl-staging`) |
 | Workflow | `deploy-pages.yml` | `deploy-staging-cloudflare.yml` |
 | GitHub Environment | `github-pages` (build/deploy jobs) + repo-level vars | `staging` (scoped vars) |
-| Supabase project | `gato-petsit` | `gato-petsit-staging` |
+| Supabase project | `gato-catsit` | `gato-catsit-staging` |
 | Visual indicator | none (`data-env="production"`, banner hidden) | amber "🚧 STAGING" banner (`data-env="staging"`) |
 
 Both environments are built from the exact same source files — the only difference is which
@@ -156,7 +156,7 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
 ### Required (both environments)
 
 - `WHATSAPP_NUMBER` — international format, no `+`/spaces (example: `31612345678`)
-- `BRAND_NAME` — e.g. `Gato Petsit`
+- `BRAND_NAME` — e.g. `Gato Catsit`
 - `SITE_URL` — e.g. `https://gatoweb.nl` (production) / `https://staging.gatoweb.nl` (staging)
 - `CONTACT_EMAIL`
 - `CITY_NAME` — e.g. `'s-Hertogenbosch`
@@ -204,7 +204,7 @@ Supabase may pause Free Plan projects after ~7 days of low database activity (th
 discretionary heuristic, **not** a documented guarantee — the only official guarantee against
 pausing is upgrading to Pro, see
 [Production Checklist > Availability](https://supabase.com/docs/guides/deployment/going-into-prod#availability)).
-Since staging (`gato-petsit-staging`) and production (`gato-petsit`) are separate Supabase
+Since staging (`gato-catsit-staging`) and production (`gato-catsit`) are separate Supabase
 projects, each can pause independently.
 
 `.github/workflows/keep-alive.yml` mitigates this with a daily (`workflow_dispatch`-triggerable)
@@ -286,7 +286,7 @@ DNS propagation: 5-60 minutes.
 
 ## Content Overview
 
-- **Brand name:** Gato Petsit
+- **Brand name:** Gato Catsit
 - **WhatsApp:** configured via `WHATSAPP_NUMBER` variable (not stored in repo)
 - **Location:** 's-Hertogenbosch
 - **Experience:** 12+ years
@@ -353,7 +353,7 @@ All public content is in `index.html`; the invoicing dashboard is in `facturen.h
 - **Reviews** → search for `#reviews` section
 - **WhatsApp message** → search for `'Hi Lígia!`
 - **Trust bar stats** → search for `5.000+`, `50+`, `21`
-- **Brand name** → search for `Gato Petsit`
+- **Brand name** → search for `Gato Catsit`
 
 EN text: `<span class="en">` or `<p class="en">` (index.html) / `.en-l` (facturen.html)
 NL text: `<span class="nl">` or `<p class="nl">` (index.html) / `.nl-l` (facturen.html)
