@@ -1,6 +1,13 @@
 // bookingForm() Alpine component for index.html's booking form.
 import { buildInvoiceLineItems } from '../facturen/invoice-calc.js';
 
+// Issue #95: a booking started by a client WITHOUT an account yet (signup requires
+// email confirmation) is stashed here — separate from 'gatoweb_booking' below, which
+// is a lightweight draft that intentionally excludes dates. This key holds the FULL
+// booking (including dates) so it can be resumed and actually sent once the client
+// confirms their email and comes back with a session, without retyping anything.
+const PENDING_BOOKING_KEY = 'gatoweb_pending_booking';
+
 window.bookingForm = function bookingForm() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem('gatoweb_booking') || '{}'); } catch(e) {}
@@ -25,6 +32,10 @@ window.bookingForm = function bookingForm() {
     // logged in. `session` mirrors window.__gatoClientAuth's current session.
     session: null,
     sent: false,
+    // Issue #95: true when `sent` was reached automatically by resuming a booking
+    // that was waiting on email confirmation, rather than by the user clicking
+    // "Send booking request" just now — lets the success panel explain what happened.
+    resumedFromPending: false,
     showAuth: false,
     authMode: 'login',
     authEmail: '',
@@ -36,6 +47,50 @@ window.bookingForm = function bookingForm() {
     _save() {
       try { localStorage.setItem('gatoweb_booking', JSON.stringify({ clientName: this.clientName, address: this.address, clientContact: this.clientContact, pets: this.pets, pref: this.pref })); } catch(e) {}
     },
+    // Issue #95: stash the FULL booking (incl. dates) so it can survive the
+    // signup -> "check your email" -> confirmation-link -> back-to-site round trip.
+    _savePendingBooking() {
+      try {
+        localStorage.setItem(PENDING_BOOKING_KEY, JSON.stringify({
+          clientName: this.clientName,
+          address: this.address,
+          clientContact: this.clientContact,
+          from: this.from,
+          to: this.to,
+          pets: this.pets,
+          pref: this.pref
+        }));
+      } catch(e) {}
+    },
+    _loadPendingBooking() {
+      try {
+        const raw = localStorage.getItem(PENDING_BOOKING_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    },
+    _clearPendingBooking() {
+      try { localStorage.removeItem(PENDING_BOOKING_KEY); } catch(e) {}
+    },
+    // Issue #95: called once a session is known (on init, and again from the auth
+    // onChange listener — detectSessionInUrl picks up the confirmation-link tokens
+    // asynchronously, so the session may not be ready yet the first time). If the
+    // client just confirmed their email and a booking was left pending, restore it
+    // and send it automatically instead of making them start over.
+    async _tryResumePendingBooking() {
+      if (!this.session || this.sent) return;
+      const pending = this._loadPendingBooking();
+      if (!pending) return;
+      this.clientName = pending.clientName || '';
+      this.address = pending.address || '';
+      this.clientContact = pending.clientContact || '';
+      this.from = pending.from || '';
+      this.to = pending.to || '';
+      this.pets = pending.pets && pending.pets.length ? pending.pets : this.pets;
+      this.pref = pending.pref || '';
+      this.resumedFromPending = true;
+      this._clearPendingBooking();
+      await this._completeSend();
+    },
     async init() {
       this.$watch('clientName', () => this._save());
       this.$watch('address', () => this._save());
@@ -44,7 +99,11 @@ window.bookingForm = function bookingForm() {
       this.$watch('pref', () => this._save());
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured) {
         this.session = await window.__gatoClientAuth.getSession();
-        window.__gatoClientAuth.onChange((session) => { this.session = session; });
+        await this._tryResumePendingBooking();
+        window.__gatoClientAuth.onChange((session) => {
+          this.session = session;
+          this._tryResumePendingBooking();
+        });
       }
     },
     // Estimate shown to the client on the booking form itself (issue #43), computed
@@ -142,6 +201,10 @@ window.bookingForm = function bookingForm() {
       this.authLoading = false;
       if (error) { this.authError = error; return; }
       if (!session) {
+        // Issue #95: email confirmation is required before a session exists, so this
+        // booking can't be sent yet — stash it (incl. dates) so _tryResumePendingBooking()
+        // can pick it up automatically once the client confirms and comes back logged in.
+        this._savePendingBooking();
         this.authInfo = t('booking.account_created_check_email_send');
         this.authMode = 'login';
         this.authPassword = '';

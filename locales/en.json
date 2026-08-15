@@ -6,6 +6,7 @@
     "name_required": "Please enter your full name",
     "contact_required": "Please enter your WhatsApp number or phone",
     "account_created_check_email_send": "Account created! Check your email and click the confirmation link, then log in here to send your booking.",
+    "resumed_after_confirmation": "Welcome back! The booking you started before confirming your email was just sent.",
     "whatsapp_confirm_message": "Hi Lígia! I just sent a booking request for {{from}}{{toRange}}. Looking forward to hearing from you!"
   },
   "auth": {
