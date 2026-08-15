@@ -3,6 +3,7 @@
     "start_date_required": "Por favor, selecione uma data de início",
     "address": "Endereço",
     "address_required": "Por favor, informe seu endereço (necessário para a fatura)",
+    "name_required": "Por favor, informe seu nome completo",
     "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva.",
     "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo seu retorno!"
   },
@@ -166,7 +167,7 @@
         "choose_your_dates_and_preference": "Escolha suas datas e preferência — Lígia confirmará em até 24 horas.",
         "logged_in_as": "Logado como",
         "log_out": "Sair",
-        "your_name_optional": "Seu nome <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
+        "full_name": "Nome completo",
         "address": "Endereço",
         "whatsapp_phone_optional": "WhatsApp / telefone <span class=\"font-normal text-gray-400 normal-case\">(opcional)</span>",
         "first_day": "Primeiro dia",

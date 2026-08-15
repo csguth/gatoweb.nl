@@ -568,13 +568,13 @@
 <span class="en" data-i18n="booking.log_out">Log out</span><span class="nl">Uitloggen</span>
 </button>
 </div>
-<!-- Name -->
+<!-- Name (required — full name needed to identify the client, issue #107) -->
 <div>
 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-<span class="en" data-i18n="booking.your_name_optional">Your name <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
-<span class="nl">Jouw naam <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+<span class="en" data-i18n="booking.full_name">Full name</span>
+<span class="nl">Volledige naam</span>
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientName"/>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="clientName" required=""/>
 </div>
 <!-- Address (required — needed on the invoice per issue #32) -->
 <div>
