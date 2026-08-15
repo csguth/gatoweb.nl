@@ -77,6 +77,12 @@ window.bookingForm = function bookingForm() {
         alert(t('booking.address_required'));
         return;
       }
+      // Full name is required to identify the client (issue #107) — the field used to
+      // be optional, which made bookings hard to match to a real person.
+      if (!this.clientName || !this.clientName.trim()) {
+        alert(t('booking.name_required'));
+        return;
+      }
       // Client account required (issue #12) — if Supabase is configured and the client
       // isn't logged in yet, show the inline login/signup gate instead of sending.
       if (window.__gatoClientAuth && window.__gatoClientAuth.configured && !this.session) {

@@ -16,9 +16,17 @@ Feature: Booking form
     Then I see an alert asking for the address
     And the booking is not marked as sent
 
+  Scenario: Sending without a name is rejected
+    Given I fill in the first day as "2025-08-10"
+    And I fill in the address as "Kerkstraat 1, 's-Hertogenbosch"
+    When I click "Send booking request" without filling in a name
+    Then I see an alert asking for the name
+    And the booking is not marked as sent
+
   Scenario: A complete booking is sent and shows the WhatsApp confirmation
     Given I fill in the first day as "2025-08-10" and the last day as "2025-08-12"
     And I fill in the address as "Kerkstraat 1, 's-Hertogenbosch"
+    And I fill in the name as "Jane Doe"
     When I click "Send booking request"
     Then the booking is marked as sent
     And the WhatsApp confirmation link includes the phone number "31699999999"
@@ -57,6 +65,7 @@ Feature: Booking form
   Scenario: Sending a booking requires logging in first when accounts are enabled
     Given I fill in the first day as "2025-08-10"
     And I fill in the address as "Kerkstraat 1, 's-Hertogenbosch"
+    And I fill in the name as "Jane Doe"
     When I click "Send booking request"
     Then I see the login or signup gate instead of a sent confirmation
     And the booking is not marked as sent
