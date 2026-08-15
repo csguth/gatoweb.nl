@@ -584,27 +584,27 @@
 </label>
 <input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" x-model="address" required=""/>
 </div>
-<!-- WhatsApp / phone (optional) — lets Ligia message the client directly (issue #39) -->
+<!-- WhatsApp / phone (required — issue #108, lets Ligia message the client directly, issue #39) -->
 <div>
 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-<span class="en" data-i18n="booking.whatsapp_phone_optional">WhatsApp / phone <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
-<span class="nl">WhatsApp / telefoon <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+<span class="en" data-i18n="booking.whatsapp_phone">WhatsApp / phone</span>
+<span class="nl">WhatsApp / telefoon</span>
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="+31 6 12345678" type="tel" x-model="clientContact"/>
+<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="+31 6 12345678" type="tel" x-model="clientContact" required=""/>
 </div>
 <!-- Dates -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-<span class="en" data-i18n="booking.first_day">First day</span>
-<span class="nl">Eerste dag</span>
+<span class="en" data-i18n="booking.first_visit_date">First visit date</span>
+<span class="nl">Eerste bezoekdatum</span>
 </label>
 <input :min="today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" x-model="from"/>
 </div>
 <div>
 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-<span class="en" data-i18n="booking.last_day_optional">Last day <span class="font-normal text-gray-400 normal-case">(optional)</span></span>
-<span class="nl">Laatste dag <span class="font-normal text-gray-400 normal-case">(optioneel)</span></span>
+<span class="en" data-i18n="booking.last_visit_date">Last visit date</span>
+<span class="nl">Laatste bezoekdatum</span>
 </label>
 <input :min="from || today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" x-model="to"/>
 </div>

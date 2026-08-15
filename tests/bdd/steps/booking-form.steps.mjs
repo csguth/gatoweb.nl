@@ -45,6 +45,10 @@ Given('I fill in the name as {string}', async ({ page }, name) => {
   await form(page).locator('input[type="text"]').nth(0).fill(name);
 });
 
+Given('I fill in the phone as {string}', async ({ page }, phone) => {
+  await form(page).locator('input[type="tel"]').fill(phone);
+});
+
 Given('I add a pet of type {string}', async ({ page }, type) => {
   const rows = form(page).locator('.space-y-3 > div.bg-white');
   if (world.petIndex > 0) {
@@ -73,6 +77,10 @@ When('I click {string} without filling in a name', async ({ page }, buttonText) 
   await clickSendAndCaptureAlert(page, buttonText);
 });
 
+When('I click {string} without filling in a phone number', async ({ page }, buttonText) => {
+  await clickSendAndCaptureAlert(page, buttonText);
+});
+
 When('I click {string}', async ({ page }, buttonText) => {
   await clickSendAndCaptureAlert(page, buttonText);
 });
@@ -97,6 +105,10 @@ Then('I see an alert asking for the address', async () => {
 
 Then('I see an alert asking for the name', async () => {
   expect(world.alertMessage).toBe('Please enter your full name');
+});
+
+Then('I see an alert asking for the phone number', async () => {
+  expect(world.alertMessage).toBe('Please enter your WhatsApp number or phone');
 });
 
 Then('the booking is not marked as sent', async ({ page }) => {
