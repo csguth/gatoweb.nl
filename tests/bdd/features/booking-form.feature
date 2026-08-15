@@ -92,3 +92,4 @@ Feature: Booking form
     Then the booking is marked as sent
     And I see the welcome-back note about the resumed booking
     And the WhatsApp confirmation link mentions "2025-08-10"
+    And the booking form is scrolled into view

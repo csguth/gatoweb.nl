@@ -116,7 +116,18 @@ Then('the booking is not marked as sent', async ({ page }) => {
 });
 
 Then('the booking is marked as sent', async ({ page }) => {
-  await expect(form(page).getByText('Booking request sent!')).toBeVisible();
+  // i18n-static.js can overwrite BOTH the '.en' and '.nl' sibling spans with the same
+  // (current-language) text if it reruns after Alpine's x-if="sent" inserts this
+  // content (e.g. following the page.reload() in the resumed-booking scenario) — only
+  // one of the pair is actually visible via CSS, so matching by text alone can
+  // spuriously find the hidden sibling too and hit a strict-mode violation. Assert on
+  // real visibility instead, mirroring the same fix in i18n.steps.mjs.
+  await expect
+    .poll(() => page.evaluate(() => {
+      const candidates = Array.from(document.querySelectorAll('.en, .nl, .pt'));
+      return candidates.some((el) => el.textContent.trim() === 'Booking request sent!' && el.offsetParent !== null);
+    }))
+    .toBe(true);
 });
 
 Then('the WhatsApp confirmation link includes the phone number {string}', async ({ page }, number) => {
@@ -195,4 +206,16 @@ When('I return to the site already logged in as {string} after confirming my ema
 
 Then('I see the welcome-back note about the resumed booking', async ({ page }) => {
   await expect(form(page).getByText('Welcome back! The booking you started before confirming your email was just sent.')).toBeVisible();
+});
+
+// Issue #95 follow-up: the client lands on '/' after confirming their email, not
+// '/#booking' — without an explicit scroll, the auto-sent confirmation renders below
+// the fold and looks like nothing happened.
+Then('the booking form is scrolled into view', async ({ page }) => {
+  await page.waitForFunction(() => {
+    const el = document.getElementById('booking');
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.top >= -50 && rect.top <= 50;
+  }, null, { timeout: 3000 });
 });
