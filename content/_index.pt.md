@@ -4,6 +4,6 @@ description: "Cuidado profissional de gatos em __CITY_NAME__ com a Lígia — cu
 ogDescription: "Respeito, carinho e diversão para o seu gato — enquanto você está fora. Mais de 50 ⭐ avaliações cinco estrelas."
 ogImageAlt: "Lígia da __BRAND_NAME__ cuidando de gatos em __CITY_NAME__"
 htmlClass: "scroll-smooth"
-bodyClass: "bg-warm-50 text-gray-800"
+bodyClass: "bg-brand-cream text-brand-ink"
 webFonts: true
 ---

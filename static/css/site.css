@@ -2,9 +2,50 @@
    browser: Hugo renders one fully-translated page per language (/en/, /nl/, /pt/), so
    the old .en/.nl/.pt visibility rules are gone. */
 
-html { font-family: 'Inter', system-ui, sans-serif; }
-.font-serif { font-family: 'Playfair Display', Georgia, serif; }
-body { background: #faf7f0; }
+/* Brand webfonts, self-hosted (#137). Anton stands in for the Canva font
+   "Extend 50 Mega" and Nunito for "Bubblebody Neue"; both are SIL OFL. The files are
+   the latin / latin-ext woff2 subsets from Google Fonts — refresh them with
+   `node scripts/fetch-fonts.mjs`. Licences live next to them in static/fonts/.
+   The latin-ext subset is what carries the Portuguese and Dutch diacritics. */
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Nunito ships as a variable font: one file covers every weight from 400 to 800. */
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/nunito-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/nunito-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Base typography and page background. These mirror the Tailwind tokens in
+   js/tailwind-config.js so the page still looks right before the CDN script runs. */
+html { font-family: 'Nunito', system-ui, sans-serif; }
+.font-display { font-family: 'Anton', 'Arial Narrow', system-ui, sans-serif; }
+body { background: #F4F1EA; }
 
 /* About Lígia bio carousel — hides the native scroll bar so the CSS
    scroll-snap track (js/index/about-carousel.js) reads as a carousel, not

@@ -388,12 +388,25 @@ DNS propagation: 5-60 minutes.
 - **Translation check:** run `node scripts/i18n-check.mjs` to validate that every `{{ i18n "…" }}` key
   used in `layouts/` exists in all three `i18n/*.toml` files, and every static `t('…')` key used in
   `static/js/` exists in all three `static/locales/*.json` files
+- **Contrast check:** `hugo --gc --minify --destination site && node scripts/preview-fill.mjs`, serve
+  `site/` (e.g. `npx http-server site -p 8913`), then run
+  `node scripts/contrast-audit.mjs http://127.0.0.1:8913` to check every rendered page for WCAG AA
+  contrast failures. Text sitting on a photo is listed separately for a visual check rather than
+  failing the run, since its real backdrop isn't a single colour
 - **Alpine directives use a `data-x-` prefix** (`data-x-data`, `data-x-on:click`, `data-x-bind:class`)
   registered via `Alpine.prefix('data-x-')` in `layouts/partials/head.html`, so every directive is a
   valid HTML5 `data-*` attribute and the pages pass the W3C checker
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates). A separate `localStorage.gatoweb_pending_booking` key (issue #95) stashes a FULL booking (incl. dates) when signup requires email confirmation, so it can be resumed and sent automatically once the client confirms and returns with a session — instead of losing the in-progress request
-- **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
-- **Fonts:** Playfair Display (serif) + Inter (sans-serif)
+- **Colors:** `brand.*` Tailwind palette from Lígia's Canva design system (issues #137 / #149) —
+  `brand-ink` (`#3D0C11`), `brand-plum`, `brand-wine`, `brand-crimson`, `brand-red` (`#B83C4E`),
+  `brand-blush`, `brand-rose`, `brand-cream` (`#F4F1EA`), `brand-sand`, `brand-moss`, `brand-grey`.
+  Each token is annotated with its role in the design in `static/js/tailwind-config.js`. Status
+  colours (error red, success green, warning amber) stay on Tailwind's defaults — they're semantic,
+  not brand
+- **Fonts:** Anton (`font-display`, headings) + Nunito (`font-sans`, body), both SIL OFL and
+  **self-hosted** from `static/fonts/` — no Google Fonts CDN. They stand in for the Canva fonts in
+  the design ("Extend 50 Mega" and "Bubblebody Neue"), which can't be licensed for use on a
+  self-hosted site. Refresh the woff2 subsets with `node scripts/fetch-fonts.mjs`
 - **Staging banner:** pure CSS, no JS — `body[data-env="staging"] #env-banner { display: block; }`,
   with `data-env` substituted at build time from the `ENV_LABEL` variable
 - **Why two Cloudflare Pages projects for one repo:** Cloudflare Pages only supports a custom
