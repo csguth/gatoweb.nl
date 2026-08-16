@@ -1,5 +1,6 @@
 {{ define "main" }}
 <div class="max-w-lg mx-auto px-5 py-10">
+{{ partial "internal-nav.html" (dict "booking" true) }}
 <div class="flex items-center justify-between mb-6">
 <h1 class="font-display text-2xl font-bold text-brand-ink">
         🐾 <span>{{ i18n "static.account.account.my_bookings" }}</span>

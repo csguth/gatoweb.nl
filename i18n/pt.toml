@@ -12,6 +12,9 @@
 "form.password_placeholder" = "Senha"
 "static.facturen.facturen.search_placeholder" = "Pesquisar por nome, telefone, animal..."
 "nav.language_selector" = "Idioma"
+"nav.home" = "Início"
+"nav.book_a_visit" = "Marque uma visita"
+"nav.back_to_site" = "Voltar ao site"
 
 "static.account.account.amount" = "Valor:"
 "static.account.account.awaiting_confirmation" = "Aguardando confirmação"

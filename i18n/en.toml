@@ -12,6 +12,9 @@
 "form.password_placeholder" = "Password"
 "static.facturen.facturen.search_placeholder" = "Search by name, phone, pet..."
 "nav.language_selector" = "Language"
+"nav.home" = "Home"
+"nav.book_a_visit" = "Book a visit"
+"nav.back_to_site" = "Back to the site"
 
 "static.account.account.amount" = "Amount:"
 "static.account.account.awaiting_confirmation" = "Awaiting confirmation"

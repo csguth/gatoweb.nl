@@ -12,6 +12,9 @@
 "form.password_placeholder" = "Wachtwoord"
 "static.facturen.facturen.search_placeholder" = "Zoeken op naam, telefoon, huisdier..."
 "nav.language_selector" = "Taal"
+"nav.home" = "Home"
+"nav.book_a_visit" = "Boek een bezoek"
+"nav.back_to_site" = "Terug naar de site"
 
 "static.account.account.amount" = "Bedrag:"
 "static.account.account.awaiting_confirmation" = "Wacht op bevestiging"
