@@ -2,13 +2,13 @@
 import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 import { world } from '../support/world.mjs';
-import { formatDateDDMMYYYY } from '../../../js/shared/format-date.js';
+import { formatDateDDMMYYYY } from '../../../static/js/shared/format-date.js';
 import { makeBooking, seedBookings } from './account-tikkie.steps.mjs';
 
 const { Given, When, Then } = createBdd();
 
 function app(page) {
-  return page.locator('[x-data="accountApp()"]');
+  return page.locator('[data-x-data="accountApp()"]');
 }
 
 When('I format the date {string}', async ({}, input) => {

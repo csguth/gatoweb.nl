@@ -1,0 +1,122 @@
+{{ define "main" }}
+<div class="max-w-lg mx-auto px-5 py-10">
+<div class="flex items-center justify-between mb-6">
+<h1 class="font-serif text-2xl font-bold text-sage-700">
+        🐾 <span>{{ i18n "static.account.account.my_bookings" }}</span>
+</h1>
+{{ partial "lang-switcher.html" . }}
+</div>
+<div data-x-data="accountApp()" data-x-init="init()">
+<template data-x-if="!configured">
+<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+<span>{{ i18n "static.account.account.this_page_isn_t_configured" }}</span>
+
+
+</div>
+</template>
+<template data-x-if="configured &amp;&amp; !session">
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200 space-y-5">
+<div class="flex gap-2 text-sm font-semibold">
+<button data-x-bind:class="mode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" data-x-on:click="mode = 'login'" class="flex-1 border rounded-lg py-2 transition" type="button">
+<span>{{ i18n "static.account.account.log_in" }}</span>
+</button>
+<button data-x-bind:class="mode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" data-x-on:click="mode = 'signup'" class="flex-1 border rounded-lg py-2 transition" type="button">
+<span>{{ i18n "static.account.account.create_account" }}</span>
+</button>
+</div>
+<form data-x-on:submit.prevent="mode === 'login' ? login() : signup()" class="space-y-4">
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.account.account.email" }}</span>
+</label>
+<input autocomplete="username" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="email" data-x-model="email">
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.account.account.password" }}</span>
+</label>
+<input data-x-bind:autocomplete="mode === 'login' ? 'current-password' : 'new-password'" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="password" data-x-model="password">
+</div>
+<p class="text-red-600 text-xs" data-x-show="errorMsg" data-x-text="errorMsg"></p>
+<p class="text-sage-600 text-xs" data-x-show="infoMsg" data-x-text="infoMsg"></p>
+<button data-x-bind:disabled="loading" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition" type="submit">
+<template data-x-if="!loading &amp;&amp; mode === 'login'"><span><span>{{ i18n "static.account.account.log_in_2" }}</span></span></template>
+<template data-x-if="!loading &amp;&amp; mode === 'signup'"><span><span>{{ i18n "static.account.account.create_account_2" }}</span></span></template>
+<template data-x-if="loading"><span><span>{{ i18n "static.account.account.working" }}</span></span></template>
+</button>
+</form>
+</div>
+</template>
+<template data-x-if="configured &amp;&amp; session">
+<div class="space-y-4">
+<div class="flex justify-between items-center bg-white rounded-2xl p-4 shadow-sm border border-warm-200">
+<p class="text-xs text-gray-500" data-x-text="session.user.email"></p>
+<div class="flex gap-3">
+<button data-x-on:click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">
+<span>{{ i18n "static.account.account.refresh" }}</span>
+</button>
+<button data-x-on:click="logout()" class="text-xs text-gray-400 hover:text-red-500">
+<span>{{ i18n "static.account.account.log_out" }}</span>
+</button>
+</div>
+</div>
+<p class="text-sm text-gray-400 text-center py-10" data-x-show="loadingList">
+<span>{{ i18n "static.account.account.loading" }}</span>
+</p>
+<p class="text-sm text-gray-400 text-center py-10" data-x-show="!loadingList &amp;&amp; bookings.length === 0">
+<span>{{ i18n "static.account.account.no_bookings_yet" }}</span>
+</p>
+<template data-x-bind:key="b.id" data-x-for="b in bookings">
+<div data-x-bind:class="{
+                 'border-warm-200': b.status === 'pending',
+                 'border-orange-300': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
+                 'border-warm-200 opacity-70': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                 'border-gray-200 opacity-50': b.status === 'cancelled'
+               }" class="bg-white rounded-2xl p-4 shadow-sm space-y-2 border">
+<div class="flex items-center justify-between gap-2">
+<span data-x-bind:class="{
+                      'bg-amber-100 text-amber-700': b.status === 'pending',
+                      'bg-orange-100 text-orange-700': b.status === 'approved' &amp;&amp; !b.tikkie_sent,
+                      'bg-green-100 text-green-700': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
+                    }" class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full">
+<template data-x-if="b.status === 'pending'"><span><span>{{ i18n "static.account.account.awaiting_confirmation" }}</span></span></template>
+<template data-x-if="b.status === 'approved' &amp;&amp; !b.tikkie_sent"><span><span>{{ i18n "static.account.account.confirmed_payment_request_coming" }}</span></span></template>
+<template data-x-if="b.status === 'approved' &amp;&amp; b.tikkie_sent"><span><span>{{ i18n "static.account.account.completed" }}</span></span></template>
+<template data-x-if="b.status === 'cancelled'"><span><span>{{ i18n "static.account.account.cancelled" }}</span></span></template>
+</span>
+<span class="text-[11px] text-gray-400" data-x-show="b.factuur_number" data-x-text="'#' + factuurLabel(b)"></span>
+</div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span>{{ i18n "static.account.account.dates" }}</span> <span data-x-text="formatDate(b.date_from)"></span><template data-x-if="b.date_to"><span> → <span data-x-text="formatDate(b.date_to)"></span></span></template></div>
+<div><span>{{ i18n "static.account.account.pets" }}</span> <span data-x-text="petsSummary(b.pets)"></span></div>
+<template data-x-if="b.status === 'approved' || b.status === 'cancelled'">
+<div><span>{{ i18n "static.account.account.amount" }}</span> € <span data-x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+</template>
+</div>
+<template data-x-if="canViewInvoice(b)">
+<button data-x-on:click="viewInvoice(b)" class="w-full border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+<template data-x-if="b.factuur_number"><span><span>{{ i18n "static.account.account.view_invoice" }}</span></span></template>
+<template data-x-if="!b.factuur_number"><span><span>{{ i18n "static.account.account.view_proforma" }}</span></span></template>
+</button>
+</template>
+<template data-x-if="b.status === 'approved' &amp;&amp; b.tikkie_url">
+<a data-x-bind:href="b.tikkie_url" class="block text-center bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold py-2.5 rounded-xl transition" rel="noopener noreferrer" target="_blank">
+<span>{{ i18n "static.account.account.pay_with_tikkie" }}</span>
+</a>
+</template>
+</div>
+</template>
+</div>
+</template>
+</div>
+</div>
+<!-- Client account (issue #12) — see js/account/account-app.js -->
+
+<!-- Alpine must load after the module script above so window.accountApp already exists
+       when Alpine scans and evaluates data-x-data on the page. -->
+{{ end }}
+{{ define "scripts" }}
+<script src="/js/account/account-app.js" type="module"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{ end }}

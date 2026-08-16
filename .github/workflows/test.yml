@@ -31,6 +31,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Hugo
+        # The BDD fixtures are now produced by a real Hugo build (see
+        # tests/bdd/support/build-fixtures.mjs), so the test container needs Hugo too.
+        uses: ./.github/actions/setup-hugo
+
       - name: Run BDD test suite
         run: npm test
 

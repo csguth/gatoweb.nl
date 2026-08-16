@@ -3,7 +3,7 @@
 // browser needed), matching that module's own "no i18n/DOM/Alpine" design.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { buildInvoiceLineItems } from '../../../js/facturen/invoice-calc.js';
+import { buildInvoiceLineItems } from '../../../static/js/facturen/invoice-calc.js';
 
 const { Given, When, Then } = createBdd();
 

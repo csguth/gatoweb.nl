@@ -4,7 +4,7 @@
 // design (same pattern as invoice-calc.steps.mjs).
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { sortDoneByCompletionDesc } from '../../../js/facturen/booking-sort.js';
+import { sortDoneByCompletionDesc } from '../../../static/js/facturen/booking-sort.js';
 
 const { Given, When, Then } = createBdd();
 

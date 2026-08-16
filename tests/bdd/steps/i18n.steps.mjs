@@ -1,63 +1,77 @@
-// Step definitions for tests/bdd/features/i18n.feature (js/lang-toggle.js).
+// Step definitions for tests/bdd/features/i18n.feature.
+//
+// i18n is now resolved at build time: each language is a separate, fully-rendered page
+// under its own URL, so there is no in-page toggle to click and only ONE language is
+// ever present in the DOM. The steps therefore navigate between URLs and assert on
+// plain visible text, instead of poking at .en/.nl sibling spans.
 import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 
 const { Given, When, Then } = createBdd();
 
-Given('I open the site with browser language {string} and no saved preference', async ({ page }, _locale) => {
-  // Each Playwright test already gets a fresh browser context (no leftover
-  // localStorage), so a plain goto is enough. An addInitScript here would be
-  // wrong: it re-runs on every navigation, including the "reload" scenario's
-  // page.reload(), which would wipe out the just-saved `gatoweb_lang` choice.
-  await page.goto('/');
+Given('my browser language is {string} and I have no saved language preference', async ({ page }, locale) => {
+  // Playwright's context-level `locale` can't be changed mid-test, so override the
+  // navigator properties js/root-redirect.js actually reads. addInitScript runs before
+  // any page script on every navigation, which is exactly when the redirect runs.
+  // It deliberately touches no storage, so the saved-preference scenarios still work.
+  await page.addInitScript((lang) => {
+    Object.defineProperty(navigator, 'languages', { get: () => [lang], configurable: true });
+    Object.defineProperty(navigator, 'language', { get: () => lang, configurable: true });
+  }, locale);
+  // A fresh Playwright context starts with empty storage, so "no saved preference"
+  // needs no extra setup.
+});
+
+Given('I open the site at {string}', async ({ page }, urlPath) => {
+  await page.goto(urlPath);
   await expect(page.locator('body')).toBeVisible();
-  await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
 });
 
-When('I switch the language to {string}', async ({ page }, lang) => {
-  await page.getByLabel('Switch language').selectOption(lang);
-  // The i18n runtime applies the resolved language (incl. body classes)
-  // asynchronously after i18next.changeLanguage() resolves.
-  await page.waitForFunction(
-    (expected) => document.body.classList.contains('show-nl') === (expected === 'nl'),
-    lang
-  );
+When('I open the root', async ({ page }) => {
+  await page.goto('/');
+  // The root is a redirect stub: wait until the language page has taken over.
+  await page.waitForURL(/\/(en|nl|pt)\/$/);
 });
 
-When('I reload the page', async ({ page }) => {
-  await page.reload();
-  await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
+When('I open the root with {string}', async ({ page }, suffix) => {
+  await page.goto('/' + suffix);
+  await page.waitForURL(/\/(en|nl|pt)\//);
 });
 
-Then('the nav shows {string} and hides {string}', async ({ page }, shownText, hiddenText) => {
-  // i18n-static.js overwrites BOTH the `.en` and `.nl` sibling spans with the
-  // same (current-language) text — only one of the pair is actually visible
-  // via CSS (`body.show-nl`/`.show-pt`) — so matching by text alone can find
-  // a same-text-but-hidden element. Assert on real visibility instead.
-  await expect
-    .poll(() => isAnyVisibleWithExactText(page, shownText))
-    .toBe(true);
-  await expect
-    .poll(() => isAnyVisibleWithExactText(page, hiddenText))
-    .toBe(false);
+Then('the current fragment is {string}', async ({ page }, expected) => {
+  expect(new URL(page.url()).hash).toBe(expected);
 });
 
-// Same assertion as "the nav shows ..." above, phrased generically for
-// content that lives outside the nav (e.g. the About section bio).
-Then('the page shows {string} and hides {string}', async ({ page }, shownText, hiddenText) => {
-  await expect
-    .poll(() => isAnyVisibleWithExactText(page, shownText))
-    .toBe(true);
-  await expect
-    .poll(() => isAnyVisibleWithExactText(page, hiddenText))
-    .toBe(false);
+Then('the current query string is {string}', async ({ page }, expected) => {
+  expect(new URL(page.url()).search).toBe(expected);
 });
 
-function isAnyVisibleWithExactText(page, text) {
-  return page.evaluate((expected) => {
-    const candidates = Array.from(document.querySelectorAll('.en, .nl, .pt'));
-    return candidates.some(
-      (el) => el.textContent.trim() === expected && el.offsetParent !== null
-    );
-  }, text);
+When('I follow the language selector link for {string}', async ({ page }, lang) => {
+  await page.locator(`nav a[hreflang="${lang}"]`).click();
+  await page.waitForURL(new RegExp(`/${lang}/$`));
+});
+
+Then('the current path is {string}', async ({ page }, expectedPath) => {
+  expect(new URL(page.url()).pathname).toBe(expectedPath);
+});
+
+Then('the page language is {string}', async ({ page }, lang) => {
+  await expect(page.locator('html')).toHaveAttribute('lang', lang);
+});
+
+Then('the page shows {string}', async ({ page }, text) => {
+  await expect.poll(() => countVisibleWithExactText(page, text)).toBeGreaterThan(0);
+});
+
+Then('the page does not show {string}', async ({ page }, text) => {
+  await expect.poll(() => countVisibleWithExactText(page, text)).toBe(0);
+});
+
+// Counts elements whose own trimmed text is exactly `expected` and that are actually
+// rendered. Exact matching keeps "/day" from matching a longer sentence containing it.
+function countVisibleWithExactText(page, expected) {
+  return page.evaluate((wanted) => {
+    const all = Array.from(document.querySelectorAll('body *'));
+    return all.filter((el) => el.textContent.trim() === wanted && el.offsetParent !== null).length;
+  }, expected);
 }

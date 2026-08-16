@@ -2,12 +2,13 @@
 
 Professional catsitting service by Lígia in 's-Hertogenbosch.
 
-## Stack (zero build process, all free/cheap)
+## Stack (Hugo static site generator, all free/cheap)
 
 | Tool | Purpose | Cost |
 |---|---|---|
+| Hugo (extended) | Static site generator: one fully-translated page per language | Free |
 | Plain HTML + Tailwind CDN | Website | Free |
-| Alpine.js CDN | EN/NL bilingual toggle, booking form, facturen dashboard | Free |
+| Alpine.js CDN | Booking form, facturen dashboard, client account | Free |
 | Supabase | Bookings database + Auth (facturen feature) | Free tier |
 | Browser print (`@media print`) | A4 invoice layout, "Save as PDF" via native print dialog | Free |
 | WhatsApp | Direct booking / confirmation | Free |
@@ -22,33 +23,94 @@ Professional catsitting service by Lígia in 's-Hertogenbosch.
 ## Repository structure
 
 ```
-index.html          Public landing page (bilingual EN/NL)
-facturen.html        Private invoicing dashboard for Ligia (Supabase Auth, not indexed by search engines)
-supabase/schema.sql  Database schema: bookings table, RLS policies, approve_booking() function
-robots.txt, sitemap.xml
-CNAME                GitHub Pages custom domain config
-images/              Favicon and other static assets
-js/                  Browser JavaScript (Alpine components + i18n runtime + static i18n bridge)
-locales/             Translation files for static HTML + JS runtime strings (en.json, nl.json, pt.json)
-scripts/i18n-check.mjs  Checks that all JS t('...') keys exist in locale files
+hugo.toml            Hugo config: languages (en/nl/pt), publishDir = site/, minify settings
+content/             Page front matter only (title/description/flags), one file per language
+  _index.{en,nl,pt}.md          Home page
+  account/_index.{en,nl,pt}.md  Client "My bookings" page
+  facturen/_index.{en,nl,pt}.md Ligia's private invoicing dashboard
+layouts/
+  _default/baseof.html   Shared page skeleton (<html>/<head>/<body>)
+  index.html             Home page markup
+  account/list.html      Client account page markup
+  facturen/list.html     Invoicing dashboard markup
+  alias.html             Redirect template: bare "/" language picker + legacy URLs
+  partials/              head.html, staging-banner.html, lang-switcher.html
+i18n/{en,nl,pt}.toml   Compile-time UI strings ({{ i18n "static.<page>.<section>.<slug>" }})
+static/                Copied verbatim into the build output
+  css/ js/ images/
+  locales/{en,nl,pt}.json   Runtime-only strings that JavaScript builds (t('...'))
+  robots.txt, sitemap.xml, CNAME
+  account.html, facturen.html  Redirect stubs for the pre-Hugo URLs
+site/                  Build output (git-ignored) — what actually gets deployed
+supabase/schema.sql    Database schema: bookings table, RLS policies, approve_booking()
+scripts/i18n-check.mjs Checks that every i18n/t() key used actually exists in all languages
+.github/actions/
+  setup-hugo/          Installs the pinned Hugo version (used by every workflow)
+  build-site/          hugo build + placeholder substitution + generated js/config.js
+  apply-db-migration/
 .github/workflows/
   deploy-pages.yml               Production deploy -> GitHub Pages (push to main)
   deploy-staging-cloudflare.yml  Staging deploy -> Cloudflare Pages (push to staging)
+  deploy-preview-cloudflare.yml  Per-PR preview deploy -> Cloudflare Pages
   guard-main-merges.yml          Enforces the staging -> main promotion order (see below)
-  keep-alive.yml                 Daily ping to keep both Supabase projects from auto-pausing (see below)
+  test.yml                       BDD test suite
+  w3c-compliance.yml             W3C Nu Html Checker over every generated page
+  keep-alive.yml                 Daily ping to keep both Supabase projects from auto-pausing
 ```
+
+### Building locally
+
+```
+hugo server            # dev server with live reload, http://localhost:1313
+hugo --gc --minify     # one-off build into site/
+node scripts/i18n-check.mjs
+```
+
+The `__PLACEHOLDER__` values (`__BRAND_NAME__`, `__SITE_URL__`, …) stay literal in a local
+build — they're only substituted at deploy time (see [Deploy updates](#deploy-updates)).
+
+---
+
+## URLs and languages
+
+Every language is a real, fully-rendered page under its own path:
+
+| URL | Page |
+|---|---|
+| `/` | Tiny redirect that sends the visitor to their saved/detected language |
+| `/en/`, `/nl/`, `/pt/` | Public landing page + booking form |
+| `/en/account/`, `/nl/account/`, `/pt/account/` | Client "My bookings" page (`noindex`) |
+| `/en/facturen/`, `/nl/facturen/`, `/pt/facturen/` | Ligia's invoicing dashboard (`noindex`) |
+| `/account.html`, `/facturen.html` | Redirect stubs kept for pre-Hugo bookmarks |
+
+- The language selector is a set of plain links to the current page's other languages,
+  not a JavaScript toggle. `static/js/lang-persist.js` records whichever language page
+  you land on in `localStorage.gatoweb_lang`, and `static/js/root-redirect.js` reads it
+  back at `/`.
+- `localStorage.gatoweb_lang` is deliberately the same key the old client-side toggle
+  used, so visitors keep the language they had already chosen.
+- The private pages are **not** listed in `robots.txt`: that file is world-readable, so a
+  `Disallow` line advertises the admin panel's location rather than hiding it. They're
+  kept out of search results by their `noindex,nofollow` meta tag and out of
+  `sitemap.xml`, and actually protected by Supabase Auth + RLS.
+
+> **Supabase note:** the auth confirmation e-mail redirects back to
+> `window.location.origin + window.location.pathname`, which is now language-prefixed.
+> Make sure the Supabase project's *Redirect URLs* allowlist covers `/en/*`, `/nl/*`
+> and `/pt/*` (e.g. `https://gatoweb.nl/**`).
 
 ---
 
 ## Features
 
-✅ **Unified i18n (static + runtime)** — Language toggle with EN/NL/PT persisted in localStorage, with both static HTML copy and JS runtime strings managed in shared JSON locale files
-✅ **Real reviews** — 50+ five-star reviews from Pawshake (3 EN + 3 NL)
+✅ **Compile-time i18n (EN/NL/PT)** — Hugo renders one fully-translated page per language at its own URL; static copy lives in `i18n/*.toml`, runtime JS strings in `static/locales/*.json`
+✅ **Real reviews** — 50+ five-star reviews from Pawshake
 ✅ **WhatsApp booking** — Direct message with pre-filled dates/pets/preference
 ✅ **Booking persistence** — Booking form also saves an optional record to Supabase (`bookings` table) when configured
-✅ **Facturen (invoices) dashboard** — `facturen.html`, private page for Ligia: Supabase Auth login, lists all bookings sorted by what needs action (approve → send Tikkie → done), generates a PDF invoice client-side with a sequential invoice number
+✅ **Facturen (invoices) dashboard** — private page for Ligia: Supabase Auth login, lists all bookings sorted by what needs action (approve → send Tikkie → done), generates a PDF invoice client-side with a sequential invoice number
 ✅ **Responsive** — Mobile-first design with Tailwind CSS
-✅ **SEO optimized** — Meta tags, canonical, Open Graph/Twitter cards, robots.txt, sitemap.xml
+✅ **SEO optimized** — Per-language URLs with hreflang + `x-default`, canonical, Open Graph/Twitter cards, robots.txt, sitemap.xml
+✅ **W3C-valid markup** — every generated page is validated in CI by the W3C Nu Html Checker
 ✅ **Staging environment** — Full parallel environment (own Supabase project + own Cloudflare Pages deployment) with a visible "STAGING" banner, so features can be tested before reaching production
 
 ---
@@ -94,6 +156,9 @@ Rules enforced on GitHub:
 - `.github/workflows/test.yml` runs the BDD test suite (see [Automated tests](#automated-tests)) on
   every push/PR to `staging` and `main`. It is not yet marked as a required status check — do that
   in `staging`'s branch protection settings once you've seen it pass reliably a few times.
+- `.github/workflows/w3c-compliance.yml` validates every generated page with the W3C Nu Html
+  Checker on PRs into `staging` and `main`. This should also be set as a **required status check**
+  in both branches' protection rules once it has passed reliably a few times.
 
 ---
 
@@ -104,16 +169,19 @@ A [Playwright](https://playwright.dev/) + [playwright-bdd](https://vitalets.gith
 
 - **Booking form** (`tests/bdd/features/booking-form.feature`) — required-field validation, suggested
   price calculation, the WhatsApp confirmation message, and the login gate when Supabase auth is configured.
-- **Language toggle** (`tests/bdd/features/i18n.feature`) — EN/NL/PT switching and that the choice is
-  remembered across a reload.
-- **Invoice calculation** (`tests/bdd/features/invoice-calc.feature`) — `js/facturen/invoice-calc.js`,
+- **Per-language URLs** (`tests/bdd/features/i18n.feature`) — that `/en/`, `/nl/` and `/pt/` each render
+  their own language, that the selector links between them, and that `/` redirects using the saved
+  preference or the browser language.
+- **Invoice calculation** (`tests/bdd/features/invoice-calc.feature`) — `static/js/facturen/invoice-calc.js`,
   including the high-season surcharge split.
 - **Staging banner** (`tests/bdd/features/staging-banner.feature`) — visible on the staging build,
   hidden on production.
 
-Since the site has no build step, the tests build three throwaway "compiled" copies of the site in a
-temp folder (production / staging / production-with-auth), mirroring the same placeholder
-substitution the deploy workflows do, with fake test values — no real secrets or deployments involved.
+The tests run against the real thing: `tests/bdd/support/build-fixtures.mjs` invokes
+`hugo --gc --minify` three times (production / staging / production-with-auth) into a temp folder and
+then applies the same placeholder substitution and `js/config.js` generation the deploy workflows do,
+with fake test values — no real secrets or deployments involved. **Hugo must therefore be installed
+locally to run the suite.**
 
 ### Running locally
 
@@ -171,7 +239,7 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
   for booking days in July, August, December and January (issue #32)
 - `PRICE_EXTRA_CAT_PER_DAY` — optional flat amount per day (default `0`) charged for each cat
   beyond the first one in the same booking. Unlike `SEASONAL_SURCHARGE_PERCENT`, this is also
-  included in the public price estimate shown on the booking form (`index.html`), not just the
+  included in the public price estimate shown on the booking form (`layouts/index.html`), not just the
   final factuur, since it's known upfront
 
 ### Internal / infra
@@ -181,16 +249,22 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
   by the staging deploy workflow
 
 Notes:
-- Language default is hardcoded: browser language detection (`nl` → Dutch) with fallback to
-  English, or previous user choice saved in localStorage.
+- The site is built by `.github/actions/build-site` (shared by the production, staging and PR-preview
+  workflows): it installs the pinned Hugo from `.github/actions/setup-hugo`, runs `hugo --gc --minify`
+  into `site/`, then substitutes the placeholders and writes `site/js/config.js`.
+- Language selection is no longer a runtime choice: Hugo renders `/en/`, `/nl/` and `/pt/` as separate
+  pages, and `/` redirects based on `localStorage.gatoweb_lang` → browser language → English.
 - Review count label is hardcoded in the site (`50+`).
-- Placeholders like `__WHATSAPP_NUMBER__`, `__SITE_URL__`, `__ENV_LABEL__`, etc. — visible markup
-  in `index.html`, `facturen.html`, `account.html`, `robots.txt` and `sitemap.xml` — are substituted
-  with `sed` at deploy time, see the "Build site with injected variables" step in each workflow.
+- Placeholders like `__WHATSAPP_NUMBER__`, `__SITE_URL__`, `__ENV_LABEL__`, etc. are authored into
+  `content/`, `layouts/`, `i18n/*.toml` and `static/{robots.txt,sitemap.xml,locales/*.json}`, and are
+  substituted with `sed` over **every generated `.html`/`.json`/`.xml`/`.txt` file in `site/`** after
+  the Hugo build. The build fails if any `__PLACEHOLDER__` survives that step.
   Values only needed by JavaScript (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `BUSINESS_LEGAL_NAME`,
   `BUSINESS_ADDRESS`, `KVK_NUMBER`, `IBAN_NUMBER`, `BTW_EXEMPT`) are instead written into a
-  generated `js/config.js` (`window.GATOWEB_CONFIG`) by the "Generate js/config.js" step — see
-  `js/config.js` for the committed defaults and folder structure under `js/`/`css/`.
+  generated `js/config.js` (`window.GATOWEB_CONFIG`) — see `static/js/config.js` for the committed
+  defaults.
+- `hugo.toml` keeps attribute quotes during minification, so an empty substituted value can never
+  merge into the next attribute and corrupt the markup.
 
 Changes go live automatically:
 - push/merge to `staging` → deploys to `staging.gatoweb.nl` in ~1-2 minutes
@@ -222,13 +296,14 @@ residual risks (this is a best-effort mitigation, not a guaranteed fix).
 
 ## Facturen (invoices) feature
 
-`facturen.html` is a private dashboard for Ligia, gated behind Supabase Auth (not linked from the
-public site, disallowed in `robots.txt`):
+The invoicing dashboard (`/en/facturen/`, `/nl/facturen/`, `/pt/facturen/`, from
+`layouts/facturen/list.html`) is a private page for Ligia, gated behind Supabase Auth — not linked
+from the public site and marked `noindex,nofollow`:
 
-- Public booking form (`index.html`) optionally saves a `pending` row to the Supabase `bookings`
-  table (anon insert-only, see RLS policies in `supabase/schema.sql`). It also shows the client a
-  live price estimate as soon as a start date is chosen, computed via the shared
-  `buildInvoiceLineItems()` (`js/facturen/invoice-calc.js`) — the same logic used for the final
+- The public booking form (`layouts/index.html`) optionally saves a `pending` row to the Supabase
+  `bookings` table (anon insert-only, see RLS policies in `supabase/schema.sql`). It also shows the
+  client a live price estimate as soon as a start date is chosen, computed via the shared
+  `buildInvoiceLineItems()` (`static/js/facturen/invoice-calc.js`) — the same logic used for the final
   factuur — including the flat extra-cat-per-day charge (`PRICE_EXTRA_CAT_PER_DAY`), but always
   excluding the seasonal surcharge, which only appears once Ligia issues the actual factuur.
 - Ligia logs in (Supabase Auth) and sees all bookings sorted by what needs action: pending (needs
@@ -298,11 +373,24 @@ DNS propagation: 5-60 minutes.
 
 ## Tech Details
 
-- **Unified i18n system:** both static HTML strings and JavaScript runtime strings flow through i18next (`js/i18n.js` + `js/i18n-static.js`) and shared locale files (`locales/en.json`, `locales/nl.json`, `locales/pt.json`)
-- **Static key naming:** each translated HTML element pair (`.en`/`.nl`(/`.pt`)) is tagged with a `data-i18n="section.slug"` attribute on its EN element (e.g. `data-i18n="hero.book_a_visit"`), which `js/i18n-static.js` reads to resolve the locale key `static.<page>.section.slug` (e.g. `static.index.hero.book_a_visit`). Keys are semantic and grouped by page section (`hero`, `about`, `services`, `reviews`, `booking`, `footer`, `nav`, `misc`, ...), not positional, so they stay readable and stable even if markup is reordered. Untagged pairs still fall back to the legacy positional `kNNN` key for safety, but new content should always get a `data-i18n` attribute.
-- **Auto-detection:** `navigator.language.startsWith('nl')` → defaults to NL
-- **Persistence:** Language choice saved in `localStorage.gatoweb_lang` (shared across both pages)
-- **JS translation check:** run `node scripts/i18n-check.mjs` to validate that all `t('...')` keys used in JS exist in locale files
+- **Two-layer i18n:** static page copy is resolved at **build time** by Hugo from `i18n/{en,nl,pt}.toml`
+  (`{{ i18n "key" }}`); only the strings JavaScript builds at runtime (booking messages, invoice line
+  items, auth errors) still go through i18next and `static/locales/{en,nl,pt}.json` (`static/js/i18n.js`)
+- **Static key naming:** compile-time keys keep the `static.<page>.<section>.<slug>` shape
+  (e.g. `static.index.hero.book_a_visit`), grouped by page section (`hero`, `about`, `services`,
+  `reviews`, `booking`, `footer`, `nav`, `misc`, …) so they stay readable and stable even if markup is
+  reordered. They're quoted in the TOML files because they contain dots, which TOML would otherwise
+  read as nested tables
+- **Auto-detection:** only at `/` — `static/js/root-redirect.js` picks saved preference → browser
+  language → English, then redirects to `/en/`, `/nl/` or `/pt/`
+- **Persistence:** `static/js/lang-persist.js` writes the current page's `<html lang>` into
+  `localStorage.gatoweb_lang` on every load (shared across all pages)
+- **Translation check:** run `node scripts/i18n-check.mjs` to validate that every `{{ i18n "…" }}` key
+  used in `layouts/` exists in all three `i18n/*.toml` files, and every static `t('…')` key used in
+  `static/js/` exists in all three `static/locales/*.json` files
+- **Alpine directives use a `data-x-` prefix** (`data-x-data`, `data-x-on:click`, `data-x-bind:class`)
+  registered via `Alpine.prefix('data-x-')` in `layouts/partials/head.html`, so every directive is a
+  valid HTML5 `data-*` attribute and the pages pass the W3C checker
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates). A separate `localStorage.gatoweb_pending_booking` key (issue #95) stashes a FULL booking (incl. dates) when signup requires email confirmation, so it can be resumed and sent automatically once the client confirms and returns with a session — instead of losing the in-progress request
 - **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
 - **Fonts:** Playfair Display (serif) + Inter (sans-serif)
@@ -318,22 +406,28 @@ DNS propagation: 5-60 minutes.
 
 ## SEO Assets
 
-- **Canonical URL:** `https://gatoweb.nl/`
-- **Open Graph/Twitter cards:** configured in `<head>`
-- **Favicon:** `images/favicon.png`
-- **Robots:** `robots.txt` (disallows `/facturen.html`)
-- **Sitemap:** `sitemap.xml`
+- **Canonical URL:** one per language — `https://gatoweb.nl/en/`, `/nl/`, `/pt/`
+- **hreflang:** every public page links to all three languages plus `x-default` → `https://gatoweb.nl/`
+- **Open Graph/Twitter cards:** configured in `layouts/partials/head.html`, with `og:locale` and
+  `og:locale:alternate` per language
+- **Favicon:** `static/images/favicon.png`
+- **Robots:** `static/robots.txt` — deliberately does not enumerate the private pages (see
+  [URLs and languages](#urls-and-languages))
+- **Sitemap:** `static/sitemap.xml` — hand-written (Hugo's generated one is disabled) so it can carry
+  the `__SITE_URL__` placeholder; lists all three language homepages with hreflang annotations
 
 ---
 
 ## Production Checklist
 
 - [ ] Confirm required variables are set for both `github-pages` (or repo-level) and `staging` GitHub Environments
-- [ ] Check homepage title/description preview in social share debuggers
+- [ ] Check homepage title/description preview in social share debuggers (share `https://gatoweb.nl/` — the root redirect carries its own OG tags)
 - [ ] Verify `https://gatoweb.nl/robots.txt` returns 200
 - [ ] Verify `https://gatoweb.nl/sitemap.xml` returns 200
 - [ ] Verify WhatsApp links work in hero, floating button and booking form
-- [ ] Verify EN/NL auto-detection and manual toggle persistence
+- [ ] Verify `https://gatoweb.nl/` redirects to `/en/`, `/nl/` or `/pt/` per browser language, and that the choice sticks on the next visit
+- [ ] Verify the legacy `https://gatoweb.nl/facturen.html` and `/account.html` still land on the right page
+- [ ] Confirm the Supabase project's *Redirect URLs* allowlist covers the language-prefixed paths (`https://gatoweb.nl/**`)
 - [ ] Confirm HTTPS lock appears for `gatoweb.nl`, `www.gatoweb.nl` and `staging.gatoweb.nl`
 - [ ] Confirm the staging banner is visible on staging and hidden on production
 
@@ -347,16 +441,20 @@ CSS build.
 
 ## Updating Content
 
-All public content is in `index.html`; the invoicing dashboard is in `facturen.html`. Key search terms:
+Page **markup** lives in `layouts/` (`index.html`, `account/list.html`, `facturen/list.html`); the
+**text** lives in `i18n/{en,nl,pt}.toml`. To change a piece of copy, find its key in the layout
+(`{{ i18n "static.index.hero.book_a_visit" }}`) and edit that key in all three TOML files. Adding a
+new string means adding both the `{{ i18n "…" }}` call and the key in every language —
+`node scripts/i18n-check.mjs` fails if one is missing.
 
-- **Prices** → search for `€`
-- **Reviews** → search for `#reviews` section
-- **WhatsApp message** → search for `'Hi Lígia!`
-- **Trust bar stats** → search for `5.000+`, `50+`, `21`
-- **Brand name** → search for `Gato Catsit`
+Key search terms:
 
-EN text: `<span class="en">` or `<p class="en">` (index.html) / `.en-l` (facturen.html)
-NL text: `<span class="nl">` or `<p class="nl">` (index.html) / `.nl-l` (facturen.html)
+- **Prices** → search for `€` in `layouts/` (the numbers themselves come from the `PRICE_*` variables)
+- **Reviews** → `#reviews` section in `layouts/index.html`, text under `static.index.reviews.*`
+- **WhatsApp message** → search for `wa.me/` in `layouts/index.html`
+- **Trust bar stats** → search for `5.000+`, `50+`, `21` in `layouts/index.html`
+- **Brand name** → `__BRAND_NAME__` (substituted at deploy time from the `BRAND_NAME` variable)
+- **Page titles/descriptions** → `content/**/_index.{en,nl,pt}.md` front matter
 
 ---
 
@@ -371,7 +469,7 @@ WhatsApp message opens with pre-filled request (+ optional Supabase record)
         ↓
 Ligia confirms availability manually
         ↓
-Ligia opens facturen.html, approves the booking (assigns invoice number, generates PDF)
+Ligia opens the facturen dashboard, approves the booking (assigns invoice number, generates PDF)
         ↓
 Ligia sends the Tikkie payment request manually and marks it as sent
 ```

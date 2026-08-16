@@ -1,14 +1,18 @@
-// Builds two throwaway "compiled" copies of the static site (production/staging),
-// mirroring the same __PLACEHOLDER__ substitution + js/config.js generation that
-// .github/workflows/deploy-pages.yml and deploy-staging-cloudflare.yml do at deploy
-// time. This lets BDD tests exercise the site exactly as it will be served, instead
-// of the raw repo copy that still has literal `__WHATSAPP_NUMBER__` etc. placeholders.
+// Builds three throwaway "compiled" copies of the site (production / staging /
+// production-with-auth) by running the real Hugo build and then applying the same
+// __PLACEHOLDER__ substitution + js/config.js generation that
+// .github/actions/build-site does at deploy time. This lets the BDD tests exercise the
+// site exactly as it will be served — same per-language URLs, same minified markup —
+// instead of the raw repo sources, which contain no rendered pages at all.
 //
-// Output: .test-site/<variant> (gitignored, rebuilt every run).
-import { cp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+// Output: <tmp>/gatoweb-nl-test-site/<variant> (rebuilt every run).
+import { mkdir, readFile, writeFile, rm, readdir } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import path from 'node:path';
 import { repoRoot, fixturesRoot as outRoot } from './paths.mjs';
+
+const execFileAsync = promisify(execFile);
 
 // Deliberately fake but realistic-looking values — good enough to assert on in
 // tests without touching any real business/production data.
@@ -53,41 +57,51 @@ const CONFIG_BY_ENV = {
   }
 };
 
-const SOURCE_FILES_WITH_PLACEHOLDERS = [
-  'index.html',
-  'facturen.html',
-  'account.html',
-  'locales/en.json',
-  'locales/nl.json',
-  'locales/pt.json',
-  'robots.txt',
-  'sitemap.xml'
-];
+// Same set the deploy action substitutes over: every generated text file, but not
+// js/*.js (the only per-environment JS values live in the generated js/config.js).
+const SUBSTITUTED_EXTENSIONS = new Set(['.html', '.json', '.xml', '.txt']);
+
+async function* walk(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) yield* walk(full);
+    else yield full;
+  }
+}
+
+async function hugoBuild(destination) {
+  try {
+    await execFileAsync('hugo', ['--gc', '--minify', '--destination', destination], {
+      cwd: repoRoot
+    });
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(
+        'Hugo is required to build the test fixtures but was not found on PATH.\n' +
+          'Install the extended build (same version as .github/actions/setup-hugo) from\n' +
+          'https://github.com/gohugoio/hugo/releases and try again.'
+      );
+    }
+    throw new Error(`hugo build failed:\n${err.stderr || err.message}`);
+  }
+}
 
 async function buildVariant(name, vars) {
   const dest = path.join(outRoot, name);
   await rm(dest, { recursive: true, force: true });
   await mkdir(dest, { recursive: true });
 
-  await cp(repoRoot, dest, {
-    recursive: true,
-    filter: (src) => {
-      const rel = path.relative(repoRoot, src);
-      if (!rel) return true;
-      const first = rel.split(path.sep)[0];
-      return !['node_modules', '.git', '.github', '.test-site', 'tests', 'test-results', 'playwright-report'].includes(first);
-    }
-  });
+  await hugoBuild(dest);
 
   const allVars = { ...BASE_VARS, __ENV_LABEL__: vars.ENV_LABEL };
-  for (const relFile of SOURCE_FILES_WITH_PLACEHOLDERS) {
-    const filePath = path.join(dest, relFile);
-    if (!existsSync(filePath)) continue;
-    let contents = await readFile(filePath, 'utf8');
+  for await (const filePath of walk(dest)) {
+    if (!SUBSTITUTED_EXTENSIONS.has(path.extname(filePath))) continue;
+    const original = await readFile(filePath, 'utf8');
+    let contents = original;
     for (const [placeholder, value] of Object.entries(allVars)) {
       contents = contents.split(placeholder).join(value);
     }
-    await writeFile(filePath, contents, 'utf8');
+    if (contents !== original) await writeFile(filePath, contents, 'utf8');
   }
 
   const config = {
@@ -111,7 +125,11 @@ async function buildVariant(name, vars) {
 }
 
 async function main() {
-  await Promise.all(Object.entries(CONFIG_BY_ENV).map(([name, vars]) => buildVariant(name, vars)));
+  // Sequentially: concurrent `hugo` runs in the same project directory race on the
+  // shared resources/ cache and the .hugo_build.lock file.
+  for (const [name, vars] of Object.entries(CONFIG_BY_ENV)) {
+    await buildVariant(name, vars);
+  }
   console.log('Built test fixtures in', outRoot, ':', Object.keys(CONFIG_BY_ENV).join(', '));
 }
 

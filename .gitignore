@@ -6,3 +6,8 @@ tests/bdd/.features-gen/
 test-results/
 playwright-report/
 .test-site/
+
+# Hugo build output
+/site/
+/resources/
+/.hugo_build.lock

@@ -68,7 +68,7 @@ Then('the about carousel is on slide {int} of {int}', async ({ page }, slideNumb
 Then('the about carousel shows {string}', async ({ page }, heading) => {
   const activeHeading = await page.evaluate((index) => {
     const slide = document.querySelectorAll('#about-carousel-track > article')[index];
-    return slide ? slide.querySelector('h3 .en').textContent.trim() : null;
+    return slide ? slide.querySelector('h3 span').textContent.trim() : null;
   }, await activeSlideIndex(page));
   expect(activeHeading).toBe(heading);
 });

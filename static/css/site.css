@@ -1,0 +1,18 @@
+/* Shared stylesheet for every page. Language variants are no longer toggled in the
+   browser: Hugo renders one fully-translated page per language (/en/, /nl/, /pt/), so
+   the old .en/.nl/.pt visibility rules are gone. */
+
+html { font-family: 'Inter', system-ui, sans-serif; }
+.font-serif { font-family: 'Playfair Display', Georgia, serif; }
+body { background: #faf7f0; }
+
+/* About Lígia bio carousel — hides the native scroll bar so the CSS
+   scroll-snap track (js/index/about-carousel.js) reads as a carousel, not
+   a plain overflowing div. Scrolling/swiping itself needs no JS at all. */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Staging environment banner — only visible when built with ENV_LABEL=staging */
+#env-banner { display: none; }
+body[data-env="staging"] #env-banner { display: block; }
+body[data-env="staging"] { padding-top: 28px; }

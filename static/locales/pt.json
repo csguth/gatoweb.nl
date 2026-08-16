@@ -1,0 +1,71 @@
+{
+  "booking": {
+    "start_date_required": "Por favor, selecione uma data de início",
+    "address": "Endereço",
+    "address_required": "Por favor, informe seu endereço (necessário para a fatura)",
+    "name_required": "Por favor, informe seu nome completo",
+    "contact_required": "Por favor, informe seu WhatsApp ou telefone",
+    "account_created_check_email_send": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui para enviar sua reserva.",
+    "resumed_after_confirmation": "Bem-vindo de volta! O pedido de reserva que você iniciou antes de confirmar seu e-mail acabou de ser enviado.",
+    "whatsapp_confirm_message": "Oi Lígia! Acabei de enviar um pedido de reserva para {{from}}{{toRange}}. Aguardo seu retorno!"
+  },
+  "auth": {
+    "account_created_check_email_login": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui.",
+    "not_configured": "O serviço ainda não está configurado."
+  },
+  "adjustment_note_required": "Informe um motivo para o ajuste do valor.",
+  "client_edit_reason_required": "Informe um motivo para corrigir os dados do cliente.",
+  "not_staff_error": "Esta conta não tem acesso ao painel de faturas.",
+  "reject_confirm": "Recusar o pedido de reserva de {{client}}? Isso pode ser desfeito depois na coluna 'Concluído'.",
+  "reject_button_title": "Recusar reserva",
+  "tikkie_url_invalid": "Insira um link Tikkie válido (começando com https://).",
+  "invoice": {
+    "title": "Fatura {{number}}",
+    "proforma_title": "Fatura proforma",
+    "proforma_notice": "Esta é uma proforma, não uma fatura fiscal definitiva, e não tem número oficial de fatura. A fatura definitiva será emitida assim que o Tikkie for pago.",
+    "date_label": "Data: {{date}}",
+    "client_label": "Cliente: {{client}}",
+    "description_label": "Descrição:",
+    "service_description": "Serviços de pet sitting {{from}}{{toPart}}",
+    "date_range_connector": " até {{to}}",
+    "pets_label": "Animais: {{pets}}",
+    "preference_label": "Preferência: {{preference}}",
+    "total_label": "Total: € {{amount}}",
+    "vat_exempt_kor": "Isento de IVA de acordo com o regime holandês para pequenas empresas (KOR).",
+    "payment_tikkie_iban": "Pagamento: via Tikkie (enviado separadamente) - IBAN {{iban}}",
+    "file_name": "fatura-{{number}}",
+    "this_client": "este cliente",
+    "confirm_approve": "Aprovar permanentemente a fatura para {{client}}?",
+    "recipient_label": "Para:",
+    "address_label": "Endereço: {{address}}",
+    "contact_label": "Telefone: {{contact}}",
+    "table": {
+      "description": "Descrição",
+      "period": "Período",
+      "days": "Dias",
+      "unit_price": "Preço/dia",
+      "subtotal": "Subtotal"
+    },
+    "line": {
+      "service_cat": "Catsitting",
+      "service_dog": "Dogwalking",
+      "period_morning": "diurno",
+      "period_evening": "noturno",
+      "period_both": "diurno e noturno",
+      "period_none": "",
+      "frequency_1": "1x por dia",
+      "frequency_2": "2x por dia",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} até {{to}}",
+      "surcharge_item": "Sobretaxa de alta temporada (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Gato adicional (+{{count}}) — {{description}}",
+      "adjustment": "Ajuste: {{note}}"
+    },
+    "seasonal_note": "* Uma sobretaxa de alta temporada de {{percent}}% se aplica aos dias de julho, agosto, dezembro e janeiro.",
+    "print_button": "🖨️ Imprimir fatura / salvar como PDF",
+    "popup_blocked": "Permita pop-ups para visualizar a fatura.",
+    "whatsapp_message": "Oi {{name}}! Sua reserva ({{dates}}) está confirmada. Até breve!",
+    "whatsapp_message_generic": "Oi! Sua reserva ({{dates}}) está confirmada. Até breve!",
+    "whatsapp_client": "WhatsApp cliente"
+  }
+}

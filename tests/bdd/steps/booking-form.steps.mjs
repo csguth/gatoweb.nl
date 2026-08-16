@@ -9,13 +9,13 @@ import { world } from '../support/world.mjs';
 const { Given, When, Then } = createBdd();
 
 function form(page) {
-  return page.locator('[x-data="bookingForm()"]');
+  return page.locator('[data-x-data="bookingForm()"]');
 }
 
 Given('I open the booking form', async ({ page }) => {
   world.alertMessage = null;
   world.petIndex = 0;
-  await page.goto('/');
+  await page.goto('/en/');
   await expect(form(page)).toBeVisible();
   // Static markup renders immediately, but i18n JS strings (used by
   // t('booking.start_date_required') etc.) resolve asynchronously via
@@ -116,18 +116,7 @@ Then('the booking is not marked as sent', async ({ page }) => {
 });
 
 Then('the booking is marked as sent', async ({ page }) => {
-  // i18n-static.js can overwrite BOTH the '.en' and '.nl' sibling spans with the same
-  // (current-language) text if it reruns after Alpine's x-if="sent" inserts this
-  // content (e.g. following the page.reload() in the resumed-booking scenario) — only
-  // one of the pair is actually visible via CSS, so matching by text alone can
-  // spuriously find the hidden sibling too and hit a strict-mode violation. Assert on
-  // real visibility instead, mirroring the same fix in i18n.steps.mjs.
-  await expect
-    .poll(() => page.evaluate(() => {
-      const candidates = Array.from(document.querySelectorAll('.en, .nl, .pt'));
-      return candidates.some((el) => el.textContent.trim() === 'Booking request sent!' && el.offsetParent !== null);
-    }))
-    .toBe(true);
+  await expect(form(page).getByText('Booking request sent!')).toBeVisible();
 });
 
 Then('the WhatsApp confirmation link includes the phone number {string}', async ({ page }, number) => {

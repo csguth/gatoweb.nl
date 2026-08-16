@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="{{ .Language.Lang }}"{{ with .Param "htmlClass" }} class="{{ . }}"{{ end }}>
+<head>
+{{ partial "head.html" . }}
+</head>
+<body class="{{ .Param "bodyClass" }}" data-env="__ENV_LABEL__">
+{{ partial "staging-banner.html" . }}
+{{ block "main" . }}{{ end }}
+{{ block "scripts" . }}{{ end }}
+<script src="/js/lang-persist.js"></script>
+</body>
+</html>

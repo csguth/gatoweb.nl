@@ -1,0 +1,63 @@
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>{{ .Title }}</title>
+  <meta content="{{ .Description }}" name="description" />
+
+{{- if .Params.private }}
+  {{/* facturen/account are internal pages: never indexed, and no hreflang or
+       canonical cross-links, exactly like the old noindex,nofollow markup. */}}
+  <meta content="noindex,nofollow" name="robots" />
+{{- else }}
+  <meta content="index,follow,max-image-preview:large" name="robots" />
+  <link href="__SITE_URL__{{ .RelPermalink }}" rel="canonical" />
+{{- range .AllTranslations }}
+  <link href="__SITE_URL__{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}" rel="alternate" />
+{{- end }}
+  {{/* The bare root is the language-picking redirect (layouts/alias.html), which is
+       exactly what x-default is for: "no language matched, let the site decide". */}}
+  <link href="__SITE_URL__/" hreflang="x-default" rel="alternate" />
+
+{{- $ogLocales := dict "en" "en_GB" "nl" "nl_NL" "pt" "pt_BR" }}
+  <meta content="{{ .Title }}" property="og:title" />
+  <meta content="{{ .Params.ogDescription | default .Description }}" property="og:description" />
+  <meta content="website" property="og:type" />
+  <meta content="__SITE_URL__{{ .RelPermalink }}" property="og:url" />
+  <meta content="__SITE_URL__/images/ligia-profile.jpg" property="og:image" />
+  <meta content="{{ .Params.ogImageAlt }}" property="og:image:alt" />
+  <meta content="__BRAND_NAME__" property="og:site_name" />
+  <meta content="{{ index $ogLocales .Language.Lang }}" property="og:locale" />
+{{- range .Translations }}
+  <meta content="{{ index $ogLocales .Language.Lang }}" property="og:locale:alternate" />
+{{- end }}
+  <meta content="summary_large_image" name="twitter:card" />
+  <meta content="{{ .Title }}" name="twitter:title" />
+  <meta content="{{ .Params.ogDescription | default .Description }}" name="twitter:description" />
+  <meta content="__SITE_URL__/images/ligia-profile.jpg" name="twitter:image" />
+  <meta content="#221f19" name="theme-color" />
+{{- end }}
+
+  <link href="/images/favicon.png" rel="icon" type="image/png" />
+  <link href="/images/favicon.png" rel="apple-touch-icon" />
+
+  <!-- Tailwind CSS (no build process needed) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <!-- Runtime config (Supabase URL/keys, prices) injected at deploy time -->
+  <script src="/js/config.js"></script>
+  <!-- i18next still powers the strings JavaScript builds at runtime (booking
+       messages, invoice lines, ...). Static page copy is compiled by Hugo instead. -->
+  <script src="https://cdn.jsdelivr.net/npm/i18next@23.16.8/dist/umd/i18next.min.js"></script>
+  <script src="/js/i18n.js"></script>
+  <!-- Alpine itself is loaded at the end of <body> on each page, after the module
+       scripts it depends on. Only the prefix registration happens here: it must be
+       listening before Alpine's deferred build dispatches `alpine:init` (which runs
+       before Alpine walks the DOM). The `data-x-` prefix makes every Alpine directive
+       a valid HTML5 data-* attribute, keeping the markup W3C-valid — see
+       .github/workflows/w3c-compliance.yml. -->
+  <script>document.addEventListener('alpine:init', function () { Alpine.prefix('data-x-'); });</script>
+{{- if .Params.webFonts }}
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet" />
+{{- end }}
+  <link href="/css/site.css" rel="stylesheet" />
