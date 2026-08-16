@@ -8,8 +8,6 @@
 <img alt="__BRAND_NAME__" class="h-20 md:h-28 w-auto" src="/images/logo.png">
 </a>
 <div class="flex items-center gap-3">
-<!-- Language selector: plain links, one per language URL (see partials/lang-switcher.html) -->
-{{ partial "lang-switcher.html" . }}
 <!-- Book CTA (desktop) -->
 <a class="hidden sm:inline-flex bg-brand-ink hover:bg-brand-wine text-white text-xs font-semibold px-4 py-2 rounded-full transition" href="#booking">
 <span>{{ i18n "static.index.nav.book_a_visit" }}</span>
@@ -734,6 +732,11 @@
 
 <a class="text-brand-cream/60 hover:text-brand-cream/80 text-xs mt-2 block transition" href="__SITE_URL__">__SITE_URL__</a>
 </div>
+</div>
+<!-- Language selector (issue #154). Sits on its own centred row so the dropdown,
+     which opens upwards, has room and doesn't overlap the columns above. -->
+<div class="max-w-5xl mx-auto px-5 mt-10 flex justify-center text-brand-cream">
+{{ partial "lang-switcher.html" . }}
 </div>
 </footer>
 <!-- ══════════════════════════════════════════════════════════
