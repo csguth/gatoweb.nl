@@ -1,10 +1,25 @@
-// Shared Tailwind CDN config for index.html, facturen.html and account.html.
-// Superset of all three pages' previous per-page configs (facturen/account didn't use
-// the pink palette or the custom fontFamily, but having them present is harmless).
+// Shared Tailwind CDN config for every page.
+//
+// `brand` is the design system from Lígia's Canva specs (see issue #137). The older
+// sage/warm/pink palette is the previous identity and is still referenced by the
+// existing markup; it goes away once #149 has migrated every page to `brand`.
 tailwind.config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          ink:     '#3D0C11', // hero/menu background, dark sections
+          plum:    '#530B2C', // "behaviour consultation" tag
+          wine:    '#740A1E', // "About Lígia" title, senior-cats tag
+          crimson: '#7E0001', // "How does a visit work?" headings and arrows
+          red:     '#B83C4E', // primary brand red
+          blush:   '#F1ACB1', // 2-visits card, kittens tag, "Book a visit" button
+          rose:    '#E5A8B8', // pink section background
+          cream:   '#F4F1EA', // off-white page background / text on dark
+          sand:    '#EEE8DC', // beige buttons
+          moss:    '#6C8D84', // WhatsApp button
+          grey:    '#B4B4B4',
+        },
         sage: {
           50:  '#f5f5f4',
           100: '#e7e6e3',
@@ -43,8 +58,14 @@ tailwind.config = {
         }
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans:  ['Inter', 'system-ui', 'sans-serif'],
+        // Brand typography (#137). Anton stands in for the Canva font "Extend 50 Mega"
+        // and Nunito for "Bubblebody Neue" — both SIL OFL and self-hosted (/fonts).
+        display: ['Anton', '"Arial Narrow"', 'system-ui', 'sans-serif'],
+        sans:    ['Nunito', 'system-ui', 'sans-serif'],
+        // `serif` is aliased to the display face so the existing `font-serif` headings
+        // pick up the new brand font untouched. #149 renames them to `font-display`,
+        // after which this alias can go.
+        serif:   ['Anton', '"Arial Narrow"', 'system-ui', 'sans-serif'],
       },
     }
   }

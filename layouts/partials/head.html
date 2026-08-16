@@ -33,7 +33,8 @@
   <meta content="{{ .Title }}" name="twitter:title" />
   <meta content="{{ .Params.ogDescription | default .Description }}" name="twitter:description" />
   <meta content="__SITE_URL__/images/ligia-profile.jpg" name="twitter:image" />
-  <meta content="#221f19" name="theme-color" />
+  {{/* Brand ink (#137) — matches the dark sections of the new identity. */}}
+  <meta content="#3D0C11" name="theme-color" />
 {{- end }}
 
   <link href="/images/favicon.png" rel="icon" type="image/png" />
@@ -56,8 +57,9 @@
        .github/workflows/w3c-compliance.yml. -->
   <script>document.addEventListener('alpine:init', function () { Alpine.prefix('data-x-'); });</script>
 {{- if .Params.webFonts }}
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet" />
+  {{/* Brand webfonts are self-hosted (see static/css/site.css). Preloading the latin
+       subsets avoids the flash of fallback text on the pages that set webFonts. */}}
+  <link as="font" crossorigin href="/fonts/anton-latin.woff2" rel="preload" type="font/woff2" />
+  <link as="font" crossorigin href="/fonts/nunito-latin.woff2" rel="preload" type="font/woff2" />
 {{- end }}
   <link href="/css/site.css" rel="stylesheet" />
