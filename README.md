@@ -388,6 +388,11 @@ DNS propagation: 5-60 minutes.
 - **Translation check:** run `node scripts/i18n-check.mjs` to validate that every `{{ i18n "…" }}` key
   used in `layouts/` exists in all three `i18n/*.toml` files, and every static `t('…')` key used in
   `static/js/` exists in all three `static/locales/*.json` files
+- **Contrast check:** `hugo --gc --minify --destination site && node scripts/preview-fill.mjs`, serve
+  `site/` (e.g. `npx http-server site -p 8913`), then run
+  `node scripts/contrast-audit.mjs http://127.0.0.1:8913` to check every rendered page for WCAG AA
+  contrast failures. Text sitting on a photo is listed separately for a visual check rather than
+  failing the run, since its real backdrop isn't a single colour
 - **Alpine directives use a `data-x-` prefix** (`data-x-data`, `data-x-on:click`, `data-x-bind:class`)
   registered via `Alpine.prefix('data-x-')` in `layouts/partials/head.html`, so every directive is a
   valid HTML5 `data-*` attribute and the pages pass the W3C checker
