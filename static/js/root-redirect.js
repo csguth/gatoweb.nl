@@ -29,5 +29,14 @@
   }
 
   var lang = fromStorage() || fromBrowser() || 'en';
-  window.location.replace('/' + lang + '/');
+
+  // Carry the query string and fragment across the redirect. Supabase Auth sends users
+  // back to a URL with its state appended — `#access_token=…` / `#error=…` for the
+  // implicit flow, `?code=…` for PKCE — and it falls back to the project's Site URL
+  // (this bare root) whenever the e-mail link's redirect_to isn't on the allow list, or
+  // for any older confirmation e-mail still pointing here. Dropping them would silently
+  // throw the session away and leave the client stuck at "confirm your e-mail", so
+  // everything after the path is forwarded verbatim to the language page, which runs
+  // supabase-js with detectSessionInUrl (see js/index/client-auth.js).
+  window.location.replace('/' + lang + '/' + window.location.search + window.location.hash);
 })();

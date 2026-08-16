@@ -73,3 +73,19 @@ Feature: Per-language URLs (EN/NL/PT)
     And I open the site at "/pt/"
     When I open the root
     Then the current path is "/pt/"
+
+  # Supabase Auth appends its state to the URL it returns the visitor to — "#access_token=…"
+  # for the implicit flow, "?code=…" for PKCE — and falls back to the project's Site URL
+  # (this bare root) whenever the e-mail link's redirect_to isn't on the allow list. If the
+  # redirect dropped it, the session would be silently thrown away on confirmation.
+  Scenario: The root redirect keeps an auth fragment intact
+    Given my browser language is "en-US" and I have no saved language preference
+    When I open the root with "#access_token=fake-token&type=signup"
+    Then the current path is "/en/"
+    And the current fragment is "#access_token=fake-token&type=signup"
+
+  Scenario: The root redirect keeps an auth query string intact
+    Given my browser language is "nl-NL" and I have no saved language preference
+    When I open the root with "?code=fake-pkce-code"
+    Then the current path is "/nl/"
+    And the current query string is "?code=fake-pkce-code"

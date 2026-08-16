@@ -26,6 +26,11 @@
     }
   }
 
-  // English is already the meta-refresh target, so only override for nl/pt.
-  if (lang && lang !== 'en') window.location.replace('/' + lang + '/' + page + '/');
+  // English is already the meta-refresh target, so only override for nl/pt. The query
+  // string and fragment are carried over for the same reason as in js/root-redirect.js:
+  // an auth callback can land here with `#access_token=…` or `?code=…` appended, and
+  // dropping it would throw the session away.
+  if (lang && lang !== 'en') {
+    window.location.replace('/' + lang + '/' + page + '/' + window.location.search + window.location.hash);
+  }
 })();

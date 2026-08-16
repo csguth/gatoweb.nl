@@ -33,6 +33,19 @@ When('I open the root', async ({ page }) => {
   await page.waitForURL(/\/(en|nl|pt)\/$/);
 });
 
+When('I open the root with {string}', async ({ page }, suffix) => {
+  await page.goto('/' + suffix);
+  await page.waitForURL(/\/(en|nl|pt)\//);
+});
+
+Then('the current fragment is {string}', async ({ page }, expected) => {
+  expect(new URL(page.url()).hash).toBe(expected);
+});
+
+Then('the current query string is {string}', async ({ page }, expected) => {
+  expect(new URL(page.url()).search).toBe(expected);
+});
+
 When('I follow the language selector link for {string}', async ({ page }, lang) => {
   await page.locator(`nav a[hreflang="${lang}"]`).click();
   await page.waitForURL(new RegExp(`/${lang}/$`));
