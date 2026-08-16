@@ -16,9 +16,15 @@ tailwind.config = {
           rose:    '#E5A8B8', // pink section background
           cream:   '#F4F1EA', // off-white page background / text on dark
           sand:    '#EEE8DC', // beige buttons
-          moss:    '#6C8D84', // WhatsApp button
+          // The design puts the WhatsApp button's label and icon in moss on a sand
+          // pill. At its original lightness that pairing is only 2.98:1, so `deep` is
+          // the same hue/saturation darkened to clear WCAG AA (4.6:1) for text.
+          moss:    { DEFAULT: '#6C8D84', deep: '#546D68' },
           grey:    '#B4B4B4',
         },
+        // Third-party brand colour, kept out of `brand` on purpose: it belongs to
+        // WhatsApp, not to Gato Catsit. Used for the "open WhatsApp" affordances.
+        whatsapp: '#25D366',
       },
       fontFamily: {
         // Brand typography (#137). Anton stands in for the Canva font "Extend 50 Mega"
