@@ -79,6 +79,7 @@ jobs:
           price-one-visit: ${{ vars.PRICE_ONE_VISIT }}
           price-two-visits: ${{ vars.PRICE_TWO_VISITS }}
           dog-walk-price-from: ${{ vars.DOG_WALK_PRICE_FROM }}
+          instagram-handle: ${{ vars.INSTAGRAM_HANDLE || 'gatocatsit' }}
           env-label: ${{ vars.ENV_LABEL }}
           supabase-url: ${{ vars.SUPABASE_URL }}
           supabase-anon-key: ${{ vars.SUPABASE_ANON_KEY }}

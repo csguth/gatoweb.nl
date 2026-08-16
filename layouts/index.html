@@ -347,11 +347,16 @@
 </a>
 </div>
 </div>
-<p class="text-center text-xs text-brand-ink/70 mt-6">
+<!-- Additional services and the seasonal-surcharge caveat (#115). Both used to be
+     text-xs at 70% opacity and were easy to miss. The services line is a selling
+     point, so it gets the most weight; the surcharge is a caveat, so it stays
+     quieter but is now on a tinted card that makes it read as a deliberate notice
+     rather than fine print. -->
+<p class="text-center text-base md:text-lg font-semibold text-brand-wine mt-8">
 <span>{{ i18n "static.index.services.also_available_for_dogs_rabbits" }}</span>
 
 </p>
-<p class="text-center text-xs text-brand-ink/70 mt-2">
+<p class="max-w-xl mx-auto text-center text-sm text-brand-ink bg-brand-sand border border-brand-blush rounded-xl px-4 py-3 mt-4">
 <span>{{ i18n "static.index.services.seasonal_surcharges_may_apply_e" }}</span>
 
 </p>
@@ -735,6 +740,17 @@
 
 <a class="text-brand-cream/60 hover:text-brand-cream/80 text-xs mt-2 block transition" href="__SITE_URL__">__SITE_URL__</a>
 </div>
+</div>
+<!-- Social CTA (#116). Sits above the language row so it reads as the last thing
+     the page invites you to do, rather than being buried among the contact details. -->
+<div class="max-w-5xl mx-auto px-5 mt-10 flex flex-col items-center gap-3 text-center">
+<p class="font-display text-lg md:text-xl text-brand-cream uppercase tracking-wide">
+<span>{{ i18n "social.cta" }}</span>
+</p>
+<a class="inline-flex items-center gap-2 bg-brand-cream hover:bg-white text-brand-ink font-semibold text-sm px-5 py-2.5 rounded-full transition" href="https://instagram.com/__INSTAGRAM_HANDLE__" rel="noopener noreferrer" target="_blank">
+{{ partial "icon.html" (dict "name" "cat-head" "class" "w-5 h-5" "size" 20) }}
+<span>{{ i18n "social.instagram" }}</span>
+</a>
 </div>
 <!-- Language selector (issue #154). Sits on its own centred row so the dropdown,
      which opens upwards, has room and doesn't overlap the columns above. -->

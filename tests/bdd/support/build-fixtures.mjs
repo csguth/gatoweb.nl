@@ -24,7 +24,8 @@ const BASE_VARS = {
   __CITY_NAME__: "'s-Hertogenbosch",
   __PRICE_ONE_VISIT__: '15',
   __PRICE_TWO_VISITS__: '25',
-  __DOG_WALK_PRICE_FROM__: '10'
+  __DOG_WALK_PRICE_FROM__: '10',
+  __INSTAGRAM_HANDLE__: 'gatocatsit'
 };
 
 const CONFIG_BY_ENV = {

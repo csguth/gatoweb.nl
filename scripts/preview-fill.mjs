@@ -15,6 +15,7 @@ const vars = {
   __PRICE_ONE_VISIT__: '20',
   __PRICE_TWO_VISITS__: '32',
   __DOG_WALK_PRICE_FROM__: '10',
+  __INSTAGRAM_HANDLE__: 'gatocatsit',
 };
 
 function walk(dir) {
