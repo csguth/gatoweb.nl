@@ -8,7 +8,7 @@
 
      js/lang-persist.js records whichever language page you land on, and the root
      redirect (js/root-redirect.js) reads that back for returning visitors. */}}
-{{- $flags := dict "en" "🇬🇧" "nl" "🇳🇱" "pt" "🇵🇹" }}
+{{- $flags := dict "en" "🇬🇧" "nl" "🇳🇱" "pt" "🇧🇷" }}
 <div class="relative" data-x-data="{ open: false }" data-x-on:click.outside="open = false" data-x-on:keydown.escape.window="open = false">
   <button aria-haspopup="listbox" aria-label="{{ i18n "nav.language_selector" }}" class="lang-switcher-btn" data-x-bind:aria-expanded="open.toString()" data-x-on:click="open = !open" type="button">
     <span aria-hidden="true">{{ index $flags .Language.Lang }}</span>
