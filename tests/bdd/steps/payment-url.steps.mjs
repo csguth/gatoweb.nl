@@ -4,7 +4,7 @@
 // the same style as invoice-calc.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { isValidPaymentUrl } from '../../../js/facturen/payment-url.js';
+import { isValidPaymentUrl } from '../../../static/js/facturen/payment-url.js';
 
 const { Given, When, Then } = createBdd();
 

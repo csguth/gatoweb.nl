@@ -1,0 +1,52 @@
+# Hugo config. The site is still deployed as plain static files; Hugo is only the
+# build/templating tool. i18n is now done at COMPILE TIME (one fully-translated page
+# per language) with a URL per language: English under /en/, Dutch under /nl/,
+# Portuguese under /pt/.
+#
+# publishDir = "site" so the deploy workflows keep deploying `site/`, and the
+# `__SITE_URL__` / `__ENV_LABEL__` / `__BRAND_NAME__` / ... placeholders are still
+# substituted with `sed` at deploy time (kept verbatim in the generated HTML).
+baseURL = "/"
+title = "Gato Catsit"
+publishDir = "site"
+
+# Keep the generated markup clean (no Hugo generator <meta> tag advertised).
+disableHugoGeneratorInject = true
+
+# We ship our own hand-authored robots.txt and sitemap.xml (with the __SITE_URL__
+# placeholder) as static files, so disable Hugo's generated ones and the unused kinds.
+disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
+
+# Multilingual: every language lives under its own subdirectory, including the default
+# one (so English is /en/, not /). The bare root /index.html is a small JS redirect that
+# honours the client's saved language preference (see layouts/alias.html).
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true
+
+[languages]
+  [languages.en]
+    locale = "en-GB"
+    label = "English"
+    weight = 1
+  [languages.nl]
+    locale = "nl-NL"
+    label = "Nederlands"
+    weight = 2
+  [languages.pt]
+    locale = "pt-BR"
+    label = "Português"
+    weight = 3
+
+[build]
+  writeStats = false
+
+# Keep attribute quotes during HTML minification. The deploy workflows substitute the
+# `__SITE_URL__` / `__ENV_LABEL__` / `__BRAND_NAME__` / ... placeholders with `sed`
+# AFTER `hugo --minify`; without this, the minifier drops the quotes around e.g.
+# `data-env="__ENV_LABEL__"`, and an empty substituted value would then merge into the
+# next attribute and corrupt the tag (invalid HTML). Keeping quotes makes the
+# placeholder substitution robust for any value (including empty).
+[minify]
+  [minify.tdewolff]
+    [minify.tdewolff.html]
+      keepQuotes = true

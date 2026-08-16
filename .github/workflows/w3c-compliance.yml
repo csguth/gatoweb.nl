@@ -1,0 +1,48 @@
+name: W3C HTML compliance check
+
+# Validates every generated page against the W3C Nu Html Checker (the same engine
+# behind validator.w3.org) on every PR into `staging` or `main`. Meant to be set as a
+# required status check in branch protection so a PR can only be merged once this job
+# is green.
+#
+# Builds without injecting __SITE_URL__/__BRAND_NAME__/__ENV_LABEL__/... (no secrets or
+# environment needed) since the placeholders don't affect HTML validity — this keeps
+# the check fast and safe to run on any PR, including from forks.
+
+on:
+  pull_request:
+    branches: [staging, main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: w3c-compliance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: ./.github/actions/setup-hugo
+
+      - name: Build site with Hugo
+        run: hugo --gc --minify
+
+      - name: Setup Java (required by the W3C Nu Html Checker)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download W3C Nu Html Checker (vnu.jar)
+        run: curl -sSL -o vnu.jar https://github.com/validator/validator/releases/download/latest/vnu.jar
+
+      - name: Run W3C HTML validation
+        run: java -jar vnu.jar --skip-non-html site

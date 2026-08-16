@@ -1,0 +1,71 @@
+{
+  "booking": {
+    "start_date_required": "Please select a start date",
+    "address": "Address",
+    "address_required": "Please enter your address (required for the invoice)",
+    "name_required": "Please enter your full name",
+    "contact_required": "Please enter your WhatsApp number or phone",
+    "account_created_check_email_send": "Account created! Check your email and click the confirmation link, then log in here to send your booking.",
+    "resumed_after_confirmation": "Welcome back! The booking you started before confirming your email was just sent.",
+    "whatsapp_confirm_message": "Hi Lígia! I just sent a booking request for {{from}}{{toRange}}. Looking forward to hearing from you!"
+  },
+  "auth": {
+    "account_created_check_email_login": "Account created! Check your email and click the confirmation link, then log in here.",
+    "not_configured": "Service is not configured yet."
+  },
+  "adjustment_note_required": "Please provide a reason for the amount adjustment.",
+  "client_edit_reason_required": "Please provide a reason for correcting the client info.",
+  "not_staff_error": "This account doesn't have access to the invoice dashboard.",
+  "reject_confirm": "Reject the booking request from {{client}}? This can be undone later from the 'Done' column.",
+  "reject_button_title": "Reject booking",
+  "tikkie_url_invalid": "Please enter a valid Tikkie link (starting with https://).",
+  "invoice": {
+    "title": "Invoice {{number}}",
+    "proforma_title": "Proforma invoice",
+    "proforma_notice": "This is a proforma, not a final (tax) invoice, and has no official invoice number. The final invoice follows once the Tikkie has been paid.",
+    "date_label": "Date: {{date}}",
+    "client_label": "Client: {{client}}",
+    "description_label": "Description:",
+    "service_description": "Cat sitting/pet care services {{from}}{{toPart}}",
+    "date_range_connector": " to {{to}}",
+    "pets_label": "Pets: {{pets}}",
+    "preference_label": "Preference: {{preference}}",
+    "total_label": "Total: € {{amount}}",
+    "vat_exempt_kor": "VAT exempt under the Dutch small business scheme (KOR).",
+    "payment_tikkie_iban": "Payment: via Tikkie (sent separately) - IBAN {{iban}}",
+    "file_name": "invoice-{{number}}",
+    "this_client": "this client",
+    "confirm_approve": "Permanently approve the invoice for {{client}}?",
+    "recipient_label": "To:",
+    "address_label": "Address: {{address}}",
+    "contact_label": "Phone: {{contact}}",
+    "table": {
+      "description": "Description",
+      "period": "Period",
+      "days": "Days",
+      "unit_price": "Price/day",
+      "subtotal": "Subtotal"
+    },
+    "line": {
+      "service_cat": "Cat sitting",
+      "service_dog": "Dog walking",
+      "period_morning": "daytime",
+      "period_evening": "evening",
+      "period_both": "daytime and evening",
+      "period_none": "",
+      "frequency_1": "1x per day",
+      "frequency_2": "2x per day",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} to {{to}}",
+      "surcharge_item": "Peak-season surcharge (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Extra cat (+{{count}}) — {{description}}",
+      "adjustment": "Adjustment: {{note}}"
+    },
+    "seasonal_note": "* A high-season surcharge of {{percent}}% applies to days in July, August, December and January.",
+    "print_button": "🖨️ Print invoice / save as PDF",
+    "popup_blocked": "Please allow pop-ups to view the invoice.",
+    "whatsapp_message": "Hi {{name}}! Your booking ({{dates}}) is confirmed. See you soon!",
+    "whatsapp_message_generic": "Hi! Your booking ({{dates}}) is confirmed. See you soon!",
+    "whatsapp_client": "WhatsApp client"
+  }
+}

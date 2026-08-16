@@ -1,0 +1,175 @@
+name: Build site
+description: >-
+  Builds the Hugo site into site/ and injects the environment's configuration:
+  __PLACEHOLDER__ substitution over the generated output plus a generated
+  js/config.js holding the values only JavaScript needs.
+
+  Shared by the production, staging and PR-preview deploy workflows so all three
+  produce byte-for-byte comparable output from the same steps.
+
+inputs:
+  whatsapp-number:
+    required: true
+    description: International format, no "+" or spaces.
+  brand-name:
+    required: true
+    description: Public brand name.
+  site-url:
+    required: true
+    description: Absolute base URL of this environment, no trailing slash.
+  contact-email:
+    required: true
+    description: Public contact e-mail address.
+  city-name:
+    required: true
+    description: City the service operates in.
+  price-one-visit:
+    required: true
+    description: Price per day for one daily visit.
+  price-two-visits:
+    required: true
+    description: Price per day for two daily visits.
+  dog-walk-price-from:
+    required: true
+    description: Starting price for dog walks.
+  env-label:
+    required: true
+    description: production or staging — drives the visible staging banner.
+  supabase-url:
+    required: false
+    default: ''
+    description: Supabase project URL for this environment.
+  supabase-anon-key:
+    required: false
+    default: ''
+    description: Supabase anon key for this environment.
+  business-legal-name:
+    required: false
+    default: ''
+    description: Printed on generated invoices when set.
+  business-address:
+    required: false
+    default: ''
+    description: Printed on generated invoices when set.
+  kvk-number:
+    required: false
+    default: ''
+    description: Printed on generated invoices when set.
+  iban-number:
+    required: false
+    default: ''
+    description: Printed on generated invoices when set.
+  btw-exempt:
+    required: false
+    default: ''
+    description: Printed on generated invoices when set.
+  seasonal-surcharge-percent:
+    required: false
+    default: '0'
+    description: Percentage added to high-season booking days.
+  price-extra-cat-per-day:
+    required: false
+    default: '0'
+    description: Flat amount per day for each cat beyond the first.
+
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/setup-hugo
+
+    - name: Build site with Hugo
+      shell: bash
+      run: |
+        set -euo pipefail
+        # publishDir = "site" (hugo.toml), so this writes the same site/ directory the
+        # deploy steps have always uploaded. --minify keeps attribute quotes (see the
+        # [minify] block in hugo.toml) so the substitution below stays safe.
+        hugo --gc --minify
+
+    - name: Inject variables into the built site
+      shell: bash
+      env:
+        WHATSAPP_NUMBER: ${{ inputs.whatsapp-number }}
+        BRAND_NAME: ${{ inputs.brand-name }}
+        SITE_URL: ${{ inputs.site-url }}
+        CONTACT_EMAIL: ${{ inputs.contact-email }}
+        CITY_NAME: ${{ inputs.city-name }}
+        PRICE_ONE_VISIT: ${{ inputs.price-one-visit }}
+        PRICE_TWO_VISITS: ${{ inputs.price-two-visits }}
+        DOG_WALK_PRICE_FROM: ${{ inputs.dog-walk-price-from }}
+        ENV_LABEL: ${{ inputs.env-label }}
+      run: |
+        set -euo pipefail
+        # Hugo now renders one page per language, so instead of a hard-coded list of
+        # source files this walks every generated text file. js/*.js is deliberately
+        # excluded: the only JS value that varies per environment lives in the
+        # generated js/config.js below.
+        find site -type f \( -name '*.html' -o -name '*.json' -o -name '*.xml' -o -name '*.txt' \) -print0 |
+          xargs -0 --no-run-if-empty sed -i \
+            -e "s|__WHATSAPP_NUMBER__|${WHATSAPP_NUMBER}|g" \
+            -e "s|__BRAND_NAME__|${BRAND_NAME}|g" \
+            -e "s|__SITE_URL__|${SITE_URL}|g" \
+            -e "s|__CONTACT_EMAIL__|${CONTACT_EMAIL}|g" \
+            -e "s|__CITY_NAME__|${CITY_NAME}|g" \
+            -e "s|__PRICE_ONE_VISIT__|${PRICE_ONE_VISIT}|g" \
+            -e "s|__PRICE_TWO_VISITS__|${PRICE_TWO_VISITS}|g" \
+            -e "s|__DOG_WALK_PRICE_FROM__|${DOG_WALK_PRICE_FROM}|g" \
+            -e "s|__ENV_LABEL__|${ENV_LABEL}|g"
+
+        if grep -rl '__[A-Z_]\+__' site --include='*.html' --include='*.xml' --include='*.txt'; then
+          echo "::error::The files above still contain unsubstituted __PLACEHOLDER__ values"
+          exit 1
+        fi
+
+    - name: Generate js/config.js with runtime constants
+      shell: bash
+      env:
+        SUPABASE_URL: ${{ inputs.supabase-url }}
+        SUPABASE_ANON_KEY: ${{ inputs.supabase-anon-key }}
+        BUSINESS_LEGAL_NAME: ${{ inputs.business-legal-name }}
+        BUSINESS_ADDRESS: ${{ inputs.business-address }}
+        KVK_NUMBER: ${{ inputs.kvk-number }}
+        IBAN_NUMBER: ${{ inputs.iban-number }}
+        BTW_EXEMPT: ${{ inputs.btw-exempt }}
+        BRAND_NAME: ${{ inputs.brand-name }}
+        WHATSAPP_NUMBER: ${{ inputs.whatsapp-number }}
+        PRICE_ONE_VISIT: ${{ inputs.price-one-visit }}
+        PRICE_TWO_VISITS: ${{ inputs.price-two-visits }}
+        DOG_WALK_PRICE_FROM: ${{ inputs.dog-walk-price-from }}
+        SEASONAL_SURCHARGE_PERCENT: ${{ inputs.seasonal-surcharge-percent }}
+        PRICE_EXTRA_CAT_PER_DAY: ${{ inputs.price-extra-cat-per-day }}
+      run: |
+        set -euo pipefail
+        # Overwrites the committed placeholder static/js/config.js that Hugo copied
+        # into site/js/config.js.
+        jq -n \
+          --arg supabaseUrl "$SUPABASE_URL" \
+          --arg supabaseAnonKey "$SUPABASE_ANON_KEY" \
+          --arg businessLegalName "$BUSINESS_LEGAL_NAME" \
+          --arg businessAddress "$BUSINESS_ADDRESS" \
+          --arg kvkNumber "$KVK_NUMBER" \
+          --arg ibanNumber "$IBAN_NUMBER" \
+          --arg btwExempt "$BTW_EXEMPT" \
+          --arg brandName "$BRAND_NAME" \
+          --arg whatsappNumber "$WHATSAPP_NUMBER" \
+          --argjson priceOneVisit "$PRICE_ONE_VISIT" \
+          --argjson priceTwoVisits "$PRICE_TWO_VISITS" \
+          --argjson dogWalkPriceFrom "$DOG_WALK_PRICE_FROM" \
+          --argjson seasonalSurchargePercent "${SEASONAL_SURCHARGE_PERCENT:-0}" \
+          --argjson priceExtraCatPerDay "${PRICE_EXTRA_CAT_PER_DAY:-0}" \
+          '{
+            SUPABASE_URL: $supabaseUrl,
+            SUPABASE_ANON_KEY: $supabaseAnonKey,
+            BUSINESS_LEGAL_NAME: $businessLegalName,
+            BUSINESS_ADDRESS: $businessAddress,
+            KVK_NUMBER: $kvkNumber,
+            IBAN_NUMBER: $ibanNumber,
+            BTW_EXEMPT: $btwExempt,
+            BRAND_NAME: $brandName,
+            PRICE_ONE_VISIT: $priceOneVisit,
+            PRICE_TWO_VISITS: $priceTwoVisits,
+            DOG_WALK_PRICE_FROM: $dogWalkPriceFrom,
+            SEASONAL_SURCHARGE_PERCENT: $seasonalSurchargePercent,
+            PRICE_EXTRA_CAT_PER_DAY: $priceExtraCatPerDay,
+            WHATSAPP_NUMBER: $whatsappNumber
+          }' | sed '1s|^|window.GATOWEB_CONFIG = |; $s|$|;|' > site/js/config.js

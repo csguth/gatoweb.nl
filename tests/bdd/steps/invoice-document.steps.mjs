@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { buildInvoiceDocumentHtml } from '../../../js/shared/invoice-document.js';
+import { buildInvoiceDocumentHtml } from '../../../static/js/shared/invoice-document.js';
 
 const { Given, When, Then } = createBdd();
 
 const here = dirname(fileURLToPath(import.meta.url));
-const nl = JSON.parse(readFileSync(join(here, '../../../locales/nl.json'), 'utf8'));
+const nl = JSON.parse(readFileSync(join(here, '../../../static/locales/nl.json'), 'utf8'));
 
 // Minimal i18next.getFixedT stand-in: walks the dotted key into the loaded nl bundle
 // and interpolates {{placeholders}} from the options, mirroring how i18next resolves

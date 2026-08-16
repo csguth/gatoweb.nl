@@ -1,0 +1,32 @@
+name: Setup Hugo
+description: >-
+  Installs the pinned Hugo extended binary used to build this site. Pinned (rather
+  than "latest") so a Hugo release can never silently change the generated markup
+  between two deploys — bump the default below deliberately, together with any local
+  Hugo you use, and re-run the W3C + BDD checks.
+
+inputs:
+  version:
+    description: Hugo version to install (without the leading "v").
+    required: false
+    default: 0.164.0
+
+runs:
+  using: composite
+  steps:
+    - name: Install Hugo (extended)
+      shell: bash
+      env:
+        HUGO_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        url="https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz"
+        curl -fsSL "$url" | tar -xz -C /tmp hugo
+        # Deploy jobs run as a normal user on ubuntu-latest; the BDD job runs as root
+        # inside the Playwright container, where sudo isn't installed.
+        if [ "$(id -u)" -eq 0 ]; then
+          install -m 0755 /tmp/hugo /usr/local/bin/hugo
+        else
+          sudo install -m 0755 /tmp/hugo /usr/local/bin/hugo
+        fi
+        hugo version

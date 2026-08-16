@@ -1,0 +1,5 @@
+{{/* Staging-only banner. Purely CSS-driven: css/site.css hides #env-banner unless
+     body[data-env="staging"], and __ENV_LABEL__ is substituted at deploy time. */}}
+<div class="fixed top-0 inset-x-0 z-[100] bg-amber-400 text-black text-xs md:text-sm font-bold text-center py-1.5" id="env-banner">
+🚧 STAGING — {{ i18n "staging_banner.message" }}
+</div>

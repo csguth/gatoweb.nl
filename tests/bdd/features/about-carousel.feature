@@ -1,10 +1,10 @@
 Feature: About Lígia bio carousel
   As a visitor, I can browse Lígia's bio as a set of short chapters instead of
   one long wall of text, using the next/previous buttons or the dots
-  (js/index/about-carousel.js, index.html #about-carousel-track).
+  (js/index/about-carousel.js, layouts/index.html #about-carousel-track).
 
   Background:
-    Given I open the site with browser language "en-US" and no saved preference
+    Given I open the site at "/en/"
 
   Scenario: First slide and its dot are active on load
     Then the about carousel is on slide 1 of 6
