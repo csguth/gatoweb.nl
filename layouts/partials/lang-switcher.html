@@ -1,10 +1,26 @@
-{{/* Language selector. Compile-time i18n means each language is its own URL, so this
-     is a plain list of links to the current page's translations — no JS toggle.
+{{/* Language selector (issue #154). Compile-time i18n means each language is its own
+     URL, so the menu is a plain list of links to the current page's translations —
+     Alpine only drives the open/closed state.
+
+     Lives in the footer, so the menu opens upwards. The button's colours are
+     deliberately inherited (`currentColor`): the same partial sits on the dark footer
+     of the home page and on the light background of the account/facturen pages.
+
      js/lang-persist.js records whichever language page you land on, and the root
      redirect (js/root-redirect.js) reads that back for returning visitors. */}}
 {{- $flags := dict "en" "🇬🇧" "nl" "🇳🇱" "pt" "🇵🇹" }}
-<nav aria-label="{{ i18n "nav.language_selector" }}" class="flex items-center gap-1 text-xs font-semibold border border-brand-sand rounded-full px-2 py-1 bg-white">
+<div class="relative" data-x-data="{ open: false }" data-x-on:click.outside="open = false" data-x-on:keydown.escape.window="open = false">
+  <button aria-haspopup="listbox" aria-label="{{ i18n "nav.language_selector" }}" class="lang-switcher-btn" data-x-bind:aria-expanded="open.toString()" data-x-on:click="open = !open" type="button">
+    <span aria-hidden="true">{{ index $flags .Language.Lang }}</span>
+    <span class="uppercase tracking-wide">{{ .Language.Lang }}</span>
+    <svg aria-hidden="true" class="w-3 h-3 transition-transform" data-x-bind:class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
+  </button>
+  <div aria-label="{{ i18n "nav.language_selector" }}" class="lang-switcher-menu" data-x-cloak data-x-show="open" role="listbox">
 {{- range .AllTranslations }}
-  <a class="px-1.5 py-0.5 rounded-full transition {{ if eq .Language.Lang $.Language.Lang }}bg-brand-ink text-white{{ else }}text-brand-ink hover:bg-brand-sand{{ end }}" href="{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="true"{{ end }}>{{ index $flags .Language.Lang }} {{ upper .Language.Lang }}</a>
+    <a class="lang-switcher-item{{ if eq .Language.Lang $.Language.Lang }} is-active{{ end }}" data-x-on:click="open = false" href="{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}" role="option"{{ if eq .Language.Lang $.Language.Lang }} aria-current="true"{{ end }}>
+      <span aria-hidden="true">{{ index $flags .Language.Lang }}</span>
+      <span>{{ .Language.LanguageName }}</span>
+    </a>
 {{- end }}
-</nav>
+  </div>
+</div>

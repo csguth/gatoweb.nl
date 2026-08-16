@@ -4,7 +4,6 @@
 <h1 class="font-display text-2xl font-bold text-brand-ink">
         🐾 <span>{{ i18n "static.account.account.my_bookings" }}</span>
 </h1>
-{{ partial "lang-switcher.html" . }}
 </div>
 <div data-x-data="accountApp()" data-x-init="init()">
 <template data-x-if="!configured">
@@ -111,6 +110,11 @@
 </template>
 </div>
 </div>
+<!-- Language selector (issue #154): a minimal footer, matching the home page where
+     the switcher also lives at the bottom. -->
+<footer class="max-w-lg mx-auto px-5 pb-10 flex justify-center text-brand-ink">
+{{ partial "lang-switcher.html" . }}
+</footer>
 <!-- Client account (issue #12) — see js/account/account-app.js -->
 
 <!-- Alpine must load after the module script above so window.accountApp already exists

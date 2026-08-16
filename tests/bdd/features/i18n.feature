@@ -48,6 +48,25 @@ Feature: Per-language URLs (EN/NL/PT)
     Then the current path is "/nl/"
     And the page shows "Boek een bezoek"
 
+  Scenario: The language menu stays closed until it is opened (issue #154)
+    Given I open the site at "/en/"
+    Then the language menu is hidden
+
+  Scenario: The language menu lists every language by its native name (issue #154)
+    Given I open the site at "/en/"
+    When I open the language selector
+    Then the language menu is visible
+    And the language menu lists "English"
+    And the language menu lists "Nederlands"
+    And the language menu lists "Português"
+
+  Scenario: Pressing Escape closes the language menu (issue #154)
+    Given I open the site at "/en/"
+    When I open the language selector
+    Then the language menu is visible
+    When I press Escape
+    Then the language menu is hidden
+
   Scenario: The root redirects an English-speaking visitor to /en/
     Given my browser language is "en-US" and I have no saved language preference
     When I open the root
