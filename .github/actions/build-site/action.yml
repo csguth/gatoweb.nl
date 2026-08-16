@@ -32,6 +32,10 @@ inputs:
   dog-walk-price-from:
     required: true
     description: Starting price for dog walks.
+  instagram-handle:
+    required: false
+    default: gatocatsit
+    description: Instagram handle (without the @), linked from the social CTA.
   env-label:
     required: true
     description: production or staging — drives the visible staging banner.
@@ -97,6 +101,7 @@ runs:
         PRICE_ONE_VISIT: ${{ inputs.price-one-visit }}
         PRICE_TWO_VISITS: ${{ inputs.price-two-visits }}
         DOG_WALK_PRICE_FROM: ${{ inputs.dog-walk-price-from }}
+        INSTAGRAM_HANDLE: ${{ inputs.instagram-handle }}
         ENV_LABEL: ${{ inputs.env-label }}
       run: |
         set -euo pipefail
@@ -114,6 +119,7 @@ runs:
             -e "s|__PRICE_ONE_VISIT__|${PRICE_ONE_VISIT}|g" \
             -e "s|__PRICE_TWO_VISITS__|${PRICE_TWO_VISITS}|g" \
             -e "s|__DOG_WALK_PRICE_FROM__|${DOG_WALK_PRICE_FROM}|g" \
+            -e "s|__INSTAGRAM_HANDLE__|${INSTAGRAM_HANDLE}|g" \
             -e "s|__ENV_LABEL__|${ENV_LABEL}|g"
 
         if grep -rl '__[A-Z_]\+__' site --include='*.html' --include='*.xml' --include='*.txt'; then

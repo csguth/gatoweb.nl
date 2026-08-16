@@ -231,6 +231,8 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
 - `CONTACT_EMAIL`
 - `CITY_NAME` — e.g. `'s-Hertogenbosch`
 - `PRICE_ONE_VISIT`, `PRICE_TWO_VISITS`, `DOG_WALK_PRICE_FROM` — numeric
+- `INSTAGRAM_HANDLE` — optional, without the `@` (defaults to `gatocatsit`); linked from the
+  social CTA in the footer
 
 ### Optional (facturen/invoicing feature, issue #5)
 
