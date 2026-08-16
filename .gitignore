@@ -11,3 +11,6 @@ playwright-report/
 /site/
 /resources/
 /.hugo_build.lock
+
+# Canva export working directory (scripts/canva-icons.py) — holds the OAuth token
+/.canva/
