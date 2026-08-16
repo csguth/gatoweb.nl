@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>__BRAND_NAME__ — __CITY_NAME__</title>
+  <meta content="Professional catsitting in __CITY_NAME__ by Lígia — expert feline care, 50+ five-star reviews, home visits, behaviour consultations." name="description" />
+  <meta content="noindex" name="robots" />
+  <link href="{{ .Permalink }}" rel="canonical" />
+  <link href="/images/favicon.png" rel="icon" type="image/png" />
+
+  {{/* This redirect page has no JS-independent content of its own, but link previews
+       (WhatsApp, Facebook, Slack, ...) fetch the raw HTML without running JavaScript,
+       so it still needs static Open Graph/Twitter tags — otherwise sharing the bare
+       domain renders no preview at all. */}}
+  <meta content="__BRAND_NAME__ — __CITY_NAME__" property="og:title" />
+  <meta content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." property="og:description" />
+  <meta content="website" property="og:type" />
+  <meta content="__SITE_URL__/" property="og:url" />
+  <meta content="__SITE_URL__/images/ligia-profile.jpg" property="og:image" />
+  <meta content="summary_large_image" name="twitter:card" />
+  <meta content="__BRAND_NAME__ — __CITY_NAME__" name="twitter:title" />
+  <meta content="Respect, love and fun for your cat while you're away. 50+ ⭐ five-star reviews." name="twitter:description" />
+  <meta content="__SITE_URL__/images/ligia-profile.jpg" name="twitter:image" />
+{{- $segments := split (strings.Trim .Permalink "/") "/" }}
+{{- if gt (len $segments) 1 }}
+  {{/* Legacy pre-i18n page URLs (/facturen.html, /account.html) — always redirect to
+       the English version. Search engines treat a 0-second meta refresh + canonical as
+       a permanent redirect, so any old ranking follows to the new URL. */}}
+  <meta content="0; url={{ .Permalink }}" http-equiv="refresh" />
+{{- else }}
+  {{/* Bare root "/" — pick the visitor's language and send them to /en|nl|pt/. */}}
+  <noscript><meta content="0; url={{ .Permalink }}" http-equiv="refresh" /></noscript>
+  <script src="/js/root-redirect.js"></script>
+{{- end }}
+</head>
+<body></body>
+</html>

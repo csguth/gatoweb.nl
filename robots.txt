@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /facturen.html
-Disallow: /account.html
-
-Sitemap: __SITE_URL__/sitemap.xml

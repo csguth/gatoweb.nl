@@ -59,46 +59,27 @@ jobs:
             fi
           done
 
-      - name: Build site with injected variables
-        run: |
-          mkdir -p site
-          rsync -av --exclude='.git' --exclude='.github' --exclude='site' ./ site/
-
-          for f in site/index.html site/facturen.html site/account.html site/locales/en.json site/locales/nl.json site/locales/pt.json; do
-            sed -i "s|__WHATSAPP_NUMBER__|${{ vars.WHATSAPP_NUMBER }}|g" "$f"
-            sed -i "s|__BRAND_NAME__|${{ vars.BRAND_NAME }}|g" "$f"
-            sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" "$f"
-            sed -i "s|__CONTACT_EMAIL__|${{ vars.CONTACT_EMAIL }}|g" "$f"
-            sed -i "s|__CITY_NAME__|${{ vars.CITY_NAME }}|g" "$f"
-            sed -i "s|__PRICE_ONE_VISIT__|${{ vars.PRICE_ONE_VISIT }}|g" "$f"
-            sed -i "s|__PRICE_TWO_VISITS__|${{ vars.PRICE_TWO_VISITS }}|g" "$f"
-            sed -i "s|__DOG_WALK_PRICE_FROM__|${{ vars.DOG_WALK_PRICE_FROM }}|g" "$f"
-            sed -i "s|__ENV_LABEL__|${{ vars.ENV_LABEL }}|g" "$f"
-          done
-
-          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/robots.txt
-          sed -i "s|__SITE_URL__|${{ vars.SITE_URL }}|g" site/sitemap.xml
-
-      - name: Generate js/config.js with runtime constants
-        run: |
-          cat > site/js/config.js <<JSEOF
-          window.GATOWEB_CONFIG = {
-            SUPABASE_URL: $(jq -Rn --arg v "${{ vars.SUPABASE_URL }}" '$v'),
-            SUPABASE_ANON_KEY: $(jq -Rn --arg v "${{ vars.SUPABASE_ANON_KEY }}" '$v'),
-            BUSINESS_LEGAL_NAME: $(jq -Rn --arg v "${{ vars.BUSINESS_LEGAL_NAME }}" '$v'),
-            BUSINESS_ADDRESS: $(jq -Rn --arg v "${{ vars.BUSINESS_ADDRESS }}" '$v'),
-            KVK_NUMBER: $(jq -Rn --arg v "${{ vars.KVK_NUMBER }}" '$v'),
-            IBAN_NUMBER: $(jq -Rn --arg v "${{ vars.IBAN_NUMBER }}" '$v'),
-            BTW_EXEMPT: $(jq -Rn --arg v "${{ vars.BTW_EXEMPT }}" '$v'),
-            BRAND_NAME: $(jq -Rn --arg v "${{ vars.BRAND_NAME }}" '$v'),
-            PRICE_ONE_VISIT: ${{ vars.PRICE_ONE_VISIT }},
-            PRICE_TWO_VISITS: ${{ vars.PRICE_TWO_VISITS }},
-            DOG_WALK_PRICE_FROM: ${{ vars.DOG_WALK_PRICE_FROM }},
-            SEASONAL_SURCHARGE_PERCENT: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }},
-            PRICE_EXTRA_CAT_PER_DAY: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }},
-            WHATSAPP_NUMBER: $(jq -Rn --arg v "${{ vars.WHATSAPP_NUMBER }}" '$v')
-          };
-          JSEOF
+      - name: Build site
+        uses: ./.github/actions/build-site
+        with:
+          whatsapp-number: ${{ vars.WHATSAPP_NUMBER }}
+          brand-name: ${{ vars.BRAND_NAME }}
+          site-url: ${{ vars.SITE_URL }}
+          contact-email: ${{ vars.CONTACT_EMAIL }}
+          city-name: ${{ vars.CITY_NAME }}
+          price-one-visit: ${{ vars.PRICE_ONE_VISIT }}
+          price-two-visits: ${{ vars.PRICE_TWO_VISITS }}
+          dog-walk-price-from: ${{ vars.DOG_WALK_PRICE_FROM }}
+          env-label: ${{ vars.ENV_LABEL }}
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          supabase-anon-key: ${{ vars.SUPABASE_ANON_KEY }}
+          business-legal-name: ${{ vars.BUSINESS_LEGAL_NAME }}
+          business-address: ${{ vars.BUSINESS_ADDRESS }}
+          kvk-number: ${{ vars.KVK_NUMBER }}
+          iban-number: ${{ vars.IBAN_NUMBER }}
+          btw-exempt: ${{ vars.BTW_EXEMPT }}
+          seasonal-surcharge-percent: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }}
+          price-extra-cat-per-day: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }}
 
       - name: Apply DB migration (production)
         uses: ./.github/actions/apply-db-migration

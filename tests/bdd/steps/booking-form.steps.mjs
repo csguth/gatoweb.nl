@@ -9,13 +9,13 @@ import { world } from '../support/world.mjs';
 const { Given, When, Then } = createBdd();
 
 function form(page) {
-  return page.locator('[x-data="bookingForm()"]');
+  return page.locator('[data-x-data="bookingForm()"]');
 }
 
 Given('I open the booking form', async ({ page }) => {
   world.alertMessage = null;
   world.petIndex = 0;
-  await page.goto('/');
+  await page.goto('/en/');
   await expect(form(page)).toBeVisible();
   // Static markup renders immediately, but i18n JS strings (used by
   // t('booking.start_date_required') etc.) resolve asynchronously via
@@ -144,4 +144,67 @@ Then('the estimated price is not shown', async ({ page }) => {
 
 Then('I see the login or signup gate instead of a sent confirmation', async ({ page }) => {
   await expect(form(page).getByRole('button', { name: 'Log in & send' })).toBeVisible();
+});
+
+// Issue #95: simulates a booking left pending because signup required email confirmation
+// (see authSignup() in js/index/booking-form.js) — stashed under the dedicated
+// 'gatoweb_pending_booking' localStorage key (separate from the regular draft, which
+// excludes dates) before the client ever gets a session.
+Given('a booking is pending confirmation with the first day {string} and the last day {string}', async ({ page }, from, to) => {
+  await page.evaluate(({ from, to }) => {
+    localStorage.setItem('gatoweb_pending_booking', JSON.stringify({
+      clientName: 'Jane Doe',
+      address: "Kerkstraat 1, 's-Hertogenbosch",
+      clientContact: '+31 6 11111111',
+      from,
+      to,
+      pets: [{ name: '', type: 'cat', otherType: '' }],
+      pref: 'morning'
+    }));
+  }, { from, to });
+});
+
+// Mimics the post-email-confirmation redirect: Supabase's detectSessionInUrl normally
+// parses session tokens from the URL fragment and persists them under the
+// 'gatoweb-client-auth' storage key (see js/index/client-auth.js) — seeding that key
+// directly and reloading has the same effect for supabase-js's getSession(), which only
+// reads localStorage (no network call), without depending on a real Supabase project.
+When('I return to the site already logged in as {string} after confirming my email', async ({ page }, email) => {
+  await page.evaluate((email) => {
+    const now = Math.floor(Date.now() / 1000);
+    localStorage.setItem('gatoweb-client-auth', JSON.stringify({
+      access_token: 'fake.access.token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: now + 3600 * 24 * 365,
+      refresh_token: 'fake-refresh-token',
+      user: {
+        id: '11111111-1111-1111-1111-111111111111',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email,
+        app_metadata: {},
+        user_metadata: {},
+        created_at: new Date().toISOString()
+      }
+    }));
+  }, email);
+  await page.reload();
+  await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
+});
+
+Then('I see the welcome-back note about the resumed booking', async ({ page }) => {
+  await expect(form(page).getByText('Welcome back! The booking you started before confirming your email was just sent.')).toBeVisible();
+});
+
+// Issue #95 follow-up: the client lands on '/' after confirming their email, not
+// '/#booking' — without an explicit scroll, the auto-sent confirmation renders below
+// the fold and looks like nothing happened.
+Then('the booking form is scrolled into view', async ({ page }) => {
+  await page.waitForFunction(() => {
+    const el = document.getElementById('booking');
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.top >= -50 && rect.top <= 50;
+  }, null, { timeout: 3000 });
 });

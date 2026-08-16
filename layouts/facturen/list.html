@@ -1,0 +1,322 @@
+{{ define "main" }}
+<div class="mx-auto px-5 py-10">
+<div class="max-w-lg mx-auto flex items-center justify-between mb-6">
+<h1 class="font-serif text-2xl font-bold text-sage-700">🐾 <span>{{ i18n "static.facturen.facturen.invoices" }}</span></h1>
+{{ partial "lang-switcher.html" . }}
+</div>
+<div data-x-data="facturenApp()" data-x-init="init()">
+<template data-x-if="!configured">
+<div class="max-w-lg mx-auto bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+
+<span>{{ i18n "static.facturen.facturen.supabase_is_not_configured_yet" | safeHTML }}</span>
+
+</div>
+</template>
+<template data-x-if="configured &amp;&amp; !session">
+<form data-x-on:submit.prevent="login()" class="max-w-lg mx-auto bg-white rounded-2xl p-6 space-y-4 shadow-sm border border-warm-200">
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.facturen.facturen.email" }}</span>
+</label>
+<input autocomplete="username" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="email" data-x-model="email">
+</div>
+<div>
+<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.facturen.facturen.password" }}</span>
+</label>
+<input autocomplete="current-password" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="password" data-x-model="password">
+</div>
+<p class="text-red-600 text-xs" data-x-show="loginError" data-x-text="loginError"></p>
+<button data-x-bind:disabled="loading" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition" type="submit">
+<span data-x-show="!loading"><span>{{ i18n "static.facturen.facturen.log_in" }}</span></span>
+<span data-x-show="loading"><span>{{ i18n "static.facturen.facturen.working" }}</span></span>
+</button>
+</form>
+</template>
+<template data-x-if="configured &amp;&amp; session">
+<div class="max-w-lg md:max-w-6xl mx-auto space-y-4">
+<div class="flex justify-between items-center">
+<p class="text-xs text-gray-500" data-x-text="session.user.email"></p>
+<div class="flex gap-3">
+<button data-x-on:click="loadBookings()" class="text-xs text-sage-600 font-semibold hover:text-sage-700">
+<span>{{ i18n "static.facturen.facturen.refresh" }}</span>
+</button>
+<button data-x-on:click="logout()" class="text-xs text-gray-400 hover:text-red-500">
+<span>{{ i18n "static.facturen.facturen.log_out" }}</span>
+</button>
+</div>
+</div>
+<p class="text-sm text-gray-400 text-center py-10" data-x-show="loadingList">
+<span>{{ i18n "static.facturen.facturen.loading" }}</span>
+</p>
+<p class="text-sm text-gray-400 text-center py-10" data-x-show="!loadingList &amp;&amp; bookings.length === 0">
+<span>{{ i18n "static.facturen.facturen.no_invoices" }}</span>
+</p>
+<div class="relative max-w-lg md:max-w-none mx-auto" data-x-show="!loadingList &amp;&amp; bookings.length &gt; 0">
+<input placeholder="{{ i18n "static.facturen.facturen.search_placeholder" }}" class="w-full border border-warm-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="search" data-x-model="search">
+</div>
+<template data-x-if="!loadingList &amp;&amp; bookings.length &gt; 0">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-amber-700 mb-2">
+<span>{{ i18n "static.facturen.facturen.column_inbox" }}</span>
+<span class="font-normal text-gray-400 normal-case" data-x-show="inboxBookings.length" data-x-text="'(' + inboxBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" data-x-show="inboxBookings.length === 0">
+<span>{{ i18n "static.facturen.facturen.column_inbox_empty" }}</span>
+</p>
+<div class="space-y-4">
+<template data-x-bind:key="b.id" data-x-for="b in inboxBookings">
+<div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border-2 border-amber-300">
+<div class="flex items-center justify-between gap-2">
+<span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+<span>{{ i18n "static.facturen.facturen.awaiting_approval" }}</span>
+</span>
+<button data-x-bind:disabled="b._busy" data-x-bind:title="t('reject_button_title')" data-x-on:click="rejectBooking(b)" class="flex-none w-6 h-6 flex items-center justify-center rounded-full text-red-400 hover:text-white hover:bg-red-500 border border-red-200 hover:border-red-500 transition disabled:opacity-50">
+<span aria-hidden="true">✕</span>
+</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-start justify-between gap-2">
+<div class="text-sm text-gray-700 space-y-0.5">
+<div class="font-semibold" data-x-text="b.client_name || '-'"></div>
+<div class="text-xs text-gray-500" data-x-text="b.client_contact || '-'"></div>
+<div class="text-xs text-gray-500" data-x-text="b.client_address || '-'"></div>
+</div>
+<button data-x-on:click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span>{{ i18n "static.facturen.facturen.edit_client_info" }}</span>
+</button>
+</div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span>{{ i18n "static.facturen.facturen.dates" }}</span> <span data-x-text="formatDate(b.date_from)"></span><template data-x-if="b.date_to"><span> → <span data-x-text="formatDate(b.date_to)"></span></span></template></div>
+<div><span>{{ i18n "static.facturen.facturen.pets" }}</span> <span data-x-text="petsSummary(b.pets)"></span></div>
+<div><span>{{ i18n "static.facturen.facturen.preference" }}</span> <span data-x-text="b.preference || '-'"></span></div>
+</div>
+<div class="border border-warm-200 rounded-lg overflow-hidden">
+<table class="w-full text-xs">
+<tbody>
+<template data-x-bind:key="i" data-x-for="(item, i) in invoiceItems(b)">
+<tr class="border-t border-warm-100 first:border-t-0">
+<td class="px-2 py-1.5 text-gray-600" data-x-text="itemLabel(item)"></td>
+<td class="px-2 py-1.5 text-right text-gray-700 font-semibold whitespace-nowrap">€ <span data-x-text="item.subtotal.toFixed(2)"></span></td>
+</tr>
+</template>
+</tbody>
+</table>
+<div class="flex items-center justify-between px-2 py-1.5 bg-warm-50 text-xs font-semibold text-gray-700 border-t border-warm-100">
+<span>{{ i18n "static.facturen.facturen.calculated_subtotal" }}</span>
+<span>€ <span data-x-text="calculatedTotal(b).toFixed(2)"></span></span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.adjustment_amount" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" step="0.01" type="number" data-x-model.number="b._adjustmentAmount">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.final_total" }}</span>
+</label>
+<div class="w-full border border-warm-100 bg-warm-50 rounded-lg px-2 py-1.5 text-sm font-semibold text-gray-700">€ <span data-x-text="finalTotal(b).toFixed(2)"></span></div>
+</div>
+</div>
+<div data-x-show="Number(b._adjustmentAmount || 0) !== 0">
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.adjustment_note" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="b._adjustmentNote">
+</div>
+<button data-x-bind:disabled="b._busy" data-x-on:click="approve(b)" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition">
+<span data-x-show="!b._busy"><span>{{ i18n "static.facturen.facturen.approve_generate_invoice" }}</span></span>
+<span data-x-show="b._busy"><span>{{ i18n "static.facturen.facturen.working_2" }}</span></span>
+</button>
+<a data-x-bind:href="whatsappLink(b)" data-x-bind:title="t('invoice.whatsapp_client')" class="w-full flex items-center justify-center gap-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition" rel="noopener noreferrer" target="_blank" data-x-show="whatsappLink(b) !== '#'">
+<span>{{ i18n "static.facturen.facturen.whatsapp_client" }}</span>
+</a>
+</div>
+</div>
+</template>
+</div>
+</div>
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-orange-700 mb-2">
+<span>{{ i18n "static.facturen.facturen.column_confirmed" }}</span>
+<span class="font-normal text-gray-400 normal-case" data-x-show="confirmedBookings.length" data-x-text="'(' + confirmedBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" data-x-show="confirmedBookings.length === 0">
+<span>{{ i18n "static.facturen.facturen.column_confirmed_empty" }}</span>
+</p>
+<div class="space-y-4">
+<template data-x-bind:key="b.id" data-x-for="b in confirmedBookings">
+<div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-orange-300">
+<div class="flex items-center justify-between gap-2">
+<span class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-orange-100 text-orange-700">
+<template data-x-if="!b.tikkie_sent"><span><span>{{ i18n "static.facturen.facturen.send_tikkie" }}</span></span></template>
+<template data-x-if="b.tikkie_sent"><span><span>{{ i18n "static.facturen.facturen.awaiting_payment" }}</span></span></template>
+</span>
+<span class="text-[11px] text-gray-400" data-x-show="b.factuur_number" data-x-text="'#' + factuurLabel(b)"></span>
+</div>
+<div class="space-y-2">
+<div class="flex items-start justify-between gap-2">
+<div class="text-sm text-gray-700 font-semibold" data-x-text="b.client_name || '-'"></div>
+<button data-x-on:click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span>{{ i18n "static.facturen.facturen.edit_client_info_short" }}</span>
+</button>
+</div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span>{{ i18n "static.facturen.facturen.dates_2" }}</span> <span data-x-text="formatDate(b.date_from)"></span><template data-x-if="b.date_to"><span> → <span data-x-text="formatDate(b.date_to)"></span></span></template></div>
+<div><span>{{ i18n "static.facturen.facturen.pets_2" }}</span> <span data-x-text="petsSummary(b.pets)"></span></div>
+<div><span>{{ i18n "static.facturen.facturen.amount_2" }}</span> € <span data-x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-gray-500 mb-1">
+<span>{{ i18n "static.facturen.facturen.tikkie_url_label" }}</span>
+</label>
+<input type="url" data-x-model="b.tikkie_url" placeholder="https://tikkie.me/pay/..." class="w-full text-xs border border-warm-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-sage-400" >
+</div>
+<div class="flex gap-2 pt-1">
+<a data-x-bind:href="whatsappLink(b)" data-x-bind:title="t('invoice.whatsapp_client')" class="flex-none flex items-center justify-center border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold px-3 rounded-xl transition" rel="noopener noreferrer" target="_blank" data-x-show="whatsappLink(b) !== '#'">
+WhatsApp
+</a>
+<button data-x-on:click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.print_proforma" }}</span>
+</button>
+<template data-x-if="!b.tikkie_sent">
+<button data-x-bind:disabled="b._busy" data-x-on:click="markTikkieSent(b)" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.tikkie_sent" }}</span>
+</button>
+</template>
+<template data-x-if="b.tikkie_sent">
+<button data-x-bind:disabled="b._busy" data-x-on:click="markPaid(b)" class="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.mark_paid" }}</span>
+</button>
+</template>
+</div>
+</div>
+</div>
+</template>
+</div>
+</div>
+<div>
+<h2 class="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">
+<span>{{ i18n "static.facturen.facturen.column_done" }}</span>
+<span class="font-normal text-gray-400 normal-case" data-x-show="doneBookings.length" data-x-text="'(' + doneBookings.length + ')'"></span>
+</h2>
+<p class="text-xs text-gray-400 italic pb-2" data-x-show="doneBookings.length === 0">
+<span>{{ i18n "static.facturen.facturen.column_done_empty" }}</span>
+</p>
+<div class="space-y-4">
+<template data-x-bind:key="b.id" data-x-for="b in doneBookings">
+<div data-x-bind:class="{
+                 'border-warm-200 opacity-70': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                 'border-gray-200 opacity-50': b.status === 'cancelled'
+               }" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 border">
+<div class="flex items-center justify-between gap-2">
+<span data-x-bind:class="{
+                      'bg-green-100 text-green-700': b.status === 'approved' &amp;&amp; b.tikkie_sent,
+                      'bg-gray-100 text-gray-500': b.status === 'cancelled'
+                    }" class="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full">
+<template data-x-if="b.status === 'approved' &amp;&amp; b.tikkie_sent"><span><span>{{ i18n "static.facturen.facturen.completed" }}</span></span></template>
+<template data-x-if="b.status === 'cancelled'"><span><span>{{ i18n "static.facturen.facturen.cancelled" }}</span></span></template>
+</span>
+<span class="text-[11px] text-gray-400" data-x-show="b.factuur_number" data-x-text="'#' + factuurLabel(b)"></span>
+</div>
+<div class="space-y-2">
+<div class="flex items-start justify-between gap-2">
+<div class="text-sm text-gray-700 font-semibold" data-x-text="b.client_name || '-'"></div>
+<button data-x-on:click="openClientEdit(b)" class="flex-none text-[11px] font-semibold text-sage-600 hover:text-sage-700 border border-sage-200 rounded-full px-2 py-1">
+<span>{{ i18n "static.facturen.facturen.edit_client_info_short" }}</span>
+</button>
+</div>
+<div class="text-sm text-gray-600 space-y-0.5">
+<div><span>{{ i18n "static.facturen.facturen.dates_2" }}</span> <span data-x-text="formatDate(b.date_from)"></span><template data-x-if="b.date_to"><span> → <span data-x-text="formatDate(b.date_to)"></span></span></template></div>
+<div><span>{{ i18n "static.facturen.facturen.pets_2" }}</span> <span data-x-text="petsSummary(b.pets)"></span></div>
+<div><span>{{ i18n "static.facturen.facturen.amount_2" }}</span> € <span data-x-text="Number(b.final_amount || 0).toFixed(2)"></span></div>
+</div>
+<template data-x-if="b.status === 'approved'">
+<div class="flex gap-2 pt-1">
+<a data-x-bind:href="whatsappLink(b)" data-x-bind:title="t('invoice.whatsapp_client')" class="flex-none flex items-center justify-center border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold px-3 rounded-xl transition" rel="noopener noreferrer" target="_blank" data-x-show="whatsappLink(b) !== '#'">
+WhatsApp
+</a>
+<button data-x-on:click="printInvoice(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.print_invoice" }}</span>
+</button>
+</div>
+</template>
+<template data-x-if="b.status === 'cancelled'">
+<div class="flex gap-2 pt-1">
+<button data-x-bind:disabled="b._busy" data-x-on:click="restoreBooking(b)" class="flex-1 border border-sage-300 text-sage-700 hover:bg-sage-50 text-xs font-semibold py-2 rounded-xl transition disabled:opacity-50">
+<span>{{ i18n "static.facturen.facturen.restore_to_inbox" }}</span>
+</button>
+</div>
+</template>
+</div>
+</div>
+</template>
+</div>
+</div>
+</div>
+</template>
+</div>
+</template>
+<!-- Client info edit modal (issue #52): the ONLY way to change client name/phone/address
+     once a booking exists. Requires a reason, and writes an audit row via edit_client_info()
+     — see js/facturen/facturen-app.js openClientEdit()/saveClientEdit(). -->
+<div class="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center p-4" data-x-cloak="" data-x-show="clientEdit">
+<div data-x-on:click.outside="closeClientEdit()" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-lg">
+<h3 class="font-serif text-lg font-bold text-sage-700">
+<span>{{ i18n "static.facturen.facturen.edit_client_info_title" }}</span>
+</h3>
+<p class="text-xs text-gray-500">
+
+<span>{{ i18n "static.facturen.facturen.edit_client_info_help" }}</span>
+
+</p>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="clientEdit.client_name">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_contact" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="tel" data-x-model="clientEdit.client_contact">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_address" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="clientEdit.client_address">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_edit_reason" }}</span>
+</label>
+<input class="w-full border border-warm-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="clientEdit.reason">
+</div>
+<p class="text-red-600 text-xs" data-x-show="clientEdit.error" data-x-text="clientEdit.error"></p>
+<div class="flex gap-2 pt-1">
+<button data-x-on:click="closeClientEdit()" class="flex-1 border border-warm-200 text-gray-600 hover:bg-warm-50 text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.cancel" }}</span>
+</button>
+<button data-x-bind:disabled="clientEdit.busy" data-x-on:click="saveClientEdit()" class="flex-1 bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.save" }}</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Ligia's staff-only invoicing app — see js/facturen/facturen-app.js -->
+
+<!-- Alpine must load after the module script above so window.facturenApp already exists
+       when Alpine scans and evaluates data-x-data on the page. -->
+{{ end }}
+{{ define "scripts" }}
+<script src="/js/facturen/facturen-app.js" type="module"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{ end }}

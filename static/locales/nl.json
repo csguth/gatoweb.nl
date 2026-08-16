@@ -1,0 +1,71 @@
+{
+  "booking": {
+    "start_date_required": "Selecteer een startdatum",
+    "address": "Adres",
+    "address_required": "Vul je adres in (nodig voor de factuur)",
+    "name_required": "Vul je volledige naam in",
+    "contact_required": "Vul je WhatsApp-nummer of telefoonnummer in",
+    "account_created_check_email_send": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in om te versturen.",
+    "resumed_after_confirmation": "Welkom terug! De boeking die je startte voor het bevestigen van je e-mail is zojuist verstuurd.",
+    "whatsapp_confirm_message": "Hoi Lígia! Ik heb net een boekingsverzoek verstuurd voor {{from}}{{toRange}}. Ik hoor graag van je!"
+  },
+  "auth": {
+    "account_created_check_email_login": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.",
+    "not_configured": "De dienst is nog niet geconfigureerd."
+  },
+  "adjustment_note_required": "Geef een reden op voor de correctie voordat je goedkeurt.",
+  "client_edit_reason_required": "Geef een reden op voordat je de klantgegevens opslaat.",
+  "not_staff_error": "Dit account heeft geen toegang tot het facturendashboard.",
+  "reject_confirm": "Boekingsverzoek van {{client}} afwijzen? Dit kan later ongedaan worden gemaakt vanuit de kolom 'Klaar'.",
+  "reject_button_title": "Boeking afwijzen",
+  "tikkie_url_invalid": "Voer een geldige Tikkie-link in (begint met https://).",
+  "invoice": {
+    "title": "Factuur {{number}}",
+    "proforma_title": "Proforma factuur",
+    "proforma_notice": "Dit is een proforma en geen definitieve (fiscale) factuur, en heeft geen officieel factuurnummer. De definitieve factuur volgt zodra de Tikkie is betaald.",
+    "date_label": "Datum: {{date}}",
+    "client_label": "Klant: {{client}}",
+    "description_label": "Omschrijving:",
+    "service_description": "Catsitting/oppasdiensten {{from}}{{toPart}}",
+    "date_range_connector": " t/m {{to}}",
+    "pets_label": "Huisdieren: {{pets}}",
+    "preference_label": "Voorkeur: {{preference}}",
+    "total_label": "Totaal: € {{amount}}",
+    "vat_exempt_kor": "Vrijgesteld van BTW op grond van de kleineondernemersregeling (KOR).",
+    "payment_tikkie_iban": "Betaling: via Tikkie (apart verzonden) - IBAN {{iban}}",
+    "file_name": "factuur-{{number}}",
+    "this_client": "deze klant",
+    "confirm_approve": "Factuur definitief goedkeuren voor {{client}}?",
+    "recipient_label": "Aan:",
+    "address_label": "Adres: {{address}}",
+    "contact_label": "WhatsApp/telefoon: {{contact}}",
+    "table": {
+      "description": "Omschrijving",
+      "period": "Periode",
+      "days": "Dagen",
+      "unit_price": "Prijs/dag",
+      "subtotal": "Subtotaal"
+    },
+    "line": {
+      "service_cat": "Catsitting",
+      "service_dog": "Dogwalking",
+      "period_morning": "overdag",
+      "period_evening": "'s avonds",
+      "period_both": "overdag en 's avonds",
+      "period_none": "",
+      "frequency_1": "1x per dag",
+      "frequency_2": "2x per dag",
+      "date_range_single": "{{date}}",
+      "date_range_multi": "{{from}} t/m {{to}}",
+      "surcharge_item": "Hoogseizoentoeslag (+{{percent}}%) — {{description}}",
+      "extra_cat_item": "Extra kat (+{{count}}) — {{description}}",
+      "adjustment": "Correctie: {{note}}"
+    },
+    "seasonal_note": "* Voor dagen in juli, augustus, december en januari geldt een hoogseizoentoeslag van {{percent}}%.",
+    "print_button": "🖨️ Factuur afdrukken / opslaan als PDF",
+    "popup_blocked": "Sta pop-ups toe om de factuur te bekijken.",
+    "whatsapp_message": "Hoi {{name}}! Je boeking ({{dates}}) is bevestigd. Tot snel!",
+    "whatsapp_message_generic": "Hoi! Je boeking ({{dates}}) is bevestigd. Tot snel!",
+    "whatsapp_client": "WhatsApp klant"
+  }
+}

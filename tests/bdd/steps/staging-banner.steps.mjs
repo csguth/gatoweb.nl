@@ -8,7 +8,7 @@ import { expect } from '@playwright/test';
 const { Given, Then } = createBdd();
 
 Given('I open the site', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/en/');
 });
 
 Then('the {string} banner is visible', async ({ page }, _label) => {

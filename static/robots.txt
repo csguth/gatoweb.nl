@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# The private pages (facturen dashboard, client account) are deliberately NOT listed
+# here. robots.txt is world-readable, so a Disallow line advertises exactly where the
+# admin panel lives instead of hiding it. They are kept out of search results by the
+# `noindex,nofollow` meta tag Hugo renders on them (see layouts/partials/head.html,
+# `private` front matter) and out of this sitemap — and actually protected by Supabase
+# Auth + RLS, which is the only thing that really keeps them private.
+
+Sitemap: __SITE_URL__/sitemap.xml

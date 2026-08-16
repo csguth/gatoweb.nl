@@ -15,7 +15,7 @@ import { expect } from '@playwright/test';
 const { Given, When, Then } = createBdd();
 
 function app(page) {
-  return page.locator('[x-data="accountApp()"]');
+  return page.locator('[data-x-data="accountApp()"]');
 }
 
 function payLink(page) {
@@ -41,7 +41,7 @@ export function makeBooking(overrides) {
 
 export async function seedBookings(page, bookings) {
   await page.evaluate((bookings) => {
-    const el = document.querySelector('[x-data="accountApp()"]');
+    const el = document.querySelector('[data-x-data="accountApp()"]');
     const data = window.Alpine.$data(el);
     data.session = { user: { email: 'client@example.com' } };
     data.loadingList = false;
@@ -50,10 +50,10 @@ export async function seedBookings(page, bookings) {
 }
 
 Given('I am logged in on my bookings page', async ({ page }) => {
-  await page.goto('/account.html');
+  await page.goto('/en/account/');
   await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
   await page.waitForFunction(
-    () => window.Alpine && document.querySelector('[x-data="accountApp()"]')
+    () => window.Alpine && document.querySelector('[data-x-data="accountApp()"]')
   );
   // Start from a logged-in, empty list so the bookings section is rendered.
   await seedBookings(page, []);
