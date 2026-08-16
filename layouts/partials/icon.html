@@ -1,0 +1,18 @@
+{{- /* Brand icon (#139) from Lígia's Canva icon set — see static/images/icons/ and
+       scripts/canva-icons.py.
+
+       The icons are decorative: every one of them sits next to the label it
+       illustrates, so they are hidden from assistive tech (`alt=""` plus
+       `aria-hidden`) and never carry meaning of their own.
+
+       Params: name (required), class (Tailwind sizing), size (intrinsic px, used for
+       the width/height attributes so the icon reserves its box before CSS lands).
+
+       Usage: {{ partial "icon.html" (dict "name" "cat-head" "class" "w-6 h-6") }} */ -}}
+{{- $name := .name -}}
+{{- $class := .class | default "w-6 h-6" -}}
+{{- $size := .size | default 24 -}}
+{{- if not (fileExists (printf "static/images/icons/%s.svg" $name)) -}}
+  {{- errorf "icon partial: no such icon %q in static/images/icons" $name -}}
+{{- end -}}
+<img alt="" aria-hidden="true" class="{{ $class }}" height="{{ $size }}" src="/images/icons/{{ $name }}.svg" width="{{ $size }}" />

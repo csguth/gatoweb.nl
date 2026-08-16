@@ -34,16 +34,18 @@ layouts/
   account/list.html      Client account page markup
   facturen/list.html     Invoicing dashboard markup
   alias.html             Redirect template: bare "/" language picker + legacy URLs
-  partials/              head.html, staging-banner.html, lang-switcher.html
+  partials/              head.html, staging-banner.html, lang-switcher.html, icon.html, whatsapp-glyph.html
 i18n/{en,nl,pt}.toml   Compile-time UI strings ({{ i18n "static.<page>.<section>.<slug>" }})
 static/                Copied verbatim into the build output
   css/ js/ images/
+  images/icons/            Brand icon set from the Canva design (scripts/canva-icons.py)
   locales/{en,nl,pt}.json   Runtime-only strings that JavaScript builds (t('...'))
   robots.txt, sitemap.xml, CNAME
   account.html, facturen.html  Redirect stubs for the pre-Hugo URLs
 site/                  Build output (git-ignored) — what actually gets deployed
 supabase/schema.sql    Database schema: bookings table, RLS policies, approve_booking()
 scripts/i18n-check.mjs Checks that every i18n/t() key used actually exists in all languages
+scripts/canva-icons.py Rebuilds static/images/icons/ from Lígia's Canva design (#139)
 .github/actions/
   setup-hugo/          Installs the pinned Hugo version (used by every workflow)
   build-site/          hugo build + placeholder substitution + generated js/config.js
@@ -407,6 +409,13 @@ DNS propagation: 5-60 minutes.
   **self-hosted** from `static/fonts/` — no Google Fonts CDN. They stand in for the Canva fonts in
   the design ("Extend 50 Mega" and "Bubblebody Neue"), which can't be licensed for use on a
   self-hosted site. Refresh the woff2 subsets with `node scripts/fetch-fonts.mjs`
+- **Icons:** the hand-drawn set from the same design (issue #139) lives in `static/images/icons/`
+  and is rendered by `{{ partial "icon.html" (dict "name" "cat-head" "class" "w-6 h-6") }}`. They
+  replaced the emojis the UI used to carry — "Visit preference", the pricing cards, "How it works",
+  the footer. Icons are **decorative**: the partial emits `alt="" aria-hidden="true"`, so the label
+  next to them is what screen readers announce. The artwork is dark linework, so on the dark
+  sections it sits in a `brand-red` circle, the way the design does it. Regenerate the set from
+  Canva with `python scripts/canva-icons.py` (see the script's header)
 - **Staging banner:** pure CSS, no JS — `body[data-env="staging"] #env-banner { display: block; }`,
   with `data-env` substituted at build time from the `ENV_LABEL` variable
 - **Why two Cloudflare Pages projects for one repo:** Cloudflare Pages only supports a custom
