@@ -44,7 +44,6 @@
 /* Base typography and page background. These mirror the Tailwind tokens in
    js/tailwind-config.js so the page still looks right before the CDN script runs. */
 html { font-family: 'Nunito', system-ui, sans-serif; }
-.font-serif { font-family: 'Anton', 'Arial Narrow', system-ui, sans-serif; }
 .font-display { font-family: 'Anton', 'Arial Narrow', system-ui, sans-serif; }
 body { background: #F4F1EA; }
 

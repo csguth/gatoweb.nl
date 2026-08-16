@@ -4,6 +4,6 @@ description: "Professionele kattenoppas in __CITY_NAME__ door Lígia — deskund
 ogDescription: "Respect, liefde en plezier voor jouw kat — terwijl jij weg bent. 50+ ⭐ vijf-ster beoordelingen."
 ogImageAlt: "Lígia van __BRAND_NAME__ die voor katten zorgt in __CITY_NAME__"
 htmlClass: "scroll-smooth"
-bodyClass: "bg-warm-50 text-gray-800"
+bodyClass: "bg-brand-cream text-brand-ink"
 webFonts: true
 ---

@@ -392,14 +392,16 @@ DNS propagation: 5-60 minutes.
   registered via `Alpine.prefix('data-x-')` in `layouts/partials/head.html`, so every directive is a
   valid HTML5 `data-*` attribute and the pages pass the W3C checker
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates). A separate `localStorage.gatoweb_pending_booking` key (issue #95) stashes a FULL booking (incl. dates) when signup requires email confirmation, so it can be resumed and sent automatically once the client confirms and returns with a session — instead of losing the in-progress request
-- **Colors:** `brand.*` Tailwind palette from Lígia's Canva design system (issue #137) — e.g.
-  `brand-ink` (`#3D0C11`), `brand-red` (`#B83C4E`), `brand-cream` (`#F4F1EA`). The older
-  sage/warm/pink palette is the previous identity and is still referenced by existing markup; it
-  goes away once issue #149 has migrated every page
-- **Fonts:** Anton (display/headings) + Nunito (body), both SIL OFL and **self-hosted** from
-  `static/fonts/` — no Google Fonts CDN. They stand in for the Canva fonts in the design ("Extend 50
-  Mega" and "Bubblebody Neue"), which can't be licensed for use on a self-hosted site. Refresh the
-  woff2 subsets with `node scripts/fetch-fonts.mjs`
+- **Colors:** `brand.*` Tailwind palette from Lígia's Canva design system (issues #137 / #149) —
+  `brand-ink` (`#3D0C11`), `brand-plum`, `brand-wine`, `brand-crimson`, `brand-red` (`#B83C4E`),
+  `brand-blush`, `brand-rose`, `brand-cream` (`#F4F1EA`), `brand-sand`, `brand-moss`, `brand-grey`.
+  Each token is annotated with its role in the design in `static/js/tailwind-config.js`. Status
+  colours (error red, success green, warning amber) stay on Tailwind's defaults — they're semantic,
+  not brand
+- **Fonts:** Anton (`font-display`, headings) + Nunito (`font-sans`, body), both SIL OFL and
+  **self-hosted** from `static/fonts/` — no Google Fonts CDN. They stand in for the Canva fonts in
+  the design ("Extend 50 Mega" and "Bubblebody Neue"), which can't be licensed for use on a
+  self-hosted site. Refresh the woff2 subsets with `node scripts/fetch-fonts.mjs`
 - **Staging banner:** pure CSS, no JS — `body[data-env="staging"] #env-banner { display: block; }`,
   with `data-env` substituted at build time from the `ENV_LABEL` variable
 - **Why two Cloudflare Pages projects for one repo:** Cloudflare Pages only supports a custom

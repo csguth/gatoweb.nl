@@ -2,7 +2,7 @@
 <!-- ══════════════════════════════════════════════════════════
        NAV
   ══════════════════════════════════════════════════════════ -->
-<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-warm-100 shadow-sm">
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-brand-sand shadow-sm">
 <div class="max-w-5xl mx-auto px-5 h-24 md:h-32 flex items-center justify-between">
 <a class="flex items-center gap-2 group" href="#">
 <img alt="__BRAND_NAME__" class="h-20 md:h-28 w-auto" src="/images/logo.png">
@@ -11,7 +11,7 @@
 <!-- Language selector: plain links, one per language URL (see partials/lang-switcher.html) -->
 {{ partial "lang-switcher.html" . }}
 <!-- Book CTA (desktop) -->
-<a class="hidden sm:inline-flex bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition" href="#booking">
+<a class="hidden sm:inline-flex bg-brand-ink hover:bg-brand-wine text-white text-xs font-semibold px-4 py-2 rounded-full transition" href="#booking">
 <span>{{ i18n "static.index.nav.book_a_visit" }}</span>
 
 </a>
@@ -21,7 +21,7 @@
 <!-- ══════════════════════════════════════════════════════════
        HERO
   ══════════════════════════════════════════════════════════ -->
-<header class="bg-sage-600 text-white overflow-hidden">
+<header class="bg-brand-ink text-white overflow-hidden">
 <div class="max-w-5xl mx-auto px-5 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
 <!-- Text -->
 <div class="flex-1 text-center md:text-left order-2 md:order-1">
@@ -30,7 +30,7 @@
 <span>{{ i18n "static.index.hero.50_verified_reviews" }}</span>
 
 </div>
-<h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
+<h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-5">
 <span>{{ i18n "static.index.hero.expert_catsitting_in_city_name" | safeHTML }}</span>
 
 </h1>
@@ -39,7 +39,7 @@
 
 </p>
 <div class="flex flex-wrap gap-3 justify-center md:justify-start">
-<a class="bg-warm-500 hover:bg-warm-600 text-white font-semibold px-6 py-3 rounded-full transition shadow-md" href="#booking">
+<a class="bg-brand-red hover:bg-brand-wine text-white font-semibold px-6 py-3 rounded-full transition shadow-md" href="#booking">
 <span>{{ i18n "static.index.hero.book_a_visit" }}</span>
 
 </a>
@@ -52,7 +52,7 @@
 <div class="flex-shrink-0 order-1 md:order-2">
 <div class="relative inline-block">
 <img alt="Lígia, professional catsitter in __CITY_NAME__" class="w-52 h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white/25 shadow-2xl" loading="eager" src="/images/ligia-profile.jpg">
-<div class="absolute -bottom-2 -right-2 bg-warm-500 text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-lg whitespace-nowrap">
+<div class="absolute -bottom-2 -right-2 bg-brand-red text-white text-xs font-semibold rounded-full px-3 py-1.5 shadow-lg whitespace-nowrap">
 <span>{{ i18n "static.index.hero.12_yrs_exp" }}</span>
 
 </div>
@@ -63,32 +63,32 @@
 <!-- ══════════════════════════════════════════════════════════
        TRUST BAR
   ══════════════════════════════════════════════════════════ -->
-<div class="bg-white border-b border-warm-100">
+<div class="bg-white border-b border-brand-sand">
 <div class="max-w-5xl mx-auto px-5 py-7 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
 <div>
-<div class="font-serif text-2xl font-bold text-sage-600">5.000+</div>
-<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<div class="font-display text-2xl font-bold text-brand-ink">5.000+</div>
+<div class="text-xs uppercase tracking-wide text-brand-ink/70 mt-0.5">
 <span>{{ i18n "static.index.misc.cats_rescued" }}</span>
 
 </div>
 </div>
 <div>
-<div class="font-serif text-2xl font-bold text-sage-600">50+ ⭐</div>
-<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<div class="font-display text-2xl font-bold text-brand-ink">50+ ⭐</div>
+<div class="text-xs uppercase tracking-wide text-brand-ink/70 mt-0.5">
 <span>{{ i18n "static.index.misc.5_star_reviews" }}</span>
 
 </div>
 </div>
 <div>
-<div class="font-serif text-2xl font-bold text-sage-600">21</div>
-<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<div class="font-display text-2xl font-bold text-brand-ink">21</div>
+<div class="text-xs uppercase tracking-wide text-brand-ink/70 mt-0.5">
 <span>{{ i18n "static.index.misc.returning_clients" }}</span>
 
 </div>
 </div>
 <div>
-<div class="font-serif text-2xl font-bold text-sage-600">12+</div>
-<div class="text-xs uppercase tracking-wide text-gray-400 mt-0.5">
+<div class="font-display text-2xl font-bold text-brand-ink">12+</div>
+<div class="text-xs uppercase tracking-wide text-brand-ink/70 mt-0.5">
 <span>{{ i18n "static.index.misc.years_experience" }}</span>
 
 </div>
@@ -98,10 +98,10 @@
 <!-- ══════════════════════════════════════════════════════════
        ABOUT
   ══════════════════════════════════════════════════════════ -->
-<section class="py-20 bg-warm-50" id="about">
+<section class="py-20 bg-brand-cream" id="about">
 <div class="max-w-5xl mx-auto px-5">
 <div class="text-center mb-10">
-<h2 class="font-serif text-3xl font-bold text-sage-700">
+<h2 class="font-display text-3xl font-bold text-brand-ink">
 <span>{{ i18n "static.index.about.about_l_gia" }}</span>
 
 </h2>
@@ -118,7 +118,7 @@
 <img alt="Lígia holding a fluffy cat" class="absolute inset-0 w-full h-full object-cover" loading="eager" src="/images/ligia-profile.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s1_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s1_body" }}</p>
@@ -131,7 +131,7 @@
 <img alt="Lígia cheek to cheek with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="/images/gallery-1.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s2_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s2_body" }}</p>
@@ -144,7 +144,7 @@
 <img alt="Lígia at home with several cats" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="/images/gallery-3.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s3_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s3_body" }}</p>
@@ -157,7 +157,7 @@
 <img alt="Lígia close up with a cat" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="/images/ligia-profile.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s4_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s4_body" }}</p>
@@ -170,7 +170,7 @@
 <img alt="Lígia with a pet snake" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="/images/gallery-4.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s5_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s5_body" }}</p>
@@ -183,7 +183,7 @@
 <img alt="Lígia with two dogs" class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="/images/gallery-2.jpg">
 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5"></div>
 <div class="absolute inset-x-0 bottom-0 px-6 pt-12 pb-14 sm:px-10 sm:pb-16">
-<h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
+<h3 class="font-display text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow">
 <span>{{ i18n "static.index.about.s6_title" }}</span>
 </h3>
 <p>{{ i18n "static.index.about.s6_body" }}</p>
@@ -197,23 +197,23 @@
 <div class="absolute inset-x-0 bottom-4 flex items-center justify-center gap-2" id="about-carousel-dots" role="tablist"></div>
 </div>
 <div class="mt-8 flex flex-wrap justify-center gap-2">
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.senior_cats" }}</span>
 </span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">Kittens</span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">Kittens</span>
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.shy_fearful_cats" }}</span>
 </span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.medication" }}</span>
 </span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.post_op_care" }}</span>
 </span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.multi_cat_households" }}</span>
 </span>
-<span class="bg-sage-50 border border-sage-200 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+<span class="bg-brand-sand border border-brand-sand text-brand-ink text-xs font-medium px-3 py-1.5 rounded-full">
 <span>{{ i18n "static.index.about.behaviour_consultation" }}</span>
 </span>
 </div>
@@ -225,138 +225,138 @@
 <section class="py-20 bg-white" id="services">
 <div class="max-w-5xl mx-auto px-5">
 <div class="text-center mb-12">
-<h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+<h2 class="font-display text-3xl font-bold text-brand-ink mb-3">
 <span>{{ i18n "static.index.services.services_pricing" }}</span>
 
 </h2>
-<p class="text-gray-500 text-sm">
+<p class="text-brand-ink/70 text-sm">
 <span>{{ i18n "static.index.services.all_visits_are_at_your" }}</span>
 
 </p>
 </div>
 <div class="grid md:grid-cols-3 gap-6">
 <!-- 1 visit/day -->
-<div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+<div class="rounded-2xl border border-brand-sand bg-brand-cream p-6 flex flex-col hover:shadow-md transition">
 <div class="text-4xl mb-4">🐱</div>
-<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<h3 class="font-display text-xl font-semibold text-brand-ink mb-1">
 <span>{{ i18n "static.index.services.1_home_visit_day" }}</span>
 
 </h3>
-<div class="text-3xl font-bold text-warm-500 mb-4">
-            €__PRICE_ONE_VISIT__*<span class="text-sm font-normal text-gray-400"> <span>{{ i18n "static.index.services.per_day" }}</span></span>
+<div class="text-3xl font-bold text-brand-red mb-4">
+            €__PRICE_ONE_VISIT__*<span class="text-sm font-normal text-brand-ink/70"> <span>{{ i18n "static.index.services.per_day" }}</span></span>
 </div>
 <ul class="text-sm text-gray-600 space-y-2 flex-1">
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.feeding_fresh_water" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.litter_box_cleaning" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.playtime_attention" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.health_monitoring" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.photo_video_updates" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.plant_watering" }}</span>
 
 </li>
 </ul>
-<a class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
+<a class="mt-6 block text-center bg-brand-ink hover:bg-brand-wine text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
 <span>{{ i18n "static.index.services.book_now" }}</span>
 
 </a>
 </div>
 <!-- 2 visits/day (highlighted) -->
-<div class="rounded-2xl border-2 border-sage-600 bg-white p-6 flex flex-col shadow-lg relative">
-<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-pink-600 text-white text-xs font-bold uppercase tracking-wide px-4 py-1 rounded-full shadow whitespace-nowrap">
+<div class="rounded-2xl border-2 border-brand-ink bg-white p-6 flex flex-col shadow-lg relative">
+<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-red text-white text-xs font-bold uppercase tracking-wide px-4 py-1 rounded-full shadow whitespace-nowrap">
 <span>{{ i18n "static.index.services.most_popular" }}</span>
 
 </div>
 <div class="text-4xl mb-4">🐾</div>
-<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<h3 class="font-display text-xl font-semibold text-brand-ink mb-1">
 <span>{{ i18n "static.index.services.2_home_visits_day" }}</span>
 
 </h3>
-<div class="text-3xl font-bold text-warm-500 mb-4">
-            €__PRICE_TWO_VISITS__*<span class="text-sm font-normal text-gray-400"> <span>{{ i18n "static.index.services.per_day" }}</span></span>
+<div class="text-3xl font-bold text-brand-red mb-4">
+            €__PRICE_TWO_VISITS__*<span class="text-sm font-normal text-brand-ink/70"> <span>{{ i18n "static.index.services.per_day" }}</span></span>
 </div>
 <ul class="text-sm text-gray-600 space-y-2 flex-1">
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.everything_in_the_1_visit" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.morning_evening_visits" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.ideal_for_anxious_cats" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.medication_administration" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.update_after_each_visit" }}</span>
 
 </li>
 </ul>
-<a class="mt-6 block text-center bg-warm-500 hover:bg-warm-600 text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
+<a class="mt-6 block text-center bg-brand-red hover:bg-brand-wine text-white font-medium py-2.5 rounded-full transition text-sm" href="#booking">
 <span>{{ i18n "static.index.services.book_now_2" }}</span>
 
 </a>
 </div>
 <!-- Behaviour consultation -->
-<div class="rounded-2xl border border-warm-200 bg-warm-50 p-6 flex flex-col hover:shadow-md transition">
+<div class="rounded-2xl border border-brand-sand bg-brand-cream p-6 flex flex-col hover:shadow-md transition">
 <div class="text-4xl mb-4">🧠</div>
-<h3 class="font-serif text-xl font-semibold text-sage-700 mb-1">
+<h3 class="font-display text-xl font-semibold text-brand-ink mb-1">
 <span>{{ i18n "static.index.services.behaviour_consultation" }}</span>
 
 </h3>
-<div class="text-xl font-semibold text-warm-500 mb-4">
+<div class="text-xl font-semibold text-brand-red mb-4">
 <span>{{ i18n "static.index.services.on_request" }}</span>
 
 </div>
 <ul class="text-sm text-gray-600 space-y-2 flex-1">
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.litter_box_issues" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.cat_to_cat_introductions" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.scratching_aggression" }}</span>
 
 </li>
-<li class="flex gap-2"><span class="text-sage-500">✓</span>
+<li class="flex gap-2"><span class="text-brand-red">✓</span>
 <span>{{ i18n "static.index.services.anxiety_fearfulness" }}</span>
 
 </li>
 </ul>
-<a class="mt-6 block text-center bg-sage-600 hover:bg-sage-700 text-white font-medium py-2.5 rounded-full transition text-sm" href="mailto:__CONTACT_EMAIL__?subject=Feline%20Behaviour%20Consultation">
+<a class="mt-6 block text-center bg-brand-ink hover:bg-brand-wine text-white font-medium py-2.5 rounded-full transition text-sm" href="mailto:__CONTACT_EMAIL__?subject=Feline%20Behaviour%20Consultation">
 <span>{{ i18n "static.index.services.get_in_touch" }}</span>
 
 </a>
 </div>
 </div>
-<p class="text-center text-xs text-gray-400 mt-6">
+<p class="text-center text-xs text-brand-ink/70 mt-6">
 <span>{{ i18n "static.index.services.also_available_for_dogs_rabbits" }}</span>
 
 </p>
-<p class="text-center text-xs text-gray-400 mt-2">
+<p class="text-center text-xs text-brand-ink/70 mt-2">
 <span>{{ i18n "static.index.services.seasonal_surcharges_may_apply_e" }}</span>
 
 </p>
@@ -365,9 +365,9 @@
 <!-- ══════════════════════════════════════════════════════════
        HOW IT WORKS
   ══════════════════════════════════════════════════════════ -->
-<section class="py-20 bg-sage-600 text-white">
+<section class="py-20 bg-brand-ink text-white">
 <div class="max-w-5xl mx-auto px-5">
-<h2 class="font-serif text-3xl font-bold text-center mb-14">
+<h2 class="font-display text-3xl font-bold text-center mb-14">
 <span>{{ i18n "static.index.misc.how_it_works" }}</span>
 
 </h2>
@@ -411,15 +411,15 @@
 <!-- ══════════════════════════════════════════════════════════
        REVIEWS
   ══════════════════════════════════════════════════════════ -->
-<section class="py-20 bg-warm-100" id="reviews">
+<section class="py-20 bg-brand-sand" id="reviews">
 <div class="max-w-5xl mx-auto px-5">
 <div class="text-center mb-10">
-<h2 class="font-serif text-3xl font-bold text-sage-700 mb-2">
+<h2 class="font-display text-3xl font-bold text-brand-ink mb-2">
 <span>{{ i18n "static.index.reviews.50_five_star_reviews" }}</span>
 
 </h2>
 <div class="text-2xl mb-2">⭐⭐⭐⭐⭐</div>
-<p class="text-gray-500 text-sm">
+<p class="text-brand-ink/70 text-sm">
 <span>{{ i18n "static.index.reviews.verified_reviews_from_cat_owners" }}</span>
 
 </p>
@@ -429,34 +429,34 @@
 <div class="flex items-center gap-3 text-sm">
 <span>{{ i18n "static.index.reviews.communication" }}</span>
 
-<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+<div class="flex-1 bg-brand-sand rounded-full h-2 overflow-hidden">
+<div class="bg-brand-red h-2 w-full rounded-full"></div>
 </div>
-<span class="font-bold text-sage-700 w-4">5</span>
+<span class="font-bold text-brand-ink w-4">5</span>
 </div>
 <div class="flex items-center gap-3 text-sm">
 <span>{{ i18n "static.index.reviews.reliability" }}</span>
 
-<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+<div class="flex-1 bg-brand-sand rounded-full h-2 overflow-hidden">
+<div class="bg-brand-red h-2 w-full rounded-full"></div>
 </div>
-<span class="font-bold text-sage-700 w-4">5</span>
+<span class="font-bold text-brand-ink w-4">5</span>
 </div>
 <div class="flex items-center gap-3 text-sm">
 <span>{{ i18n "static.index.reviews.pet_care" }}</span>
 
-<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+<div class="flex-1 bg-brand-sand rounded-full h-2 overflow-hidden">
+<div class="bg-brand-red h-2 w-full rounded-full"></div>
 </div>
-<span class="font-bold text-sage-700 w-4">5</span>
+<span class="font-bold text-brand-ink w-4">5</span>
 </div>
 <div class="flex items-center gap-3 text-sm">
 <span>{{ i18n "static.index.reviews.value" }}</span>
 
-<div class="flex-1 bg-warm-200 rounded-full h-2 overflow-hidden">
-<div class="bg-warm-500 h-2 w-full rounded-full"></div>
+<div class="flex-1 bg-brand-sand rounded-full h-2 overflow-hidden">
+<div class="bg-brand-red h-2 w-full rounded-full"></div>
 </div>
-<span class="font-bold text-sage-700 w-4">5</span>
+<span class="font-bold text-brand-ink w-4">5</span>
 </div>
 </div>
 <div class="grid md:grid-cols-3 gap-5 mb-8">
@@ -490,125 +490,125 @@
 <section class="py-20 bg-white" id="booking">
 <div class="max-w-lg mx-auto px-5">
 <div class="text-center mb-10">
-<h2 class="font-serif text-3xl font-bold text-sage-700 mb-3">
+<h2 class="font-display text-3xl font-bold text-brand-ink mb-3">
 <span>{{ i18n "static.index.booking.book_a_catsitting_visit" }}</span>
 
 </h2>
-<p class="text-gray-500 text-sm">
+<p class="text-brand-ink/70 text-sm">
 <span>{{ i18n "static.index.booking.choose_your_dates_and_preference" }}</span>
 
 </p>
 </div>
 <!-- Booking form -->
-<div class="bg-warm-50 rounded-2xl p-8 space-y-6 shadow-sm" data-x-data="bookingForm()">
+<div class="bg-brand-cream rounded-2xl p-8 space-y-6 shadow-sm" data-x-data="bookingForm()">
 <!-- Client account status -->
-<div class="flex items-center justify-between text-xs text-gray-500" data-x-show="session">
+<div class="flex items-center justify-between text-xs text-brand-ink/70" data-x-show="session">
 <span>
 <span>{{ i18n "static.index.booking.logged_in_as" }}</span>
 <span data-x-text="session &amp;&amp; session.user.email"></span>
 </span>
-<button data-x-on:click="logout()" class="text-gray-400 hover:text-red-400 font-semibold" type="button">
+<button data-x-on:click="logout()" class="text-brand-ink/70 hover:text-red-400 font-semibold" type="button">
 <span>{{ i18n "static.index.booking.log_out" }}</span>
 </button>
 </div>
 <!-- Name (required — full name needed to identify the client, issue #107) -->
 <div>
-<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
 <span>{{ i18n "static.index.booking.full_name" }}</span>
 
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="clientName" required="">
+<input class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientName" required="">
 </div>
 <!-- Address (required — needed on the invoice per issue #32) -->
 <div>
-<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
 <span>{{ i18n "static.index.booking.address" }}</span>
 
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="text" data-x-model="address" required="">
+<input class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="address" required="">
 </div>
 <!-- WhatsApp / phone (required — issue #108, lets Ligia message the client directly, issue #39) -->
 <div>
-<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
 <span>{{ i18n "static.index.booking.whatsapp_phone" }}</span>
 
 </label>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="+31 6 12345678" type="tel" data-x-model="clientContact" required="">
+<input class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" placeholder="+31 6 12345678" type="tel" data-x-model="clientContact" required="">
 </div>
 <!-- Dates -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
-<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
 <span>{{ i18n "static.index.booking.first_visit_date" }}</span>
 
 </label>
-<input data-x-bind:min="today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" data-x-model="from">
+<input data-x-bind:min="today" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" type="date" data-x-model="from">
 </div>
 <div>
-<label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
 <span>{{ i18n "static.index.booking.last_visit_date" }}</span>
 
 </label>
-<input data-x-bind:min="from || today" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" type="date" data-x-model="to">
+<input data-x-bind:min="from || today" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" type="date" data-x-model="to">
 </div>
 </div>
 <!-- Pets -->
 <div class="space-y-3">
 <div class="flex items-center justify-between">
-<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+<p class="text-xs font-semibold text-brand-ink/70 uppercase tracking-wide">
 <span>{{ i18n "static.index.booking.pets" }}</span>
 
 </p>
-<button data-x-on:click="pets.push({ name: '', type: 'cat', otherType: '' })" class="text-xs text-sage-600 hover:text-sage-700 font-semibold flex items-center gap-1 transition" type="button">
+<button data-x-on:click="pets.push({ name: '', type: 'cat', otherType: '' })" class="text-xs text-brand-ink hover:text-brand-ink font-semibold flex items-center gap-1 transition" type="button">
 <span>+</span>
 <span>{{ i18n "static.index.booking.add_pet" }}</span>
 
 </button>
 </div>
 <template data-x-bind:key="i" data-x-for="(pet, i) in pets">
-<div class="bg-white rounded-xl border border-warm-200 p-3 space-y-2">
+<div class="bg-white rounded-xl border border-brand-sand p-3 space-y-2">
 <div class="flex gap-2 items-center">
-<input class="flex-1 border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400 min-w-0" placeholder="Name / Naam" type="text" data-x-model="pet.name">
+<input class="flex-1 border border-brand-sand rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red min-w-0" placeholder="Name / Naam" type="text" data-x-model="pet.name">
 <button data-x-on:click="pets.splice(i, 1)" class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-red-400 transition flex-shrink-0 text-xl leading-none" type="button" data-x-show="pets.length &gt; 1">×</button>
 </div>
 <div class="flex gap-2 flex-wrap">
-<button data-x-bind:class="pet.type === 'cat' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" data-x-on:click="pet.type = 'cat'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
+<button data-x-bind:class="pet.type === 'cat' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pet.type = 'cat'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
                   🐱 Catsitting
                 </button>
-<button data-x-bind:class="pet.type === 'dog' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" data-x-on:click="pet.type = 'dog'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
+<button data-x-bind:class="pet.type === 'dog' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pet.type = 'dog'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
                   🐶 Dogwalking
                 </button>
-<button data-x-bind:class="pet.type === 'other' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200 hover:border-sage-300'" data-x-on:click="pet.type = 'other'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
+<button data-x-bind:class="pet.type === 'other' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pet.type = 'other'" class="border rounded-lg px-3 py-1.5 text-xs font-medium transition" type="button">
                   ✏️ <span>{{ i18n "static.index.booking.other" }}</span>
 </button>
 </div>
-<input class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sage-400" placeholder="e.g. rabbit, bird · bijv. konijn, vogel" type="text" data-x-model="pet.otherType" data-x-show="pet.type === 'other'">
+<input class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" placeholder="e.g. rabbit, bird · bijv. konijn, vogel" type="text" data-x-model="pet.otherType" data-x-show="pet.type === 'other'">
 </div>
 </template>
 </div>
 <!-- Preference -->
 <div>
-<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+<p class="text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-3">
 <span>{{ i18n "static.index.booking.visit_preference" }}</span>
 
 </p>
 <div class="grid grid-cols-2 gap-2">
-<button data-x-bind:class="pref === 'morning' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" data-x-on:click="pref = 'morning'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<button data-x-bind:class="pref === 'morning' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-white text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pref = 'morning'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
 <span class="block text-xl mb-1">🌅</span>
 <span>{{ i18n "static.index.booking.morning_1x" | safeHTML }}</span>
 
 </button>
-<button data-x-bind:class="pref === 'evening' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" data-x-on:click="pref = 'evening'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<button data-x-bind:class="pref === 'evening' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-white text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pref = 'evening'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
 <span class="block text-xl mb-1">🌙</span>
 <span>{{ i18n "static.index.booking.evening_1x" | safeHTML }}</span>
 
 </button>
-<button data-x-bind:class="pref === 'both' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" data-x-on:click="pref = 'both'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<button data-x-bind:class="pref === 'both' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-white text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pref = 'both'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
 <span class="block text-xl mb-1">🌅🌙</span>
 <span>{{ i18n "static.index.booking.both_2x_day" | safeHTML }}</span>
 
 </button>
-<button data-x-bind:class="pref === 'none' ? 'bg-sage-600 text-white border-sage-600' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-400'" data-x-on:click="pref = 'none'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
+<button data-x-bind:class="pref === 'none' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-white text-brand-ink border-brand-sand hover:border-brand-grey'" data-x-on:click="pref = 'none'" class="border rounded-xl py-3 px-2 text-sm font-medium transition text-center" type="button">
 <span class="block text-xl mb-1">🐾</span>
 <span>{{ i18n "static.index.booking.no_pref_1x" | safeHTML }}</span>
 
@@ -618,45 +618,45 @@
 <!-- Estimated price (issue #43): computed with the same pricing logic as the final
      factuur (js/facturen/invoice-calc.js via bookingForm()._suggestedAmount()), minus
      the seasonal surcharge — that only ever shows up once Lígia issues the factuur. -->
-<div class="bg-white rounded-xl border border-warm-200 p-4 flex items-center justify-between gap-3" data-x-show="from">
+<div class="bg-white rounded-xl border border-brand-sand p-4 flex items-center justify-between gap-3" data-x-show="from">
 <div>
-<p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+<p class="text-xs font-semibold text-brand-ink/70 uppercase tracking-wide">
 <span>{{ i18n "static.index.booking.estimated_price" }}</span>
 
 </p>
-<p class="text-[11px] text-gray-400 mt-0.5">
+<p class="text-[11px] text-brand-ink/70 mt-0.5">
 <span>{{ i18n "static.index.booking.estimated_price_note" }}</span>
 
 </p>
 </div>
-<p class="text-xl font-bold text-sage-700 whitespace-nowrap" id="estimated-price-value" data-x-text="'€ ' + _suggestedAmount().toFixed(2)"></p>
+<p class="text-xl font-bold text-brand-ink whitespace-nowrap" id="estimated-price-value" data-x-text="'€ ' + _suggestedAmount().toFixed(2)"></p>
 </div>
 <!-- Inline login/signup gate — shown when the client isn't logged in yet and clicks send -->
 <template data-x-if="showAuth">
-<div class="bg-white rounded-xl border border-warm-200 p-4 space-y-3">
-<p class="text-xs text-gray-500">
+<div class="bg-white rounded-xl border border-brand-sand p-4 space-y-3">
+<p class="text-xs text-brand-ink/70">
 <span>{{ i18n "static.index.booking.create_a_free_account_or" }}</span>
 
 </p>
 <div class="flex gap-2 text-xs font-semibold">
-<button data-x-bind:class="authMode === 'login' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" data-x-on:click="authMode = 'login'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
+<button data-x-bind:class="authMode === 'login' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand'" data-x-on:click="authMode = 'login'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
 <span>{{ i18n "static.index.booking.log_in" }}</span>
 </button>
-<button data-x-bind:class="authMode === 'signup' ? 'bg-sage-600 text-white border-sage-600' : 'bg-warm-50 text-sage-700 border-warm-200'" data-x-on:click="authMode = 'signup'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
+<button data-x-bind:class="authMode === 'signup' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand'" data-x-on:click="authMode = 'signup'" class="flex-1 border rounded-lg py-1.5 transition" type="button">
 <span>{{ i18n "static.index.booking.create_account" }}</span>
 </button>
 </div>
 <form data-x-on:submit.prevent="authMode === 'login' ? authLogin() : authSignup()" class="space-y-2">
-<input placeholder="{{ i18n "form.email_placeholder" }}" autocomplete="username" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="email" data-x-model="authEmail">
-<input data-x-bind:autocomplete="authMode === 'login' ? 'current-password' : 'new-password'" placeholder="{{ i18n "form.password_placeholder" }}" class="w-full border border-warm-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sage-400" required="" type="password" data-x-model="authPassword">
+<input placeholder="{{ i18n "form.email_placeholder" }}" autocomplete="username" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" required="" type="email" data-x-model="authEmail">
+<input data-x-bind:autocomplete="authMode === 'login' ? 'current-password' : 'new-password'" placeholder="{{ i18n "form.password_placeholder" }}" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" required="" type="password" data-x-model="authPassword">
 <p class="text-red-600 text-xs" data-x-show="authError" data-x-text="authError"></p>
-<p class="text-sage-600 text-xs" data-x-show="authInfo" data-x-text="authInfo"></p>
-<button data-x-bind:disabled="authLoading" class="w-full bg-sage-600 hover:bg-sage-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl text-sm transition" type="submit">
+<p class="text-brand-ink text-xs" data-x-show="authInfo" data-x-text="authInfo"></p>
+<button data-x-bind:disabled="authLoading" class="w-full bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl text-sm transition" type="submit">
 <template data-x-if="!authLoading &amp;&amp; authMode === 'login'"><span><span>{{ i18n "static.index.booking.log_in_send" }}</span></span></template>
 <template data-x-if="!authLoading &amp;&amp; authMode === 'signup'"><span><span>{{ i18n "static.index.booking.create_account_2" }}</span></span></template>
 <template data-x-if="authLoading"><span><span>{{ i18n "static.index.booking.working" }}</span></span></template>
 </button>
-<button data-x-on:click="showAuth = false" class="w-full text-xs text-gray-400 hover:text-gray-600" type="button">
+<button data-x-on:click="showAuth = false" class="w-full text-xs text-brand-ink/70 hover:text-gray-600" type="button">
 <span>{{ i18n "static.index.booking.cancel" }}</span>
 </button>
 </form>
@@ -664,41 +664,41 @@
 </template>
 <!-- Success message shown after the booking request is sent -->
 <template data-x-if="sent">
-<div class="bg-sage-50 border border-sage-200 rounded-xl p-4 text-center space-y-2">
+<div class="bg-brand-sand border border-brand-sand rounded-xl p-4 text-center space-y-2">
 <div class="text-2xl">✅</div>
 <!-- Issue #95: shown instead of just clicking send, when the booking was auto-resumed
      after the client confirmed their email and came back logged in. -->
-<p class="text-xs text-sage-600" data-x-show="resumedFromPending" data-x-text="t('booking.resumed_after_confirmation')"></p>
-<p class="text-sm font-semibold text-sage-700">
+<p class="text-xs text-brand-ink" data-x-show="resumedFromPending" data-x-text="t('booking.resumed_after_confirmation')"></p>
+<p class="text-sm font-semibold text-brand-ink">
 <span>{{ i18n "static.index.booking.booking_request_sent" }}</span>
 
 </p>
-<p class="text-xs text-gray-500">
+<p class="text-xs text-brand-ink/70">
 <span>{{ i18n "static.index.booking.l_gia_will_confirm_availability" }}</span>
 
 </p>
-<a class="inline-block text-xs text-sage-600 hover:text-sage-700 font-semibold" href="{{ "/account/" | relLangURL }}">
+<a class="inline-block text-xs text-brand-ink hover:text-brand-ink font-semibold" href="{{ "/account/" | relLangURL }}">
 <span>{{ i18n "static.index.booking.track_my_booking" }}</span>
 
 </a>
 <div class="pt-2">
-<a data-x-bind:href="whatsappConfirmLink()" class="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-4 py-2 rounded-full transition" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
+<a data-x-bind:href="whatsappConfirmLink()" class="inline-flex items-center gap-1.5 bg-brand-moss hover:brightness-90 text-white text-xs font-semibold px-4 py-2 rounded-full transition" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
 💬 <span>{{ i18n "static.index.booking.message_ligia_whatsapp" }}</span>
 </a>
 </div>
 </div>
 </template>
 <!-- Send button -->
-<button data-x-on:click="send()" class="w-full flex items-center justify-center gap-2 bg-sage-600 hover:bg-sage-700 text-white font-semibold py-3.5 rounded-xl transition text-sm shadow" type="button" data-x-show="!showAuth &amp;&amp; !sent">
+<button data-x-on:click="send()" class="w-full flex items-center justify-center gap-2 bg-brand-ink hover:bg-brand-wine text-white font-semibold py-3.5 rounded-xl transition text-sm shadow" type="button" data-x-show="!showAuth &amp;&amp; !sent">
 <span>{{ i18n "static.index.booking.send_booking_request" }}</span>
 
 </button>
-<p class="text-center text-xs text-gray-400" data-x-show="!showAuth &amp;&amp; !sent">
+<p class="text-center text-xs text-brand-ink/70" data-x-show="!showAuth &amp;&amp; !sent">
 <span>{{ i18n "static.index.booking.l_gia_will_confirm_availability_2" }}</span>
 
 </p>
 <p class="text-center text-xs" data-x-show="!showAuth &amp;&amp; !sent">
-<a class="text-sage-600 hover:text-sage-700 font-semibold" href="{{ "/account/" | relLangURL }}">
+<a class="text-brand-ink hover:text-brand-ink font-semibold" href="{{ "/account/" | relLangURL }}">
 <span>{{ i18n "static.index.booking.track_my_booking_2" }}</span>
 
 </a>
@@ -709,42 +709,42 @@
 <!-- ══════════════════════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════════════════ -->
-<footer class="bg-sage-700 text-white py-12">
+<footer class="bg-brand-ink text-white py-12">
 <div class="max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-sm">
 <div>
 <div class="flex items-center gap-2 mb-2">
 <span>🐾</span>
-<span class="font-serif font-semibold text-base">__BRAND_NAME__</span>
+<span class="font-display font-semibold text-base">__BRAND_NAME__</span>
 </div>
-<p class="text-white/60">__CITY_NAME__, Noord-Brabant</p>
+<p class="text-brand-cream/80">__CITY_NAME__, Noord-Brabant</p>
 <p>{{ i18n "static.index.footer.speaks_en_pt_es" }}</p>
 
 </div>
 <div class="text-center">
-<p class="text-white/40 text-xs uppercase tracking-wide mb-2">Contact</p>
+<p class="text-brand-cream/70 text-xs uppercase tracking-wide mb-2">Contact</p>
 <a class="block text-white/80 hover:text-white transition mb-1" href="mailto:__CONTACT_EMAIL__">
           __CONTACT_EMAIL__
         </a>
 </div>
 <div class="text-center md:text-right">
-<p class="text-white/40 text-xs">
+<p class="text-brand-cream/70 text-xs">
           © <span id="footer-year"></span> __BRAND_NAME__
         </p>
 <p>{{ i18n "static.index.footer.made_with_for_cats" }}</p>
 
-<a class="text-white/20 hover:text-white/40 text-xs mt-2 block transition" href="__SITE_URL__">__SITE_URL__</a>
+<a class="text-brand-cream/60 hover:text-brand-cream/80 text-xs mt-2 block transition" href="__SITE_URL__">__SITE_URL__</a>
 </div>
 </div>
 </footer>
 <!-- ══════════════════════════════════════════════════════════
        FLOATING WHATSAPP BUTTON
   ══════════════════════════════════════════════════════════ -->
-<a aria-label="Contact Lígia via WhatsApp" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95" href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
+<a aria-label="Contact Lígia via WhatsApp" class="fixed bottom-6 right-6 z-50 bg-brand-moss hover:brightness-90 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition hover:scale-110 active:scale-95" href="https://wa.me/__WHATSAPP_NUMBER__?text=Hi%20L%C3%ADgia%2C%20I%27d%20like%20to%20know%20more%20about%20your%20catsitting%20services!" onclick="markWhatsAppIntent()" rel="noopener noreferrer" target="_blank">
 <svg aria-hidden="true" class="w-7 h-7 fill-white" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
 </svg>
 </a>
-<div aria-hidden="true" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(92vw,30rem)] bg-white border border-warm-200 rounded-2xl shadow-2xl p-4 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none" id="wa-return-toast" role="status">
+<div aria-hidden="true" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(92vw,30rem)] bg-white border border-brand-sand rounded-2xl shadow-2xl p-4 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none" id="wa-return-toast" role="status">
 <div class="flex items-start gap-3">
 <div class="text-2xl leading-none">💚</div>
 <div class="flex-1">
@@ -752,12 +752,12 @@
 
 <p>{{ i18n "static.index.misc.we_ll_reply_as_soon" }}</p>
 
-<a class="inline-flex mt-3 text-xs font-semibold text-sage-600 hover:text-sage-700 transition" href="#">
+<a class="inline-flex mt-3 text-xs font-semibold text-brand-ink hover:text-brand-ink transition" href="#">
 <span>{{ i18n "static.index.misc.back_to_home" }}</span>
 
 </a>
 </div>
-<button aria-label="Close" class="text-gray-400 hover:text-gray-600 transition" onclick="hideWhatsAppToast()" type="button">
+<button aria-label="Close" class="text-brand-ink/70 hover:text-gray-600 transition" onclick="hideWhatsAppToast()" type="button">
         ✕
       </button>
 </div>

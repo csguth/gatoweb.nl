@@ -3,8 +3,8 @@
      js/lang-persist.js records whichever language page you land on, and the root
      redirect (js/root-redirect.js) reads that back for returning visitors. */}}
 {{- $flags := dict "en" "🇬🇧" "nl" "🇳🇱" "pt" "🇵🇹" }}
-<nav aria-label="{{ i18n "nav.language_selector" }}" class="flex items-center gap-1 text-xs font-semibold border border-sage-200 rounded-full px-2 py-1 bg-white">
+<nav aria-label="{{ i18n "nav.language_selector" }}" class="flex items-center gap-1 text-xs font-semibold border border-brand-sand rounded-full px-2 py-1 bg-white">
 {{- range .AllTranslations }}
-  <a class="px-1.5 py-0.5 rounded-full transition {{ if eq .Language.Lang $.Language.Lang }}bg-sage-600 text-white{{ else }}text-sage-600 hover:bg-sage-50{{ end }}" href="{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="true"{{ end }}>{{ index $flags .Language.Lang }} {{ upper .Language.Lang }}</a>
+  <a class="px-1.5 py-0.5 rounded-full transition {{ if eq .Language.Lang $.Language.Lang }}bg-brand-ink text-white{{ else }}text-brand-ink hover:bg-brand-sand{{ end }}" href="{{ .RelPermalink }}" hreflang="{{ .Language.Lang }}"{{ if eq .Language.Lang $.Language.Lang }} aria-current="true"{{ end }}>{{ index $flags .Language.Lang }} {{ upper .Language.Lang }}</a>
 {{- end }}
 </nav>
