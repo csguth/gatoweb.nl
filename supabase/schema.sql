@@ -127,12 +127,21 @@ alter table public.bookings enable row level security;
 
 -- Booking a visit now requires a client account (issue #12): only an authenticated user
 -- can insert, and only as their own booking (user_id must match their own auth uid).
+-- Also blocks clients from setting financial columns on insert (issue #58): final_amount
+-- must stay null and adjustment_amount at its zero default until staff runs
+-- approve_booking(), which is the only place those columns should be written.
 drop policy if exists "public can insert pending bookings" on public.bookings;
 drop policy if exists "clients can insert own pending bookings" on public.bookings;
 create policy "clients can insert own pending bookings"
   on public.bookings for insert
   to authenticated
-  with check (status = 'pending' and factuur_number is null and user_id = auth.uid());
+  with check (
+    status = 'pending'
+    and factuur_number is null
+    and user_id = auth.uid()
+    and final_amount is null
+    and adjustment_amount = 0
+  );
 
 -- Staff (Ligia) can see every booking; a client can only see their own.
 drop policy if exists "authenticated can select bookings" on public.bookings;
