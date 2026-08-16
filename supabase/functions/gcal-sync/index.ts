@@ -43,6 +43,25 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+// SHA-256 hex digest, used to compare secrets in constant time (see timingSafeEqual below).
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+// Comparing the webhook secret with `!==` leaks timing information proportional to how
+// many leading bytes match, letting an attacker brute-force it byte by byte. Hashing both
+// sides first means any single-byte difference in the input completely changes the fixed-
+// length digest (avalanche effect), so an early string-comparison exit on the hash reveals
+// nothing about the original secret.
+async function timingSafeSecretEqual(a: string, b: string): Promise<boolean> {
+  const [hashA, hashB] = await Promise.all([sha256Hex(a), sha256Hex(b)]);
+  return hashA === hashB;
+}
+
 async function getGoogleAccessToken(): Promise<string> {
   const clientId = Deno.env.get("GOOGLE_CLIENT_ID");
   const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET");
@@ -159,7 +178,10 @@ Deno.serve(async (req: Request) => {
 
   const expectedSecret = Deno.env.get("GCAL_WEBHOOK_SECRET");
   const providedSecret = req.headers.get("x-gcal-webhook-secret");
-  if (!expectedSecret || providedSecret !== expectedSecret) {
+  if (
+    !expectedSecret || !providedSecret ||
+    !(await timingSafeSecretEqual(providedSecret, expectedSecret))
+  ) {
     return jsonResponse({ error: "Unauthorized" }, 401);
   }
 
