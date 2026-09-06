@@ -19,17 +19,21 @@ function makeRecord(overrides) {
     pets: [{ type: 'cat', name: 'Mia' }],
     preference: 'morning',
     tikkie_sent: false,
-    google_event_id: null,
+    google_event_ids: {},
     ...overrides
   };
 }
 
-Given('a booking with status {string} and no calendar event', async ({}, status) => {
-  world.record = makeRecord({ status, google_event_id: null });
+Given('a booking with status {string} and no calendar events', async ({}, status) => {
+  world.record = makeRecord({ status, google_event_ids: {} });
 });
 
-Given('a booking with status {string} and calendar event {string}', async ({}, status, eventId) => {
-  world.record = makeRecord({ status, google_event_id: eventId });
+Given('a booking with status {string} and calendar events for {string}', async ({}, status, dates) => {
+  const google_event_ids = {};
+  dates.split(',').forEach((d, i) => {
+    google_event_ids[d.trim()] = `evt-${i + 1}`;
+  });
+  world.record = makeRecord({ status, google_event_ids });
 });
 
 Given('the booking previously had status {string}', async ({}, status) => {

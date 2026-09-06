@@ -2,11 +2,11 @@
 //
 // Thin I/O adapter ONLY: this file's job is to talk to Postgres/Supabase and
 // the Google Calendar API. Every actual business decision (what time slot does
-// this booking get? should we create/update/delete/skip the calendar event?)
+// each day get? one event per day? which days need creating/updating/deleting?)
 // lives in the pure, framework-agnostic ./logic.js module instead, which is
 // covered by the Gherkin scenarios in tests/bdd/features/gcal-sync-*.feature
 // and importable/testable without Deno, a browser or real network calls. If
-// you need to change *when* something syncs or *what* the event looks like,
+// you need to change *when* something syncs or *what* the events look like,
 // change logic.js (and its tests) — this file should rarely need to change.
 //
 // Called by the `notify_gcal_sync()` Postgres trigger (see supabase/schema.sql)
@@ -21,7 +21,7 @@
 //   GCAL_WEBHOOK_SECRET
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are auto-injected by the platform.
 
-import { buildEventBody, decideSyncAction } from "./logic.js";
+import { decideSyncAction, planDailySync } from "./logic.js";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_CALENDAR_API = "https://www.googleapis.com/calendar/v3";
@@ -37,7 +37,10 @@ interface BookingRecord {
   pets?: unknown;
   preference?: string | null;
   tikkie_sent?: boolean;
-  google_event_id?: string | null;
+  // Map of 'YYYY-MM-DD' -> Google Calendar event id, one entry per day that
+  // currently has an event (issue #160 — one event per day, not one event
+  // spanning the whole stay). Maintained ONLY by this Edge Function.
+  google_event_ids?: Record<string, string> | null;
 }
 
 interface WebhookPayload {
@@ -106,39 +109,34 @@ function eventUrl(calendarId: string, eventId?: string): string {
   return eventId ? `${base}/${encodeURIComponent(eventId)}` : base;
 }
 
-async function createEvent(accessToken: string, calendarId: string, record: BookingRecord) {
+async function createEvent(accessToken: string, calendarId: string, body: unknown): Promise<string> {
   const res = await fetch(eventUrl(calendarId), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(buildEventBody(record)),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     throw new Error(`Failed to create Google Calendar event: ${res.status} ${await res.text()}`);
   }
-  return res.json();
+  const event = await res.json();
+  return event.id as string;
 }
 
-async function updateEvent(
-  accessToken: string,
-  calendarId: string,
-  eventId: string,
-  record: BookingRecord,
-) {
+async function updateEvent(accessToken: string, calendarId: string, eventId: string, body: unknown) {
   const res = await fetch(eventUrl(calendarId, eventId), {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(buildEventBody(record)),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     throw new Error(`Failed to update Google Calendar event: ${res.status} ${await res.text()}`);
   }
-  return res.json();
 }
 
 async function deleteEvent(accessToken: string, calendarId: string, eventId: string) {
@@ -153,7 +151,7 @@ async function deleteEvent(accessToken: string, calendarId: string, eventId: str
   }
 }
 
-async function setBookingGoogleEventId(bookingId: string, googleEventId: string | null) {
+async function setBookingGoogleEventIds(bookingId: string, googleEventIds: Record<string, string>) {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !serviceRoleKey) {
@@ -168,11 +166,11 @@ async function setBookingGoogleEventId(bookingId: string, googleEventId: string 
       "Content-Type": "application/json",
       Prefer: "return=minimal",
     },
-    body: JSON.stringify({ google_event_id: googleEventId }),
+    body: JSON.stringify({ google_event_ids: googleEventIds }),
   });
 
   if (!res.ok) {
-    throw new Error(`Failed to persist google_event_id: ${res.status} ${await res.text()}`);
+    throw new Error(`Failed to persist google_event_ids: ${res.status} ${await res.text()}`);
   }
 }
 
@@ -202,33 +200,51 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON body" }, 400);
   }
 
-  const { record } = payload;
-  // All the actual decision-making happens in decideSyncAction (logic.js) —
-  // this handler just executes whatever it decided.
+  const { type, record } = payload;
+  // All the actual decision-making happens in logic.js — this handler just
+  // executes whatever decideSyncAction/planDailySync decided.
   const decision = decideSyncAction(payload);
 
+  if (decision.action === "skip") {
+    return jsonResponse({ ok: true, action: "skipped", reason: decision.reason });
+  }
+
+  const plan = planDailySync({ type, record });
+
   try {
-    switch (decision.action) {
-      case "create": {
-        const accessToken = await getGoogleAccessToken();
-        const event = await createEvent(accessToken, calendarId, record);
-        await setBookingGoogleEventId(record.id, event.id);
-        return jsonResponse({ ok: true, action: "created", eventId: event.id, reason: decision.reason });
-      }
-      case "update": {
-        const accessToken = await getGoogleAccessToken();
-        const event = await updateEvent(accessToken, calendarId, record.google_event_id!, record);
-        return jsonResponse({ ok: true, action: "updated", eventId: event.id, reason: decision.reason });
-      }
-      case "delete": {
-        const accessToken = await getGoogleAccessToken();
-        await deleteEvent(accessToken, calendarId, record.google_event_id!);
-        await setBookingGoogleEventId(record.id, null);
-        return jsonResponse({ ok: true, action: "deleted", reason: decision.reason });
-      }
-      default:
-        return jsonResponse({ ok: true, action: "skipped", reason: decision.reason });
+    const accessToken = plan.toCreate.length + plan.toUpdate.length + plan.toDelete.length > 0
+      ? await getGoogleAccessToken()
+      : null;
+
+    const updatedEventIds: Record<string, string> = { ...(record.google_event_ids || {}) };
+
+    for (const { date, eventId } of plan.toDelete) {
+      await deleteEvent(accessToken!, calendarId, eventId);
+      delete updatedEventIds[date];
     }
+
+    for (const { date, eventId, body } of plan.toUpdate) {
+      await updateEvent(accessToken!, calendarId, eventId, body);
+      // eventId unchanged — no need to touch updatedEventIds for this date.
+    }
+
+    for (const { date, body } of plan.toCreate) {
+      updatedEventIds[date] = await createEvent(accessToken!, calendarId, body);
+    }
+
+    // For a genuine row DELETE there is no booking row left to PATCH.
+    if (type !== "DELETE") {
+      await setBookingGoogleEventIds(record.id, updatedEventIds);
+    }
+
+    return jsonResponse({
+      ok: true,
+      action: "synced",
+      reason: decision.reason,
+      created: plan.toCreate.length,
+      updated: plan.toUpdate.length,
+      deleted: plan.toDelete.length,
+    });
   } catch (err) {
     console.error("gcal-sync error:", err);
     return jsonResponse({ error: (err as Error).message }, 500);
