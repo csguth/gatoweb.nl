@@ -3,7 +3,7 @@
 // (no Deno, no network), same style as gcal-sync-*.steps.mjs / payment-url.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { isValidClientEmail, buildInviteRedirectTo } from '../../../supabase/functions/client-invite/logic.js';
+import { isValidClientEmail, buildInviteRedirectTo, isEmailExistsError } from '../../../supabase/functions/client-invite/logic.js';
 
 const { Given, When, Then } = createBdd();
 
@@ -42,5 +42,29 @@ When('the invite redirect is built', async () => {
 Then('the invite redirect URL is {string}', async ({}, expected) => {
   if (world.inviteRedirect !== expected) {
     throw new Error(`Expected redirect "${expected}" but got "${world.inviteRedirect}"`);
+  }
+});
+
+Given('GoTrue responded to the invite attempt with the body {string}', async ({}, body) => {
+  // Examples table cells can't contain literal double quotes without
+  // breaking the surrounding "<response>" step text, so JSON bodies are
+  // written with single quotes here and normalized to real JSON before
+  // being handed to isEmailExistsError().
+  world.goTrueBody = body.replace(/'/g, '"');
+});
+
+When('the response is checked for an {string} error', async ({}, _label) => {
+  world.emailExistsDetected = isEmailExistsError(world.goTrueBody);
+});
+
+Then('the error is detected', async () => {
+  if (world.emailExistsDetected !== true) {
+    throw new Error('Expected the email_exists error to be detected but it was not');
+  }
+});
+
+Then('the error is not detected', async () => {
+  if (world.emailExistsDetected !== false) {
+    throw new Error('Expected the email_exists error to NOT be detected but it was');
   }
 });

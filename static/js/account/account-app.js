@@ -77,8 +77,13 @@ window.accountApp = function () {
       if (!configured) return;
       // detectSessionInUrl (below) consumes the URL hash to build the
       // session, so read `type` out of it first, before it's gone.
+      // 'recovery' happens when the client's email was already registered
+      // (e.g. they signed up themselves before Lígia invited them) — the
+      // client-invite Edge Function falls back to a recovery link in that
+      // case, but from here it's the same "please set a password" prompt.
       const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-      if (hashParams.get('type') === 'invite') {
+      const linkType = hashParams.get('type');
+      if (linkType === 'invite' || linkType === 'recovery') {
         this.needsPassword = true;
       }
 

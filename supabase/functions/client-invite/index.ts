@@ -40,7 +40,7 @@
 //   3. `supabase functions deploy client-invite` (JWT verification stays ON,
 //      the default — do NOT pass --no-verify-jwt, unlike gcal-sync).
 
-import { buildInviteRedirectTo, isValidClientEmail, normalizeLang } from "./logic.js";
+import { buildInviteRedirectTo, isEmailExistsError, isValidClientEmail, normalizeLang } from "./logic.js";
 
 // Called directly from the browser (facturen-app.js), unlike gcal-sync (which
 // is only ever called server-to-server by pg_net) — needs CORS headers so the
@@ -79,24 +79,39 @@ async function callerIsStaff(supabaseUrl: string, anonKey: string, jwt: string):
 // dependency needed, matching the raw-fetch style already used in
 // ../gcal-sync/index.ts). This never sends an email by itself — it only
 // mints the link, which the caller (facturen-app.js) shows Lígia to copy.
+//
+// IMPORTANT: GoTrue expects `redirect_to` as a URL QUERY STRING parameter on
+// this endpoint, not as a JSON body field — putting it in the body (as an
+// earlier version of this function did, nested under `options`) is silently
+// ignored, and GoTrue falls back to the project's bare Site URL instead
+// (confirmed against gotrue-js's own GoTrueAdminApi.generateLink(), which
+// passes `redirectTo` through to `_request` as a dedicated query param).
 async function generateInviteLink(
   supabaseUrl: string,
   serviceRoleKey: string,
   email: string,
   redirectTo: string,
+  type: "invite" | "recovery" = "invite",
 ): Promise<string> {
-  const res = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
+  const url = new URL(`${supabaseUrl}/auth/v1/admin/generate_link`);
+  url.searchParams.set("redirect_to", redirectTo);
+
+  const res = await fetch(url.toString(), {
     method: "POST",
     headers: {
       apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
+      Authorization: "Bearer " + serviceRoleKey,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ type: "invite", email, options: { redirect_to: redirectTo } }),
+    body: JSON.stringify({ type, email }),
   });
 
   if (!res.ok) {
-    throw new Error(`generate_link failed: ${res.status} ${await res.text()}`);
+    const bodyText = await res.text();
+    if (type === "invite" && isEmailExistsError(bodyText)) {
+      return generateInviteLink(supabaseUrl, serviceRoleKey, email, redirectTo, "recovery");
+    }
+    throw new Error(`generate_link failed: ${res.status} ${bodyText}`);
   }
 
   const data = await res.json();

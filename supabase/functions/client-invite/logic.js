@@ -27,3 +27,20 @@ export function buildInviteRedirectTo(siteUrl, lang) {
   const base = String(siteUrl || '').replace(/\/+$/, '');
   return base + '/' + normalizeLang(lang) + '/account/';
 }
+
+// GoTrue's admin generate_link endpoint rejects `type: 'invite'` with HTTP 422
+// and error_code 'email_exists' when the target email is already a registered
+// auth.users account — e.g. the client already signed up themselves through
+// the normal booking form before Lígia got around to inviting them from the
+// clients panel. In that case a 'recovery' link (which authenticates an
+// EXISTING user and lets them set a new password, same as an invite link from
+// the client's point of view) is the right fallback instead of a hard
+// failure — see generateInviteLink()'s retry in index.ts.
+export function isEmailExistsError(responseBodyText) {
+  try {
+    const body = JSON.parse(responseBodyText);
+    return body && body.error_code === 'email_exists';
+  } catch {
+    return false;
+  }
+}

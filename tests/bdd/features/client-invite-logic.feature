@@ -31,3 +31,20 @@ Feature: Client invite link decisions
       | nl   | https://gatoweb.nl/nl/account/ |
       | pt   | https://gatoweb.nl/pt/account/ |
       | fr   | https://gatoweb.nl/en/account/ |
+
+  Scenario Outline: Falling back to a recovery link when the client already has an account
+    A client may have already signed up themselves through the normal booking
+    form before Lígia got around to inviting them from the clients panel — in
+    that case GoTrue rejects a fresh 'invite' link with error_code
+    'email_exists', and generateInviteLink() (index.ts) retries once with
+    'recovery' instead, which authenticates that existing user just the same.
+
+    Given GoTrue responded to the invite attempt with the body "<response>"
+    When the response is checked for an "email already registered" error
+    Then the error is <verdict>
+
+    Examples:
+      | response                                                             | verdict   |
+      | {'code':422,'error_code':'email_exists','msg':'already registered'}  | detected  |
+      | {'code':400,'error_code':'validation_failed','msg':'bad request'}    | not detected |
+      | not even json                                                        | not detected |

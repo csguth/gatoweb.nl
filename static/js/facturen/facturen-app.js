@@ -369,10 +369,26 @@ window.facturenApp = function () {
         await supabase.from('clients').update({ invited_at: new Date().toISOString() }).eq('id', c.id);
         c.invited_at = c.invited_at || new Date().toISOString();
       } catch (err) {
-        alert(err.message || t('clients.invite_error'));
+        alert(await this.describeInviteError(err));
       } finally {
         c._inviteBusy = false;
       }
+    },
+
+    // supabase-js's FunctionsHttpError only carries a generic "Edge Function
+    // returned a non-2xx status code" in err.message — the actual { error }
+    // body our Edge Function sent back (e.g. "A valid email is required")
+    // is on err.context, a Response object that must be read separately.
+    async describeInviteError(err) {
+      if (err && err.context && typeof err.context.json === 'function') {
+        try {
+          const body = await err.context.json();
+          if (body && body.error) return body.error;
+        } catch {
+          // context wasn't JSON — fall through to the generic message below.
+        }
+      }
+      return (err && err.message) || t('clients.invite_error');
     },
 
     async copyInviteLink(c) {
