@@ -44,3 +44,21 @@ export function isEmailExistsError(responseBodyText) {
     return false;
   }
 }
+
+// GoTrue's invite/recovery links are SINGLE-USE: the token is consumed the
+// instant *anything* issues a GET to it. Since Lígia sends this link over
+// WhatsApp, WhatsApp's own servers fetch the URL right away to build the
+// chat's link-preview card — silently burning the one-time token before the
+// client ever gets to click it themselves, so they land on an "invalid or
+// expired" error instead of the account page.
+//
+// The fix is a small bridge page on our own domain (/activate/) that WhatsApp
+// can safely preview (it's just static HTML — the crawler never runs JS or
+// follows the link on the page), and which only redirects to the real,
+// sensitive GoTrue link once a human actually clicks a button on it. This
+// wraps the raw action_link into that bridge page's URL, carrying the real
+// link along as an (encoded) query parameter.
+export function buildActivationUrl(siteUrl, lang, rawLink) {
+  const base = String(siteUrl || '').replace(/\/+$/, '');
+  return base + '/' + normalizeLang(lang) + '/activate/?verify=' + encodeURIComponent(rawLink);
+}

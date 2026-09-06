@@ -14,6 +14,9 @@
     "not_configured": "De dienst is nog niet geconfigureerd.",
     "linked_bookings_message": "We hebben {{count}} eerdere boeking(en) aan je account gekoppeld."
   },
+  "activate": {
+    "missing_link": "Deze activeringslink ontbreekt of is ongeldig. Vraag Lígia om een nieuwe."
+  },
   "clients": {
     "name_required": "Vul de naam van de klant in.",
     "email_required": "Vul een geldig e-mailadres in.",

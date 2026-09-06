@@ -6,6 +6,10 @@
 # stay in locales/pt.json instead.
 
 # ── account ─────────────────────────────────────────────
+# ── activate ─────────────────────────────────────────────
+"static.activate.activate.button" = "Ativar minha conta"
+"static.activate.activate.help" = "Você foi convidado(a) para uma conta Gato Catsit. Clique abaixo para ativá-la e definir sua senha."
+"static.activate.activate.title" = "Ative sua conta"
 # ── shared (site chrome) ─────────────────────────────────────
 "staging_banner.message" = "ambiente de testes, não é o site oficial"
 "form.email_placeholder" = "E-mail"

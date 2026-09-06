@@ -6,6 +6,10 @@
 # stay in locales/nl.json instead.
 
 # ── account ─────────────────────────────────────────────
+# ── activate ─────────────────────────────────────────────
+"static.activate.activate.button" = "Mijn account activeren"
+"static.activate.activate.help" = "Je bent uitgenodigd voor een Gato Catsit-account. Klik hieronder om het te activeren en je wachtwoord in te stellen."
+"static.activate.activate.title" = "Activeer je account"
 # ── shared (site chrome) ─────────────────────────────────────
 "staging_banner.message" = "testomgeving, niet de live site"
 "form.email_placeholder" = "E-mail"

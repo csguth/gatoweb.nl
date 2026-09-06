@@ -14,6 +14,9 @@
     "not_configured": "O serviço ainda não está configurado.",
     "linked_bookings_message": "Vinculamos {{count}} reserva(s) anterior(es) à sua conta."
   },
+  "activate": {
+    "missing_link": "Este link de ativação está ausente ou inválido. Peça um novo à Lígia."
+  },
   "clients": {
     "name_required": "Informe o nome do cliente.",
     "email_required": "Informe um e-mail válido.",

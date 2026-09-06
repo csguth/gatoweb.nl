@@ -14,6 +14,9 @@
     "not_configured": "Service is not configured yet.",
     "linked_bookings_message": "We linked {{count}} previous booking(s) to your account."
   },
+  "activate": {
+    "missing_link": "This activation link is missing or invalid. Please ask Lígia for a new one."
+  },
   "clients": {
     "name_required": "Please enter the client's name.",
     "email_required": "Please enter a valid email.",

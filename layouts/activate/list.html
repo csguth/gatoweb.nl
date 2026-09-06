@@ -1,0 +1,36 @@
+{{ define "main" }}
+<div class="max-w-lg mx-auto px-5 py-10">
+{{ partial "internal-nav.html" (dict "booking" true) }}
+<div class="flex items-center justify-between mb-6">
+<h1 class="font-display text-2xl font-bold text-brand-ink">
+        🐾 <span>{{ i18n "static.activate.activate.title" }}</span>
+</h1>
+</div>
+<div data-x-data="activateApp()" data-x-init="init()">
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-sand space-y-5" data-x-show="!invalidLink" data-x-cloak="">
+<p class="text-sm text-brand-ink/70">
+<span>{{ i18n "static.activate.activate.help" }}</span>
+</p>
+<a data-x-bind:href="activationLink" class="block text-center bg-brand-ink hover:bg-brand-wine text-white font-semibold py-3 rounded-xl text-sm transition">
+<span>{{ i18n "static.activate.activate.button" }}</span>
+</a>
+</div>
+<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm" data-x-show="invalidLink" data-x-cloak="">
+<span data-x-text="missingLinkMessage()"></span>
+</div>
+</div>
+</div>
+<!-- Language selector (issue #154): a minimal footer, matching the home page where
+     the switcher also lives at the bottom. -->
+<footer class="max-w-lg mx-auto px-5 pb-10 flex justify-center text-brand-ink">
+{{ partial "lang-switcher.html" . }}
+</footer>
+<!-- Invite activation bridge (issue #173 follow-up) — see js/activate/activate-app.js -->
+
+<!-- Alpine must load after the module script above so window.activateApp already exists
+       when Alpine scans and evaluates data-x-data on the page. -->
+{{ end }}
+{{ define "scripts" }}
+<script src="/js/activate/activate-app.js" type="module"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{ end }}

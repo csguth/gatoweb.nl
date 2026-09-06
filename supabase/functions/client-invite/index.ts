@@ -40,7 +40,7 @@
 //   3. `supabase functions deploy client-invite` (JWT verification stays ON,
 //      the default — do NOT pass --no-verify-jwt, unlike gcal-sync).
 
-import { buildInviteRedirectTo, isEmailExistsError, isValidClientEmail, normalizeLang } from "./logic.js";
+import { buildActivationUrl, buildInviteRedirectTo, isEmailExistsError, isValidClientEmail, normalizeLang } from "./logic.js";
 
 // Called directly from the browser (facturen-app.js), unlike gcal-sync (which
 // is only ever called server-to-server by pg_net) — needs CORS headers so the
@@ -160,7 +160,11 @@ Deno.serve(async (req: Request) => {
   const redirectTo = buildInviteRedirectTo(siteUrl, normalizeLang(body.lang));
 
   try {
-    const link = await generateInviteLink(supabaseUrl, serviceRoleKey, email, redirectTo);
+    const rawLink = await generateInviteLink(supabaseUrl, serviceRoleKey, email, redirectTo);
+    // Never hand the raw GoTrue link to Lígia — it's single-use, and
+    // WhatsApp's own link-preview crawler would silently consume it before
+    // the client clicks it. See buildActivationUrl() in logic.js.
+    const link = buildActivationUrl(siteUrl, normalizeLang(body.lang), rawLink);
     return jsonResponse({ link });
   } catch (err) {
     console.error("client-invite error:", err);
