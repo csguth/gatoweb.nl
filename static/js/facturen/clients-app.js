@@ -1,5 +1,5 @@
 // clientsApp() Alpine component for the standalone Clients page
-// (layouts/facturen/clients/list.html, issue #173 follow-up). Lígia
+// (layouts/clients/list.html, issue #173 follow-up). Lígia
 // pre-registers an existing client's info here and mints a native Supabase
 // invite link for them on demand — see supabase/functions/client-invite and
 // the `clients` table in supabase/schema.sql. Sorting/filtering/pagination
@@ -17,7 +17,7 @@ const t = (key, options) => window.t(key, options);
 const PAGE_SIZE = 10;
 
 // Same storageKey as facturen.html ('gatoweb-facturen-auth') so Lígia stays
-// logged in when navigating between /facturen/ and /facturen/clients/ —
+// logged in when navigating between /facturen/ and /clients/ —
 // this page is just as staff-only, so it must never be confused with a
 // client's own session (see 'gatoweb-client-auth' in account-app.js).
 const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {

@@ -1,10 +1,10 @@
 Feature: Standalone Clients page (issue #173 follow-up)
-  Lígia manages her client roster from its own page (/facturen/clients/,
-  linked from the Invoices dashboard), separate from the invoices kanban
-  board. She can register a client, search/filter/sort the roster, page
-  through it, and mint a fresh Supabase invite link there to copy or send
-  via WhatsApp herself — no email is ever sent automatically. See
-  js/facturen/clients-app.js and layouts/facturen/clients/list.html.
+  Lígia manages her client roster from its own page (/clients/, linked from
+  the Invoices dashboard), separate from the invoices kanban board. She can
+  register a client, search/filter/sort the roster, page through it, and
+  mint a fresh Supabase invite link there to copy or send via WhatsApp
+  herself — no email is ever sent automatically. See
+  js/facturen/clients-app.js and layouts/clients/list.html.
 
   Background:
     Given I am logged in on the clients page

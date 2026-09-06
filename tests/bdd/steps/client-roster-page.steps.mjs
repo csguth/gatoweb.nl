@@ -1,5 +1,5 @@
 // Step definitions for tests/bdd/features/client-roster-page.feature
-// (layouts/facturen/clients/list.html + js/facturen/clients-app.js, issue
+// (layouts/clients/list.html + js/facturen/clients-app.js, issue
 // #173 follow-up). Runs against the "production-auth" fixture via
 // @auth-required, same approach as account-tikkie.steps.mjs: no real
 // backend — a fake session and client roster are seeded straight into
@@ -50,7 +50,7 @@ async function currentClients(page) {
 }
 
 Given('I am logged in on the clients page', async ({ page }) => {
-  await page.goto('/en/facturen/clients/');
+  await page.goto('/en/clients/');
   await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
   await page.waitForFunction(
     () => window.Alpine && document.querySelector('[data-x-data="clientsApp()"]')

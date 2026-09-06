@@ -1,5 +1,5 @@
 // Pure helpers (issue #173 follow-up) for the standalone Clients page
-// (js/facturen/clients-app.js + layouts/facturen/clients/list.html): status
+// (js/facturen/clients-app.js + layouts/clients/list.html): status
 // derivation, search matching, sorting and pagination for the client roster.
 //
 // No i18n/DOM/Alpine/Supabase here on purpose — keeping it pure makes it easy
