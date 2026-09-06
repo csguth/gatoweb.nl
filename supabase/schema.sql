@@ -378,15 +378,17 @@ grant execute on function public.edit_client_info(uuid, text, text, text, text) 
 -- Google Calendar sync (issues #6, #160)
 --
 -- The Google Calendar is kept as a live projection of `bookings`, one event
--- PER DAY of the stay (not one event spanning the whole booking) so each
--- visit can be moved/edited independently in Calendar: events are created
--- once a booking is approved, updated in place (same event id) when a day's
--- content changes, new days get new events, removed days get their events
--- deleted, and every day's event is removed once the booking is no longer
--- approved (e.g. cancelled) or its row is deleted. This trigger intentionally
--- does NOT decide any of that itself — it just forwards every
--- INSERT/UPDATE/DELETE of a calendar-relevant field to the gcal-sync Edge
--- Function, whose `decideSyncAction()`/`planDailySync()` (see
+-- PER VISIT (a "both" day gets two events — one for the morning visit, one
+-- for the evening visit — not one event spanning the whole day, and not one
+-- event spanning the whole booking) so each visit can be moved/edited
+-- independently in Calendar: events are created once a booking is approved,
+-- updated in place (same event id) when a visit's content changes, new
+-- visits get new events, removed visits get their events deleted, and every
+-- visit's event is removed once the booking is no longer approved (e.g.
+-- cancelled) or its row is deleted. This trigger intentionally does NOT
+-- decide any of that itself — it just forwards every INSERT/UPDATE/DELETE of
+-- a calendar-relevant field to the gcal-sync Edge Function, whose
+-- `decideSyncAction()`/`planDailySync()` (see
 -- supabase/functions/gcal-sync/logic.js, covered by
 -- tests/bdd/features/gcal-sync-*.feature) are the single source of truth for
 -- what actually happens. Reminders come for free from the Google Calendar app
@@ -404,13 +406,16 @@ drop trigger if exists bookings_gcal_sync_status_update on public.bookings;
 drop trigger if exists bookings_gcal_sync_relevant_update on public.bookings;
 drop trigger if exists bookings_gcal_sync_delete on public.bookings;
 
--- Superseded by google_event_ids below (issue #160 — one event per day
--- instead of one event per booking). Safe to drop: no other code reads it.
+-- Superseded by google_event_ids below (issue #160 — one event per visit
+-- occurrence instead of one event per booking). Safe to drop: no other code
+-- reads it.
 alter table public.bookings drop column if exists google_event_id;
 
--- Map of 'YYYY-MM-DD' -> Google Calendar event id, one entry per day that
--- currently has an event on the calendar (issue #160). Written ONLY by the
--- gcal-sync Edge Function — never set this from the client/app.
+-- Map of 'YYYY-MM-DD#slot' -> Google Calendar event id, one entry per visit
+-- occurrence that currently has an event on the calendar (issue #160) — a
+-- "both" preference day has two entries, e.g. '2025-03-10#morning' and
+-- '2025-03-10#evening'. Written ONLY by the gcal-sync Edge Function — never
+-- set this from the client/app.
 alter table public.bookings add column if not exists google_event_ids jsonb not null default '{}'::jsonb;
 
 -- One-time manual step per project (run once in staging, once in production, in the
