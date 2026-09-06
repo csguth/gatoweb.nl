@@ -47,8 +47,30 @@ Then('the current query string is {string}', async ({ page }, expected) => {
 });
 
 When('I follow the language selector link for {string}', async ({ page }, lang) => {
-  await page.locator(`nav a[hreflang="${lang}"]`).click();
+  // The selector is a footer dropdown (issue #154), so it has to be opened first.
+  await page.locator('footer .lang-switcher-btn').click();
+  await page.locator(`.lang-switcher-menu a[hreflang="${lang}"]`).click();
   await page.waitForURL(new RegExp(`/${lang}/$`));
+});
+
+When('I open the language selector', async ({ page }) => {
+  await page.locator('footer .lang-switcher-btn').click();
+});
+
+When('I press Escape', async ({ page }) => {
+  await page.keyboard.press('Escape');
+});
+
+Then('the language menu is visible', async ({ page }) => {
+  await expect(page.locator('.lang-switcher-menu')).toBeVisible();
+});
+
+Then('the language menu is hidden', async ({ page }) => {
+  await expect(page.locator('.lang-switcher-menu')).toBeHidden();
+});
+
+Then('the language menu lists {string}', async ({ page }, name) => {
+  await expect(page.locator('.lang-switcher-menu [role="option"]', { hasText: name })).toBeVisible();
 });
 
 Then('the current path is {string}', async ({ page }, expectedPath) => {

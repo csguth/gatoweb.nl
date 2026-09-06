@@ -7,11 +7,15 @@ name: Keep Supabase Alive
 # accepted residual risks.
 #
 # Pings both Supabase projects (staging + production are separate projects, see
-# README > Environments) daily via a real REST API SELECT against the dedicated
-# public.keepalive table (supabase/schema.sql), which Supabase counts as activity.
-# Running daily (rather than the 2x/week some guides suggest) leaves a wide safety
-# margin, since GitHub Actions' `schedule` trigger is best-effort and can be
-# delayed or occasionally skipped.
+# README > Environments) daily via a real REST API RPC call
+# (POST .../rest/v1/rpc/ping_keepalive) that performs a genuine UPDATE against the
+# dedicated public.keepalive table (supabase/schema.sql). An earlier version of this
+# workflow used a plain SELECT, which kept succeeding (HTTP 200) yet the project
+# still received a Supabase "scheduled to be paused" warning — a read-only ping does
+# not reliably count as activity under Supabase's undocumented low-activity
+# heuristic, so this now performs a write instead. Running daily (rather than the
+# 2x/week some guides suggest) leaves a wide safety margin, since GitHub Actions'
+# `schedule` trigger is best-effort and can be delayed or occasionally skipped.
 on:
   schedule:
     - cron: '0 6 * * *'
@@ -43,9 +47,12 @@ jobs:
 
           response="$(mktemp)"
           status="$(curl -sS -o "${response}" -w '%{http_code}' \
-            "${SUPABASE_URL}/rest/v1/keepalive?select=id&limit=1" \
+            -X POST \
+            "${SUPABASE_URL}/rest/v1/rpc/ping_keepalive" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")"
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{}')"
 
           echo "Response (HTTP ${status}):"
           cat "${response}"

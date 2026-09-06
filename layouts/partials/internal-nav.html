@@ -1,0 +1,26 @@
+{{/* Navigation for the internal pages (account, facturen) — issue #98.
+
+     Both pages were dead ends: once a client opened "My bookings" there was no link
+     back to the site and no way to start another booking.
+
+     The logo doubles as the Home link, which is the usual web convention and also
+     puts the brand back on these pages. `booking` adds the "Book a visit" CTA — the
+     action a client is most likely to want from their bookings list, but meaningless
+     on Lígia's own invoicing page.
+
+     Usage: {{ partial "internal-nav.html" (dict "booking" true) }} */}}
+<nav aria-label="{{ i18n "nav.back_to_site" }}" class="flex items-center justify-between gap-4 mb-8">
+  <a class="shrink-0 transition hover:opacity-80" href="{{ "/" | relLangURL }}" title="{{ i18n "nav.home" }}">
+    <img alt="__BRAND_NAME__" class="h-12 md:h-14 w-auto" height="55" src="/images/logo.png" width="140" />
+  </a>
+{{- if .booking }}
+  <a class="shrink-0 inline-flex items-center gap-1.5 bg-brand-red hover:bg-brand-wine text-white text-xs font-semibold px-4 py-2 rounded-full transition" href="{{ "/" | relLangURL }}#booking">
+    {{ partial "icon.html" (dict "name" "calendar" "class" "w-4 h-4" "size" 16) }}
+    <span>{{ i18n "nav.book_a_visit" }}</span>
+  </a>
+{{- else }}
+  <a class="shrink-0 text-xs font-semibold text-brand-ink/70 hover:text-brand-ink transition" href="{{ "/" | relLangURL }}">
+    <span>{{ i18n "nav.back_to_site" }}</span>
+  </a>
+{{- end }}
+</nav>

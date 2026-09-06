@@ -34,16 +34,18 @@ layouts/
   account/list.html      Client account page markup
   facturen/list.html     Invoicing dashboard markup
   alias.html             Redirect template: bare "/" language picker + legacy URLs
-  partials/              head.html, staging-banner.html, lang-switcher.html
+  partials/              head.html, staging-banner.html, lang-switcher.html, icon.html, whatsapp-glyph.html
 i18n/{en,nl,pt}.toml   Compile-time UI strings ({{ i18n "static.<page>.<section>.<slug>" }})
 static/                Copied verbatim into the build output
   css/ js/ images/
+  images/icons/            Brand icon set from the Canva design (scripts/canva-icons.py)
   locales/{en,nl,pt}.json   Runtime-only strings that JavaScript builds (t('...'))
   robots.txt, sitemap.xml, CNAME
   account.html, facturen.html  Redirect stubs for the pre-Hugo URLs
 site/                  Build output (git-ignored) — what actually gets deployed
 supabase/schema.sql    Database schema: bookings table, RLS policies, approve_booking()
 scripts/i18n-check.mjs Checks that every i18n/t() key used actually exists in all languages
+scripts/canva-icons.py Rebuilds static/images/icons/ from Lígia's Canva design (#139)
 .github/actions/
   setup-hugo/          Installs the pinned Hugo version (used by every workflow)
   build-site/          hugo build + placeholder substitution + generated js/config.js
@@ -229,6 +231,8 @@ variables → Actions → Variables`). Use **Secrets** only for actual credentia
 - `CONTACT_EMAIL`
 - `CITY_NAME` — e.g. `'s-Hertogenbosch`
 - `PRICE_ONE_VISIT`, `PRICE_TWO_VISITS`, `DOG_WALK_PRICE_FROM` — numeric
+- `INSTAGRAM_HANDLE` — optional, without the `@` (defaults to `gatocatsit`); linked from the
+  social CTA in the footer
 
 ### Optional (facturen/invoicing feature, issue #5)
 
@@ -282,15 +286,18 @@ Since staging (`gato-catsit-staging`) and production (`gato-catsit`) are separat
 projects, each can pause independently.
 
 `.github/workflows/keep-alive.yml` mitigates this with a daily (`workflow_dispatch`-triggerable)
-ping to both projects: a real `GET /rest/v1/keepalive?select=id&limit=1` REST call using each
-environment's `SUPABASE_URL`/`SUPABASE_ANON_KEY`, which Supabase counts as genuine database
-activity (just loading the site's homepage does not, if it doesn't trigger a DB read). It targets
-a small dedicated `public.keepalive` table (`supabase/schema.sql`) — RLS-enabled with an explicit
-anon `SELECT` policy and no meaningful data — rather than `bookings`/`staff_emails`, since the
-anon key can't (and shouldn't) read either of those. The job fails loudly (not silently) on a
-non-2xx response so a broken ping surfaces via GitHub's scheduled-workflow-failure email with
-enough runway before the 7-day pause window. See issue #121 for the full rationale and accepted
-residual risks (this is a best-effort mitigation, not a guaranteed fix).
+ping to both projects: a real `POST /rest/v1/rpc/ping_keepalive` REST call using each
+environment's `SUPABASE_URL`/`SUPABASE_ANON_KEY`, which performs a genuine write (`UPDATE`) against
+a small dedicated `public.keepalive` table (`supabase/schema.sql`) — RLS-enabled, with `anon`
+allowed only to `EXECUTE` the `SECURITY DEFINER` `ping_keepalive()` function (no direct table
+grants) — rather than `bookings`/`staff_emails`, since the anon key can't (and shouldn't) write to
+either of those. An earlier version of this ping used a plain `SELECT`, which kept succeeding
+(HTTP 200) yet production still received a "scheduled to be paused" warning from Supabase (issue
+#162) — a read-only ping does not reliably count as activity under Supabase's undocumented
+low-activity heuristic, hence the write. The job fails loudly (not silently) on a non-2xx response
+so a broken ping surfaces via GitHub's scheduled-workflow-failure email with enough runway before
+the 7-day pause window. See issues #121 and #162 for the full rationale and accepted residual
+risks (this is a best-effort mitigation, not a guaranteed fix).
 
 ---
 
@@ -388,12 +395,32 @@ DNS propagation: 5-60 minutes.
 - **Translation check:** run `node scripts/i18n-check.mjs` to validate that every `{{ i18n "…" }}` key
   used in `layouts/` exists in all three `i18n/*.toml` files, and every static `t('…')` key used in
   `static/js/` exists in all three `static/locales/*.json` files
+- **Contrast check:** `hugo --gc --minify --destination site && node scripts/preview-fill.mjs`, serve
+  `site/` (e.g. `npx http-server site -p 8913`), then run
+  `node scripts/contrast-audit.mjs http://127.0.0.1:8913` to check every rendered page for WCAG AA
+  contrast failures. Text sitting on a photo is listed separately for a visual check rather than
+  failing the run, since its real backdrop isn't a single colour
 - **Alpine directives use a `data-x-` prefix** (`data-x-data`, `data-x-on:click`, `data-x-bind:class`)
   registered via `Alpine.prefix('data-x-')` in `layouts/partials/head.html`, so every directive is a
   valid HTML5 `data-*` attribute and the pages pass the W3C checker
 - **Booking form:** `localStorage.gatoweb_booking` saves pets/preference (not dates). A separate `localStorage.gatoweb_pending_booking` key (issue #95) stashes a FULL booking (incl. dates) when signup requires email confirmation, so it can be resumed and sent automatically once the client confirms and returns with a session — instead of losing the in-progress request
-- **Colors:** Custom Tailwind palette (sage-600: `#2d5a4b`, warm-500: `#c97d60`)
-- **Fonts:** Playfair Display (serif) + Inter (sans-serif)
+- **Colors:** `brand.*` Tailwind palette from Lígia's Canva design system (issues #137 / #149) —
+  `brand-ink` (`#3D0C11`), `brand-plum`, `brand-wine`, `brand-crimson`, `brand-red` (`#B83C4E`),
+  `brand-blush`, `brand-rose`, `brand-cream` (`#F4F1EA`), `brand-sand`, `brand-moss`, `brand-grey`.
+  Each token is annotated with its role in the design in `static/js/tailwind-config.js`. Status
+  colours (error red, success green, warning amber) stay on Tailwind's defaults — they're semantic,
+  not brand
+- **Fonts:** Anton (`font-display`, headings) + Nunito (`font-sans`, body), both SIL OFL and
+  **self-hosted** from `static/fonts/` — no Google Fonts CDN. They stand in for the Canva fonts in
+  the design ("Extend 50 Mega" and "Bubblebody Neue"), which can't be licensed for use on a
+  self-hosted site. Refresh the woff2 subsets with `node scripts/fetch-fonts.mjs`
+- **Icons:** the hand-drawn set from the same design (issue #139) lives in `static/images/icons/`
+  and is rendered by `{{ partial "icon.html" (dict "name" "cat-head" "class" "w-6 h-6") }}`. They
+  replaced the emojis the UI used to carry — "Visit preference", the pricing cards, "How it works",
+  the footer. Icons are **decorative**: the partial emits `alt="" aria-hidden="true"`, so the label
+  next to them is what screen readers announce. The artwork is dark linework, so on the dark
+  sections it sits in a `brand-red` circle, the way the design does it. Regenerate the set from
+  Canva with `python scripts/canva-icons.py` (see the script's header)
 - **Staging banner:** pure CSS, no JS — `body[data-env="staging"] #env-banner { display: block; }`,
   with `data-env` substituted at build time from the `ENV_LABEL` variable
 - **Why two Cloudflare Pages projects for one repo:** Cloudflare Pages only supports a custom
