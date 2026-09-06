@@ -48,3 +48,15 @@ Feature: Client invite link decisions
       | {'code':422,'error_code':'email_exists','msg':'already registered'}  | detected  |
       | {'code':400,'error_code':'validation_failed','msg':'bad request'}    | not detected |
       | not even json                                                        | not detected |
+
+  Scenario: The invite link Lígia copies is a bridge page, never the raw GoTrue link
+    WhatsApp's own link-preview crawler fetches any URL pasted into a chat —
+    including the invite link — to build the preview card. Since GoTrue's
+    verify link is single-use, that automatic fetch would silently consume it
+    before the client ever clicks it themselves. buildActivationUrl() wraps
+    the real link behind our own /activate/ bridge page instead, which only
+    forwards to it on an actual human click (see layouts/activate/list.html).
+
+    Given a raw GoTrue link "https://project.supabase.co/auth/v1/verify?token=abc123&type=recovery"
+    When the activation URL is built for site "https://gatoweb.nl" and language "nl"
+    Then the activation URL is "https://gatoweb.nl/nl/activate/?verify=https%3A%2F%2Fproject.supabase.co%2Fauth%2Fv1%2Fverify%3Ftoken%3Dabc123%26type%3Drecovery"

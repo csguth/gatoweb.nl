@@ -3,7 +3,7 @@
 // (no Deno, no network), same style as gcal-sync-*.steps.mjs / payment-url.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { isValidClientEmail, buildInviteRedirectTo, isEmailExistsError } from '../../../supabase/functions/client-invite/logic.js';
+import { isValidClientEmail, buildInviteRedirectTo, isEmailExistsError, buildActivationUrl } from '../../../supabase/functions/client-invite/logic.js';
 
 const { Given, When, Then } = createBdd();
 
@@ -66,5 +66,19 @@ Then('the error is detected', async () => {
 Then('the error is not detected', async () => {
   if (world.emailExistsDetected !== false) {
     throw new Error('Expected the email_exists error to NOT be detected but it was');
+  }
+});
+
+Given('a raw GoTrue link {string}', async ({}, link) => {
+  world.rawGoTrueLink = link;
+});
+
+When('the activation URL is built for site {string} and language {string}', async ({}, siteUrl, lang) => {
+  world.activationUrl = buildActivationUrl(siteUrl, lang, world.rawGoTrueLink);
+});
+
+Then('the activation URL is {string}', async ({}, expected) => {
+  if (world.activationUrl !== expected) {
+    throw new Error(`Expected activation URL "${expected}" but got "${world.activationUrl}"`);
   }
 });
