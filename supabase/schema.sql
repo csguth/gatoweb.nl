@@ -375,18 +375,43 @@ grant execute on function public.edit_client_info(uuid, text, text, text, text) 
 --   through /account.html or the booking form on / only ever see their own (RLS above).
 
 -- ─────────────────────────────────────────────────────────────────────────
--- Google Calendar sync (issue #6)
+-- Google Calendar sync (issues #6, #160)
 --
--- Bookings only get pushed to the gcal-sync Edge Function when the admin
--- approves them — pending bookings are not put on the calendar, since they
--- may never be approved. Reminders come for free from the Google Calendar
--- app (default notifications on the calendar), so no bespoke reminder
--- system is built here.
+-- The Google Calendar is kept as a live projection of `bookings`, one event
+-- PER DAY of the stay (not one event spanning the whole booking) so each
+-- visit can be moved/edited independently in Calendar: events are created
+-- once a booking is approved, updated in place (same event id) when a day's
+-- content changes, new days get new events, removed days get their events
+-- deleted, and every day's event is removed once the booking is no longer
+-- approved (e.g. cancelled) or its row is deleted. This trigger intentionally
+-- does NOT decide any of that itself — it just forwards every
+-- INSERT/UPDATE/DELETE of a calendar-relevant field to the gcal-sync Edge
+-- Function, whose `decideSyncAction()`/`planDailySync()` (see
+-- supabase/functions/gcal-sync/logic.js, covered by
+-- tests/bdd/features/gcal-sync-*.feature) are the single source of truth for
+-- what actually happens. Reminders come for free from the Google Calendar app
+-- (default notifications on the calendar), so no bespoke reminder system is
+-- built here.
 -- ─────────────────────────────────────────────────────────────────────────
 
 create extension if not exists pg_net;
 
-alter table public.bookings add column if not exists google_event_id text;
+-- Must drop every trigger that depends on the OLD google_event_id column
+-- before dropping that column below (older schema versions created these
+-- with `when (old.google_event_id is not null)`).
+drop trigger if exists bookings_gcal_sync_insert on public.bookings;
+drop trigger if exists bookings_gcal_sync_status_update on public.bookings;
+drop trigger if exists bookings_gcal_sync_relevant_update on public.bookings;
+drop trigger if exists bookings_gcal_sync_delete on public.bookings;
+
+-- Superseded by google_event_ids below (issue #160 — one event per day
+-- instead of one event per booking). Safe to drop: no other code reads it.
+alter table public.bookings drop column if exists google_event_id;
+
+-- Map of 'YYYY-MM-DD' -> Google Calendar event id, one entry per day that
+-- currently has an event on the calendar (issue #160). Written ONLY by the
+-- gcal-sync Edge Function — never set this from the client/app.
+alter table public.bookings add column if not exists google_event_ids jsonb not null default '{}'::jsonb;
 
 -- One-time manual step per project (run once in staging, once in production, in the
 -- SQL editor) to store the values the trigger below needs without committing them to
@@ -424,8 +449,10 @@ begin
     ),
     body := jsonb_build_object(
       'type', tg_op,
-      'record', to_jsonb(new),
-      'old_record', case when tg_op = 'UPDATE' then to_jsonb(old) else null end
+      -- On DELETE there is no `new` row — `record` is the deleted row itself
+      -- (matches the `record`/`old_record` shape decideSyncAction() expects).
+      'record', to_jsonb(coalesce(new, old)),
+      'old_record', case when tg_op in ('UPDATE', 'DELETE') then to_jsonb(old) else null end
     )
   );
 
@@ -438,17 +465,43 @@ $$;
 -- lint clear for both anon and authenticated.
 revoke all on function public.notify_gcal_sync() from public, anon, authenticated;
 
--- Fires only when status actually changes (e.g. pending -> approved), not on every
--- update — this also avoids a loop when the Edge Function writes google_event_id
--- back onto the row, since that update doesn't touch `status`. The Edge Function
--- itself decides whether the new status warrants creating a calendar event
--- (currently: only "approved").
-drop trigger if exists bookings_gcal_sync_insert on public.bookings;
-drop trigger if exists bookings_gcal_sync_status_update on public.bookings;
-create trigger bookings_gcal_sync_status_update
+-- (Trigger drops already happened above, before dropping the old
+-- google_event_id column they depended on.)
+
+-- Fires on every INSERT — decideSyncAction() (logic.js) skips it unless the row
+-- was inserted already approved (uncommon, but e.g. imported data).
+create trigger bookings_gcal_sync_insert
+  after insert on public.bookings
+  for each row
+  execute function public.notify_gcal_sync();
+
+-- Fires when any field that affects the calendar events' existence or content
+-- changes — NOT on every update. This list must cover exactly the same fields
+-- decideSyncAction()'s RELEVANT_FIELDS uses (supabase/functions/gcal-sync/logic.js)
+-- so the two stay in sync; keep them matched by hand when either changes,
+-- since one is SQL and the other is JS. Excluding `google_event_ids` itself
+-- from this list also avoids a feedback loop when the Edge Function writes it
+-- back onto the row after creating/updating/deleting calendar events.
+create trigger bookings_gcal_sync_relevant_update
   after update on public.bookings
   for each row
-  when (old.status is distinct from new.status)
+  when (
+    old.status is distinct from new.status or
+    old.date_from is distinct from new.date_from or
+    old.date_to is distinct from new.date_to or
+    old.pets is distinct from new.pets or
+    old.preference is distinct from new.preference or
+    old.client_name is distinct from new.client_name or
+    old.client_email is distinct from new.client_email or
+    old.client_contact is distinct from new.client_contact
+  )
+  execute function public.notify_gcal_sync();
+
+-- Fires on DELETE only when the row actually had calendar events to clean up.
+create trigger bookings_gcal_sync_delete
+  after delete on public.bookings
+  for each row
+  when (old.google_event_ids <> '{}'::jsonb)
   execute function public.notify_gcal_sync();
 
 -- ─────────────────────────────────────────────────────────────────────────

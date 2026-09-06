@@ -178,12 +178,41 @@ A [Playwright](https://playwright.dev/) + [playwright-bdd](https://vitalets.gith
   including the high-season surcharge split.
 - **Staging banner** (`tests/bdd/features/staging-banner.feature`) — visible on the staging build,
   hidden on production.
+- **Google Calendar sync** (`tests/bdd/features/gcal-sync-event.feature`,
+  `gcal-sync-sync-decision.feature`) — `supabase/functions/gcal-sync/logic.js`: the time slot derived
+  from a booking's visit preference, and the create/update/delete/skip decision for every
+  INSERT/UPDATE/DELETE of a booking row (issue #160).
 
 The tests run against the real thing: `tests/bdd/support/build-fixtures.mjs` invokes
 `hugo --gc --minify` three times (production / staging / production-with-auth) into a temp folder and
 then applies the same placeholder substitution and `js/config.js` generation the deploy workflows do,
 with fake test values — no real secrets or deployments involved. **Hugo must therefore be installed
 locally to run the suite.**
+
+### Testing pure logic (no browser/DOM needed)
+
+Business logic that doesn't need a DOM — pricing math, or the Google Calendar sync decisions — is
+kept in a plain, framework-agnostic JS module with no imports from Alpine/i18next/Deno/etc
+(`static/js/facturen/invoice-calc.js`, `supabase/functions/gcal-sync/logic.js`). Any runtime-specific
+code (the browser page, or the Deno Edge Function) is kept as a thin adapter that only wires that
+pure module up to real I/O (DOM events, `fetch` calls) — it should rarely need its own tests, since it
+contains no decisions of its own to get wrong.
+
+Because the module has no runtime-specific dependencies, its BDD steps
+(`tests/bdd/steps/invoice-calc.steps.mjs`, `tests/bdd/steps/gcal-sync-*.steps.mjs`) `import` it
+directly and call it like a plain function — no browser page, no Deno, no real network/database calls.
+This is the preferred pattern for new backend/business-logic features going forward:
+
+1. Write the Gherkin scenarios first (`tests/bdd/features/*.feature`) in plain product language —
+   they double as living, human-readable requirements documentation that survives independently of
+   whichever AI/developer wrote the implementation.
+2. Confirm they fail (the step file importing a not-yet-created module is enough to prove this).
+3. Implement the pure module to make them pass, then wire it into the thin adapter (Deno handler,
+   Alpine component, etc.) — the adapter itself stays intentionally free of business rules.
+
+This keeps the code base's actual decisions concentrated in small, dependency-free modules that are
+easy for a human (or a different LLM) to pick up, verify and extend with confidence, independently of
+whichever tool was used to write them.
 
 ### Running locally
 
