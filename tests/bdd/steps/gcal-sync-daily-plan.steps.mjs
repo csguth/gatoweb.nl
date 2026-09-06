@@ -4,7 +4,7 @@
 // same pattern as gcal-sync-event.steps.mjs / invoice-calc.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { planDailySync } from '../../../supabase/functions/gcal-sync/logic.js';
+import { planDailySync, occurrenceKey } from '../../../supabase/functions/gcal-sync/logic.js';
 
 const { Given, When, Then } = createBdd();
 
@@ -23,27 +23,36 @@ function makeRecord(overrides) {
   };
 }
 
-function eventIdsFor(dates) {
+// Parses a comma-separated list of "YYYY-MM-DD slot" occurrences (as written
+// in the Gherkin) into a { key: eventId } map, one evt-N per occurrence.
+function eventIdsFor(occurrencesText) {
   const google_event_ids = {};
-  dates.split(',').forEach((d, i) => {
-    google_event_ids[d.trim()] = `evt-${i + 1}`;
+  occurrencesText.split(',').forEach((entry, i) => {
+    const [date, slot] = entry.trim().split(' ');
+    google_event_ids[occurrenceKey(date, slot)] = `evt-${i + 1}`;
   });
   return google_event_ids;
 }
 
 Given(
-  'a booking from {string} to {string} with status {string} and no existing calendar events',
-  async ({}, from, to, status) => {
+  'a booking from {string} to {string} with {string} preference, status {string} and no existing calendar events',
+  async ({}, from, to, preference, status) => {
     world.type = 'UPDATE';
-    world.record = makeRecord({ date_from: from, date_to: to, status, google_event_ids: {} });
+    world.record = makeRecord({ date_from: from, date_to: to, preference, status, google_event_ids: {} });
   }
 );
 
 Given(
-  'a booking from {string} to {string} with status {string} and existing calendar events for {string}',
-  async ({}, from, to, status, dates) => {
+  'a booking from {string} to {string} with {string} preference, status {string} and existing calendar events for {string}',
+  async ({}, from, to, preference, status, occurrencesText) => {
     world.type = 'UPDATE';
-    world.record = makeRecord({ date_from: from, date_to: to, status, google_event_ids: eventIdsFor(dates) });
+    world.record = makeRecord({
+      date_from: from,
+      date_to: to,
+      preference,
+      status,
+      google_event_ids: eventIdsFor(occurrencesText)
+    });
   }
 );
 
@@ -63,11 +72,11 @@ When('the daily sync plan is computed', async () => {
   world.plan = planDailySync({ type: world.type, record: world.record });
 });
 
-function datesOf(list) {
-  return [...list].map((item) => item.date).sort();
+function occurrenceTextsOf(list) {
+  return [...list].map((item) => `${item.date} ${item.slot}`).sort();
 }
 
-function parseDates(expected) {
+function parseOccurrenceTexts(expected) {
   return expected
     .split(',')
     .map((s) => s.trim())
@@ -75,7 +84,7 @@ function parseDates(expected) {
 }
 
 Then('the plan creates events for {string}', async ({}, expected) => {
-  expectDeepEqual(datesOf(world.plan.toCreate), parseDates(expected), 'toCreate dates');
+  expectDeepEqual(occurrenceTextsOf(world.plan.toCreate), parseOccurrenceTexts(expected), 'toCreate occurrences');
 });
 
 Then('the plan creates no events', async () => {
@@ -83,7 +92,7 @@ Then('the plan creates no events', async () => {
 });
 
 Then('the plan updates events for {string}', async ({}, expected) => {
-  expectDeepEqual(datesOf(world.plan.toUpdate), parseDates(expected), 'toUpdate dates');
+  expectDeepEqual(occurrenceTextsOf(world.plan.toUpdate), parseOccurrenceTexts(expected), 'toUpdate occurrences');
 });
 
 Then('the plan updates no events', async () => {
@@ -91,7 +100,13 @@ Then('the plan updates no events', async () => {
 });
 
 Then('the plan deletes events for {string}', async ({}, expected) => {
-  expectDeepEqual(datesOf(world.plan.toDelete), parseDates(expected), 'toDelete dates');
+  // toDelete items only carry {key, eventId} (the occurrence was already
+  // removed from the desired set, so we don't have a fresh date/slot to
+  // rebuild from) — recover date/slot by splitting the "date#slot" key.
+  const actual = world.plan.toDelete
+    .map((item) => item.key.replace('#', ' '))
+    .sort();
+  expectDeepEqual(actual, parseOccurrenceTexts(expected), 'toDelete occurrences');
 });
 
 Then('the plan deletes no events', async () => {

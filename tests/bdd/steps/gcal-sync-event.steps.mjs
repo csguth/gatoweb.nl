@@ -5,48 +5,21 @@
 // tests/bdd/steps/invoice-calc.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { buildEventBody, datesInRange } from '../../../supabase/functions/gcal-sync/logic.js';
+import { buildEventBody } from '../../../supabase/functions/gcal-sync/logic.js';
 
 const { Given, When, Then } = createBdd();
 
-function baseRecord(overrides) {
-  return {
-    client_name: 'Jane Doe',
+Given('a booking for {string} with pet {string}', async ({}, clientName, petName) => {
+  world.record = {
+    client_name: clientName,
     client_email: 'jane@example.com',
     client_contact: '0612345678',
-    pets: [{ type: 'cat', name: 'Mia' }],
-    preference: 'morning',
-    ...overrides
+    pets: [{ type: 'cat', name: petName }]
   };
-}
-
-Given('a booking from {string} to {string}', async ({}, from, to) => {
-  world.record = baseRecord({ date_from: from, date_to: to });
 });
 
-Given('a booking from {string} with no end date', async ({}, from) => {
-  world.record = baseRecord({ date_from: from, date_to: null });
-});
-
-Given('a booking with {string} preference', async ({}, preference) => {
-  world.record = baseRecord({ preference });
-});
-
-Given('a booking with {string} preference for {string} with pet {string}', async ({}, preference, clientName, petName) => {
-  world.record = baseRecord({ preference, client_name: clientName, pets: [{ type: 'cat', name: petName }] });
-});
-
-When('the dates in range are listed', async () => {
-  world.dates = datesInRange(world.record.date_from, world.record.date_to);
-});
-
-Then('the dates are {string}', async ({}, expected) => {
-  const expectedList = expected.split(',').map((s) => s.trim().replace(/^"|"$/g, ''));
-  expectDeepEqual(world.dates, expectedList, 'dates in range');
-});
-
-When('the calendar event is built for {string}', async ({}, date) => {
-  world.event = buildEventBody(world.record, date);
+When('the calendar event is built for {string} in the {string} slot', async ({}, date, slot) => {
+  world.event = buildEventBody(world.record, date, slot);
 });
 
 Then(
@@ -78,13 +51,5 @@ Then('the event description contains {string}', async ({}, needle) => {
 function expectEqual(actual, expected, label) {
   if (actual !== expected) {
     throw new Error(`Expected ${label} to be ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
-  }
-}
-
-function expectDeepEqual(actual, expected, label) {
-  const a = JSON.stringify(actual);
-  const e = JSON.stringify(expected);
-  if (a !== e) {
-    throw new Error(`Expected ${label} to be ${e} but got ${a}`);
   }
 }
