@@ -452,17 +452,25 @@ create trigger bookings_gcal_sync_status_update
   execute function public.notify_gcal_sync();
 
 -- ─────────────────────────────────────────────────────────────────────────
--- Keep-alive heartbeat (issue #121)
+-- Keep-alive heartbeat (issue #121, hardened per issue #162)
 --
 -- Supabase may pause Free Plan projects after ~7 days of low database activity.
--- .github/workflows/keep-alive.yml pings this table daily via the anon key
--- (GET .../rest/v1/keepalive) for both the staging and production projects, which
--- is enough real DB activity to avoid an automatic pause. This table intentionally
--- holds no meaningful data — it exists ONLY as a safe, non-sensitive SELECT target
--- for the anon key. bookings/staff_emails must NOT be used for this: bookings
--- revokes anon access entirely (see above) and staff_emails is being locked down
--- (see "Fix Supabase RLS security vulnerabilities" issue), so pinging either would
--- fail with 401/403 instead of keeping the project active.
+-- .github/workflows/keep-alive.yml pings this project daily for both the staging
+-- and production projects. This table intentionally holds no meaningful data —
+-- it exists ONLY as a safe, non-sensitive ping target. bookings/staff_emails must
+-- NOT be used for this: bookings revokes anon access entirely (see above) and
+-- staff_emails is being locked down (see "Fix Supabase RLS security
+-- vulnerabilities" issue), so pinging either would fail with 401/403 instead of
+-- keeping the project active.
+--
+-- The original version of this ping did a plain `GET .../rest/v1/keepalive`
+-- (a SELECT). That kept running successfully (HTTP 200) yet the production
+-- project still received a "scheduled to be paused" warning from Supabase, so a
+-- read-only ping does not reliably count as activity under Supabase's
+-- (undocumented, discretionary) low-activity heuristic. ping_keepalive() below
+-- performs a real UPDATE instead — a write, which every keep-alive approach
+-- observed in the wild (e.g. github.com/ongwu/supabase-keepalive,
+-- github.com/AbanoupRefat/supabase-keepalive) relies on instead of a read.
 -- ─────────────────────────────────────────────────────────────────────────
 create table if not exists public.keepalive (
   id int primary key generated always as identity,
@@ -475,10 +483,24 @@ insert into public.keepalive (pinged_at)
 
 alter table public.keepalive enable row level security;
 
+-- No direct table access for anon anymore — writes only happen through
+-- ping_keepalive() below, which is the least-privilege way to allow a write
+-- without exposing INSERT/UPDATE/DELETE on the table itself.
+revoke all on public.keepalive from anon;
 drop policy if exists "anon can select keepalive" on public.keepalive;
-create policy "anon can select keepalive"
-  on public.keepalive for select
-  to anon
-  using (true);
 
-grant select on public.keepalive to anon;
+-- security definer so the anon-callable RPC can UPDATE the row despite RLS
+-- and no direct grants on the table. This is an intentional, narrow exception
+-- to the "anon can execute SECURITY DEFINER function" security-advisor lint:
+-- the function only touches this non-sensitive heartbeat table.
+create or replace function public.ping_keepalive()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.keepalive set pinged_at = now();
+$$;
+
+revoke all on function public.ping_keepalive() from public;
+grant execute on function public.ping_keepalive() to anon;
