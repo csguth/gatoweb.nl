@@ -108,6 +108,17 @@
 "static.facturen.facturen.whatsapp_client" = "WhatsApp client"
 "static.facturen.facturen.working" = "Working..."
 "static.facturen.facturen.working_2" = "Working..."
+# ── facturen clients ─────────────────────────────────────
+"static.facturen.clients.back_to_invoices" = "← Back to Invoices"
+"static.facturen.clients.column_email" = "Email"
+"static.facturen.clients.column_name" = "Name"
+"static.facturen.clients.column_registered" = "Registered"
+"static.facturen.clients.column_status" = "Status"
+"static.facturen.clients.filter_all" = "All statuses"
+"static.facturen.clients.next_page" = "Next →"
+"static.facturen.clients.previous_page" = "← Previous"
+"static.facturen.clients.search_placeholder" = "Search by name, email, phone..."
+"static.facturen.clients.title" = "Clients"
 # ── index ─────────────────────────────────────────────
 "static.index.about.about_l_gia" = "About Lígia"
 "static.index.about.behaviour_consultation" = "Behaviour consultation"

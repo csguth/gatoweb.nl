@@ -109,15 +109,6 @@ window.facturenApp = function () {
     search: '',
     clientEdit: null,
 
-    // Client roster (issue #173, MVP): lets Lígia pre-register an existing
-    // client's info and generate a native Supabase invite link for them to
-    // copy into WhatsApp herself — see supabase/functions/client-invite and
-    // the `clients` table in supabase/schema.sql.
-    clientsPanelOpen: false,
-    clients: [],
-    loadingClients: false,
-    clientForm: null,
-
     get inboxBookings() {
       const term = this.search.trim().toLowerCase();
       return sortInbox(this.bookings.filter(b => b.status === 'pending' && matchesSearch(b, term)));
@@ -292,119 +283,6 @@ window.facturenApp = function () {
         this.bookings.splice(idx, 1, { ...this.bookings[idx], ...updated });
       }
       this.clientEdit = null;
-    },
-
-    // ── Client roster (issue #173, MVP) ──────────────────────────────────
-    // Pre-register an existing client's info, then mint a native Supabase
-    // invite link for them on demand (never automatically — see
-    // generateInviteLink() below) so it's always fresh when Lígia pastes it
-    // into WhatsApp. See supabase/schema.sql (`clients` table) and
-    // supabase/functions/client-invite (the only place the link is created).
-    toggleClientsPanel() {
-      this.clientsPanelOpen = !this.clientsPanelOpen;
-      if (this.clientsPanelOpen && this.clients.length === 0) this.loadClients();
-    },
-
-    async loadClients() {
-      this.loadingClients = true;
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .order('created_at', { ascending: false });
-      this.loadingClients = false;
-      if (error) { alert(error.message); return; }
-      this.clients = (data || []).map(c => ({ ...c, _inviteLink: '', _inviteBusy: false }));
-    },
-
-    openClientForm() {
-      this.clientForm = { name: '', email: '', phone: '', address: '', preferred_lang: 'en', error: '', busy: false };
-    },
-
-    closeClientForm() {
-      this.clientForm = null;
-    },
-
-    async saveNewClient() {
-      const form = this.clientForm;
-      if (!form) return;
-      const name = form.name.trim();
-      const email = form.email.trim().toLowerCase();
-      if (!name) { form.error = t('clients.name_required'); return; }
-      if (!email) { form.error = t('clients.email_required'); return; }
-
-      form.busy = true;
-      form.error = '';
-      const { data, error } = await supabase
-        .from('clients')
-        .insert({
-          name,
-          email,
-          phone: form.phone.trim() || null,
-          address: form.address.trim() || null,
-          preferred_lang: form.preferred_lang,
-          created_by: this.session.user.id
-        })
-        .select()
-        .single();
-      form.busy = false;
-      if (error) { form.error = error.message; return; }
-
-      this.clients = [{ ...data, _inviteLink: '', _inviteBusy: false }, ...this.clients];
-      this.clientForm = null;
-    },
-
-    // Calls the client-invite Edge Function to mint a fresh Supabase invite
-    // link (no email is ever sent — see index.ts) right before Lígia sends
-    // it, so it never sits around long enough to expire before being used.
-    async generateInviteLink(c) {
-      c._inviteBusy = true;
-      c._inviteLink = '';
-      try {
-        const { data, error } = await supabase.functions.invoke('client-invite', {
-          body: { email: c.email, lang: c.preferred_lang }
-        });
-        if (error) throw error;
-        if (!data || !data.link) throw new Error(t('clients.invite_error'));
-        c._inviteLink = data.link;
-        await supabase.from('clients').update({ invited_at: new Date().toISOString() }).eq('id', c.id);
-        c.invited_at = c.invited_at || new Date().toISOString();
-      } catch (err) {
-        alert(await this.describeInviteError(err));
-      } finally {
-        c._inviteBusy = false;
-      }
-    },
-
-    // supabase-js's FunctionsHttpError only carries a generic "Edge Function
-    // returned a non-2xx status code" in err.message — the actual { error }
-    // body our Edge Function sent back (e.g. "A valid email is required")
-    // is on err.context, a Response object that must be read separately.
-    async describeInviteError(err) {
-      if (err && err.context && typeof err.context.json === 'function') {
-        try {
-          const body = await err.context.json();
-          if (body && body.error) return body.error;
-        } catch {
-          // context wasn't JSON — fall through to the generic message below.
-        }
-      }
-      return (err && err.message) || t('clients.invite_error');
-    },
-
-    async copyInviteLink(c) {
-      if (!c._inviteLink) return;
-      await navigator.clipboard.writeText(c._inviteLink);
-      alert(t('clients.link_copied'));
-    },
-
-    // Same wa.me pattern as whatsappLink(b) below, pre-filled with the
-    // freshly generated invite link instead of a booking confirmation message.
-    inviteWhatsappLink(c) {
-      if (!c._inviteLink || !c.phone) return '#';
-      const digits = String(c.phone).replace(/\D/g, '');
-      if (!digits) return '#';
-      const message = t('clients.invite_message', { name: c.name, link: c._inviteLink });
-      return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     },
 
     async markTikkieSent(b) {

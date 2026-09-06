@@ -108,6 +108,17 @@
 "static.facturen.facturen.whatsapp_client" = "WhatsApp klant"
 "static.facturen.facturen.working" = "Bezig..."
 "static.facturen.facturen.working_2" = "Bezig..."
+# ── facturen clients ─────────────────────────────────────
+"static.facturen.clients.back_to_invoices" = "← Terug naar Facturen"
+"static.facturen.clients.column_email" = "E-mail"
+"static.facturen.clients.column_name" = "Naam"
+"static.facturen.clients.column_registered" = "Geregistreerd"
+"static.facturen.clients.column_status" = "Status"
+"static.facturen.clients.filter_all" = "Alle statussen"
+"static.facturen.clients.next_page" = "Volgende →"
+"static.facturen.clients.previous_page" = "← Vorige"
+"static.facturen.clients.search_placeholder" = "Zoek op naam, e-mail, telefoon..."
+"static.facturen.clients.title" = "Klanten"
 # ── index ─────────────────────────────────────────────
 "static.index.about.about_l_gia" = "Over Lígia"
 "static.index.about.behaviour_consultation" = "Gedragsconsultatie"

@@ -1,0 +1,210 @@
+{{ define "main" }}
+<div class="mx-auto px-5 py-10">
+<div class="max-w-lg md:max-w-5xl mx-auto">
+{{ partial "internal-nav.html" (dict "booking" false) }}
+</div>
+<div class="max-w-lg md:max-w-5xl mx-auto flex items-center justify-between mb-2">
+<h1 class="font-display text-2xl font-bold text-brand-ink">👥 <span>{{ i18n "static.facturen.clients.title" }}</span></h1>
+</div>
+<div class="max-w-lg md:max-w-5xl mx-auto mb-6">
+<a class="text-xs font-semibold text-brand-ink/70 hover:text-brand-ink transition" href="{{ "/facturen/" | relLangURL }}">
+<span>{{ i18n "static.facturen.clients.back_to_invoices" }}</span>
+</a>
+</div>
+<div class="max-w-lg md:max-w-5xl mx-auto" data-x-data="clientsApp()" data-x-init="init()">
+<template data-x-if="!configured">
+<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">
+<span>{{ i18n "static.facturen.facturen.supabase_is_not_configured_yet" | safeHTML }}</span>
+</div>
+</template>
+<template data-x-if="configured &amp;&amp; !session">
+<form data-x-on:submit.prevent="login()" class="bg-white rounded-2xl p-6 space-y-4 shadow-sm border border-brand-sand">
+<div>
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.facturen.facturen.email" }}</span>
+</label>
+<input autocomplete="username" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" required="" type="email" data-x-model="email">
+</div>
+<div>
+<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
+<span>{{ i18n "static.facturen.facturen.password" }}</span>
+</label>
+<input autocomplete="current-password" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" required="" type="password" data-x-model="password">
+</div>
+<p class="text-red-600 text-xs" data-x-show="loginError" data-x-text="loginError"></p>
+<button data-x-bind:disabled="loading" class="w-full bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition" type="submit">
+<span data-x-show="!loading"><span>{{ i18n "static.facturen.facturen.log_in" }}</span></span>
+<span data-x-show="loading"><span>{{ i18n "static.facturen.facturen.working" }}</span></span>
+</button>
+</form>
+</template>
+<template data-x-if="configured &amp;&amp; session">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<p class="text-xs text-brand-ink/70" data-x-text="session.user.email"></p>
+<div class="flex gap-3">
+<button data-x-on:click="loadClients()" class="text-xs text-brand-ink font-semibold hover:text-brand-ink">
+<span>{{ i18n "static.facturen.facturen.refresh" }}</span>
+</button>
+<button data-x-on:click="logout()" class="text-xs text-brand-ink/70 hover:text-red-500">
+<span>{{ i18n "static.facturen.facturen.log_out" }}</span>
+</button>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-sand space-y-3">
+<div class="flex items-center justify-between gap-3 flex-wrap">
+<button data-x-on:click="openClientForm()" class="text-xs font-semibold text-white bg-brand-ink hover:bg-brand-wine rounded-full px-3 py-1.5 transition">
+<span>{{ i18n "static.facturen.facturen.new_client" }}</span>
+</button>
+<div class="flex items-center gap-2 flex-wrap">
+<input aria-label="Search clients" placeholder="{{ i18n "static.facturen.clients.search_placeholder" }}" class="border border-brand-sand rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="search" data-x-model="search" data-x-on:input="resetPage()">
+<select aria-label="Filter by status" class="border border-brand-sand rounded-xl px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" data-x-model="statusFilter" data-x-on:change="resetPage()">
+<option value="all">{{ i18n "static.facturen.clients.filter_all" }}</option>
+<option value="pending">{{ i18n "static.facturen.facturen.invite_pending" }}</option>
+<option value="invited">{{ i18n "static.facturen.facturen.invite_sent" }}</option>
+<option value="accepted">{{ i18n "static.facturen.facturen.invite_accepted" }}</option>
+</select>
+</div>
+</div>
+<p class="text-sm text-brand-ink/70 text-center py-6" data-x-show="loadingClients">
+<span>{{ i18n "static.facturen.facturen.loading" }}</span>
+</p>
+<p class="text-xs text-brand-ink/70 italic py-2" data-x-show="!loadingClients &amp;&amp; pagedResult.totalCount === 0">
+<span>{{ i18n "static.facturen.facturen.no_clients_yet" }}</span>
+</p>
+<div class="overflow-x-auto" data-x-show="!loadingClients &amp;&amp; pagedResult.totalCount &gt; 0">
+<table class="w-full text-sm text-left">
+<thead>
+<tr class="border-b border-brand-sand text-[10px] font-bold uppercase tracking-wide text-brand-ink/70">
+<th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('name')">
+<span>{{ i18n "static.facturen.clients.column_name" }}</span> <span data-x-text="sortIndicator('name')"></span>
+</th>
+<th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('email')">
+<span>{{ i18n "static.facturen.clients.column_email" }}</span> <span data-x-text="sortIndicator('email')"></span>
+</th>
+<th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('status')">
+<span>{{ i18n "static.facturen.clients.column_status" }}</span> <span data-x-text="sortIndicator('status')"></span>
+</th>
+<th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('created_at')">
+<span>{{ i18n "static.facturen.clients.column_registered" }}</span> <span data-x-text="sortIndicator('created_at')"></span>
+</th>
+<th class="py-2 pr-0"></th>
+</tr>
+</thead>
+<tbody>
+<template data-x-bind:key="c.id" data-x-for="c in pagedResult.items">
+<tr class="border-b border-brand-sand/60 align-top">
+<td class="py-3 pr-3 font-semibold text-gray-700" data-x-text="c.name"></td>
+<td class="py-3 pr-3 text-brand-ink/70" data-x-text="c.email"></td>
+<td class="py-3 pr-3">
+<span data-x-bind:class="c.accepted_at ? 'bg-green-100 text-green-700' : (c.invited_at ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-brand-ink/70')" class="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
+<template data-x-if="c.accepted_at"><span><span>{{ i18n "static.facturen.facturen.invite_accepted" }}</span></span></template>
+<template data-x-if="!c.accepted_at &amp;&amp; c.invited_at"><span><span>{{ i18n "static.facturen.facturen.invite_sent" }}</span></span></template>
+<template data-x-if="!c.accepted_at &amp;&amp; !c.invited_at"><span><span>{{ i18n "static.facturen.facturen.invite_pending" }}</span></span></template>
+</span>
+</td>
+<td class="py-3 pr-3 text-brand-ink/70 whitespace-nowrap" data-x-text="new Date(c.created_at).toLocaleDateString()"></td>
+<td class="py-3 pr-0">
+<template data-x-if="!c._inviteLink">
+<button data-x-bind:disabled="c._inviteBusy" data-x-on:click="generateInviteLink(c)" class="text-xs font-semibold text-white bg-brand-ink hover:bg-brand-wine disabled:opacity-50 rounded-full px-3 py-1.5 transition whitespace-nowrap">
+<span>{{ i18n "static.facturen.facturen.generate_invite_link" }}</span>
+</button>
+</template>
+<template data-x-if="c._inviteLink">
+<div class="flex gap-1.5">
+<button data-x-on:click="copyInviteLink(c)" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream whitespace-nowrap">
+<span>{{ i18n "static.facturen.facturen.copy_link" }}</span>
+</button>
+<a data-x-bind:href="inviteWhatsappLink(c)" class="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 rounded-full px-3 py-1.5 transition whitespace-nowrap" rel="noopener noreferrer" target="_blank">
+<span>{{ i18n "static.facturen.facturen.send_via_whatsapp" }}</span>
+</a>
+</div>
+</template>
+</td>
+</tr>
+</template>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between pt-2" data-x-show="!loadingClients &amp;&amp; pagedResult.totalCount &gt; 0">
+<button data-x-bind:disabled="pagedResult.page === 1" data-x-on:click="prevPage()" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream disabled:opacity-40 disabled:cursor-not-allowed">
+<span>{{ i18n "static.facturen.clients.previous_page" }}</span>
+</button>
+<span class="text-xs text-brand-ink/70" data-x-text="t('clients.page_indicator', { page: pagedResult.page, totalPages: pagedResult.totalPages })"></span>
+<button data-x-bind:disabled="pagedResult.page === pagedResult.totalPages" data-x-on:click="nextPage()" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream disabled:opacity-40 disabled:cursor-not-allowed">
+<span>{{ i18n "static.facturen.clients.next_page" }}</span>
+</button>
+</div>
+</div>
+</div>
+</template>
+<!-- New client modal: pre-registers a client's info before they ever have a
+     booking or account — see js/facturen/clients-app.js
+     openClientForm()/saveNewClient() and the `clients` table in schema.sql.
+     Nested inside the same clientsApp() root above so it shares clientForm. -->
+<div class="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center p-4" data-x-cloak="" data-x-show="clientForm">
+<div data-x-on:click.outside="closeClientForm()" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-lg">
+<h2 class="font-display text-lg font-bold text-brand-ink">
+<span>{{ i18n "static.facturen.facturen.new_client" }}</span>
+</h2>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_name_label" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientForm.name">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_email_label" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="email" data-x-model="clientForm.email">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_contact" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="tel" data-x-model="clientForm.phone">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_address" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientForm.address">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_lang_label" }}</span>
+</label>
+<select class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" data-x-model="clientForm.preferred_lang">
+<option value="en">English</option>
+<option value="nl">Nederlands</option>
+<option value="pt">Português</option>
+</select>
+</div>
+<p class="text-red-600 text-xs" data-x-show="clientForm.error" data-x-text="clientForm.error"></p>
+<div class="flex gap-2 pt-1">
+<button data-x-on:click="closeClientForm()" class="flex-1 border border-brand-sand text-gray-600 hover:bg-brand-cream text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.cancel" }}</span>
+</button>
+<button data-x-bind:disabled="clientForm.busy" data-x-on:click="saveNewClient()" class="flex-1 bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.save" }}</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Language selector (issue #154): a minimal footer, matching the home page where
+     the switcher also lives at the bottom. -->
+<footer class="max-w-lg mx-auto px-5 pb-10 flex justify-center text-brand-ink">
+{{ partial "lang-switcher.html" . }}
+</footer>
+<!-- Client roster (issue #173 follow-up) — see js/facturen/clients-app.js -->
+
+<!-- Alpine must load after the module script above so window.clientsApp already exists
+       when Alpine scans and evaluates data-x-data on the page. -->
+{{ end }}
+{{ define "scripts" }}
+<script src="/js/facturen/clients-app.js" type="module"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{ end }}
