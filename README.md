@@ -286,15 +286,18 @@ Since staging (`gato-catsit-staging`) and production (`gato-catsit`) are separat
 projects, each can pause independently.
 
 `.github/workflows/keep-alive.yml` mitigates this with a daily (`workflow_dispatch`-triggerable)
-ping to both projects: a real `GET /rest/v1/keepalive?select=id&limit=1` REST call using each
-environment's `SUPABASE_URL`/`SUPABASE_ANON_KEY`, which Supabase counts as genuine database
-activity (just loading the site's homepage does not, if it doesn't trigger a DB read). It targets
-a small dedicated `public.keepalive` table (`supabase/schema.sql`) — RLS-enabled with an explicit
-anon `SELECT` policy and no meaningful data — rather than `bookings`/`staff_emails`, since the
-anon key can't (and shouldn't) read either of those. The job fails loudly (not silently) on a
-non-2xx response so a broken ping surfaces via GitHub's scheduled-workflow-failure email with
-enough runway before the 7-day pause window. See issue #121 for the full rationale and accepted
-residual risks (this is a best-effort mitigation, not a guaranteed fix).
+ping to both projects: a real `POST /rest/v1/rpc/ping_keepalive` REST call using each
+environment's `SUPABASE_URL`/`SUPABASE_ANON_KEY`, which performs a genuine write (`UPDATE`) against
+a small dedicated `public.keepalive` table (`supabase/schema.sql`) — RLS-enabled, with `anon`
+allowed only to `EXECUTE` the `SECURITY DEFINER` `ping_keepalive()` function (no direct table
+grants) — rather than `bookings`/`staff_emails`, since the anon key can't (and shouldn't) write to
+either of those. An earlier version of this ping used a plain `SELECT`, which kept succeeding
+(HTTP 200) yet production still received a "scheduled to be paused" warning from Supabase (issue
+#162) — a read-only ping does not reliably count as activity under Supabase's undocumented
+low-activity heuristic, hence the write. The job fails loudly (not silently) on a non-2xx response
+so a broken ping surfaces via GitHub's scheduled-workflow-failure email with enough runway before
+the 7-day pause window. See issues #121 and #162 for the full rationale and accepted residual
+risks (this is a best-effort mitigation, not a guaranteed fix).
 
 ---
 
