@@ -21,10 +21,21 @@ const t = (key, options) => window.t(key, options);
 window.activateApp = function () {
   return {
     activationLink: null,
+    // Runtime t() strings fall back to the raw key until i18next finishes
+    // its async init (static/js/i18n.js) — everywhere else in this codebase
+    // that's invisible because the t()-dependent text only ever appears
+    // after some later user action, by which point i18n has long since
+    // loaded. This page's "link missing/invalid" message can render on the
+    // very first paint instead, so `ready` exists purely to give Alpine a
+    // reactive dependency to re-evaluate missingLinkMessage() against once
+    // i18next actually becomes available.
+    ready: false,
 
-    init() {
+    async init() {
       const params = new URLSearchParams(window.location.search);
       this.activationLink = resolveActivationLink(params.get('verify'));
+      if (window.__gatoI18n) await window.__gatoI18n.init();
+      this.ready = true;
     },
 
     get invalidLink() {
@@ -32,7 +43,7 @@ window.activateApp = function () {
     },
 
     missingLinkMessage() {
-      return t('activate.missing_link');
+      return this.ready ? t('activate.missing_link') : '';
     }
   };
 };
