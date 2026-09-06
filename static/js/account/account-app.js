@@ -63,12 +63,48 @@ window.accountApp = function () {
     loadingList: false,
     bookings: [],
 
+    // Issue #173 (client invite, MVP): true when the client landed here via
+    // Lígia's invite link rather than a normal login/signup — Supabase's
+    // redirect fragment includes `type=invite` in that case. They must pick a
+    // password before seeing their bookings.
+    needsPassword: false,
+    newPassword: '',
+    settingPassword: false,
+    passwordError: '',
+    linkedBookingsCount: null,
+
     async init() {
       if (!configured) return;
+      // detectSessionInUrl (below) consumes the URL hash to build the
+      // session, so read `type` out of it first, before it's gone.
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      if (hashParams.get('type') === 'invite') {
+        this.needsPassword = true;
+      }
+
       const { data } = await supabase.auth.getSession();
       this.session = data.session;
       supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
-      if (this.session) this.loadBookings();
+      if (this.session && !this.needsPassword) this.loadBookings();
+    },
+
+    // Sets the password the client picked, then links any pre-existing
+    // roster/booking rows that already carried their email but no user_id
+    // yet (see link_my_bookings() in supabase/schema.sql) before finally
+    // showing them their bookings.
+    async setPassword() {
+      this.settingPassword = true;
+      this.passwordError = '';
+      const { error } = await supabase.auth.updateUser({ password: this.newPassword });
+      if (error) { this.settingPassword = false; this.passwordError = error.message; return; }
+
+      const { data: linkedCount } = await supabase.rpc('link_my_bookings');
+      this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
+
+      this.settingPassword = false;
+      this.needsPassword = false;
+      this.newPassword = '';
+      this.loadBookings();
     },
 
     async login() {

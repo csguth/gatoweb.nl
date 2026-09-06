@@ -11,7 +11,15 @@
   },
   "auth": {
     "account_created_check_email_login": "Account created! Check your email and click the confirmation link, then log in here.",
-    "not_configured": "Service is not configured yet."
+    "not_configured": "Service is not configured yet.",
+    "linked_bookings_message": "We linked {{count}} previous booking(s) to your account."
+  },
+  "clients": {
+    "name_required": "Please enter the client's name.",
+    "email_required": "Please enter a valid email.",
+    "invite_error": "Could not generate the invite link. Please try again.",
+    "invite_message": "Hi {{name}}! Here is your Gato Catsit account link — click it to set your password: {{link}}",
+    "link_copied": "Link copied to clipboard!"
   },
   "adjustment_note_required": "Please provide a reason for the amount adjustment.",
   "client_edit_reason_required": "Please provide a reason for correcting the client info.",

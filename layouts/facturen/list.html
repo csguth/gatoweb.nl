@@ -40,12 +40,66 @@
 <div class="flex justify-between items-center">
 <p class="text-xs text-brand-ink/70" data-x-text="session.user.email"></p>
 <div class="flex gap-3">
+<button data-x-on:click="toggleClientsPanel()" class="text-xs text-brand-ink font-semibold hover:text-brand-ink">
+<span>{{ i18n "static.facturen.facturen.clients_section_title" }}</span>
+</button>
 <button data-x-on:click="loadBookings()" class="text-xs text-brand-ink font-semibold hover:text-brand-ink">
 <span>{{ i18n "static.facturen.facturen.refresh" }}</span>
 </button>
 <button data-x-on:click="logout()" class="text-xs text-brand-ink/70 hover:text-red-500">
 <span>{{ i18n "static.facturen.facturen.log_out" }}</span>
 </button>
+</div>
+</div>
+<!-- Client roster panel (issue #173, MVP): pre-register an existing client's
+     info, then mint a fresh invite link on demand for Lígia to copy/WhatsApp —
+     see js/facturen/facturen-app.js and supabase/functions/client-invite. -->
+<div class="max-w-lg md:max-w-6xl mx-auto bg-white rounded-2xl p-4 shadow-sm border border-brand-sand space-y-3" data-x-cloak="" data-x-show="clientsPanelOpen">
+<div class="flex items-center justify-between">
+<h2 class="text-xs font-bold uppercase tracking-wide text-brand-ink">
+<span>{{ i18n "static.facturen.facturen.clients_section_title" }}</span>
+</h2>
+<button data-x-on:click="openClientForm()" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1 hover:bg-brand-cream">
+<span>{{ i18n "static.facturen.facturen.new_client" }}</span>
+</button>
+</div>
+<p class="text-sm text-brand-ink/70 text-center py-6" data-x-show="loadingClients">
+<span>{{ i18n "static.facturen.facturen.loading" }}</span>
+</p>
+<p class="text-xs text-brand-ink/70 italic py-2" data-x-show="!loadingClients &amp;&amp; clients.length === 0">
+<span>{{ i18n "static.facturen.facturen.no_clients_yet" }}</span>
+</p>
+<div class="space-y-2" data-x-show="!loadingClients &amp;&amp; clients.length &gt; 0">
+<template data-x-bind:key="c.id" data-x-for="c in clients">
+<div class="border border-brand-sand rounded-xl p-3 flex items-center justify-between gap-3 flex-wrap">
+<div class="text-sm text-gray-700 space-y-0.5">
+<div class="font-semibold" data-x-text="c.name"></div>
+<div class="text-xs text-brand-ink/70" data-x-text="c.email"></div>
+<span data-x-bind:class="c.accepted_at ? 'bg-green-100 text-green-700' : (c.invited_at ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-brand-ink/70')" class="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
+<template data-x-if="c.accepted_at"><span><span>{{ i18n "static.facturen.facturen.invite_accepted" }}</span></span></template>
+<template data-x-if="!c.accepted_at &amp;&amp; c.invited_at"><span><span>{{ i18n "static.facturen.facturen.invite_sent" }}</span></span></template>
+<template data-x-if="!c.accepted_at &amp;&amp; !c.invited_at"><span><span>{{ i18n "static.facturen.facturen.invite_pending" }}</span></span></template>
+</span>
+</div>
+<div class="flex flex-col gap-1.5 items-end">
+<template data-x-if="!c._inviteLink">
+<button data-x-bind:disabled="c._inviteBusy" data-x-on:click="generateInviteLink(c)" class="text-xs font-semibold text-white bg-brand-ink hover:bg-brand-wine disabled:opacity-50 rounded-full px-3 py-1.5 transition">
+<span>{{ i18n "static.facturen.facturen.generate_invite_link" }}</span>
+</button>
+</template>
+<template data-x-if="c._inviteLink">
+<div class="flex gap-1.5">
+<button data-x-on:click="copyInviteLink(c)" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream">
+<span>{{ i18n "static.facturen.facturen.copy_link" }}</span>
+</button>
+<a data-x-bind:href="inviteWhatsappLink(c)" class="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 rounded-full px-3 py-1.5 transition" rel="noopener noreferrer" target="_blank">
+<span>{{ i18n "static.facturen.facturen.send_via_whatsapp" }}</span>
+</a>
+</div>
+</template>
+</div>
+</div>
+</template>
 </div>
 </div>
 <p class="text-sm text-brand-ink/70 text-center py-10" data-x-show="loadingList">
@@ -306,6 +360,59 @@ WhatsApp
 <span>{{ i18n "static.facturen.facturen.cancel" }}</span>
 </button>
 <button data-x-bind:disabled="clientEdit.busy" data-x-on:click="saveClientEdit()" class="flex-1 bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.save" }}</span>
+</button>
+</div>
+</div>
+</div>
+<!-- New client modal (issue #173, MVP): pre-registers a client's info before
+     they ever have a booking or account — see js/facturen/facturen-app.js
+     openClientForm()/saveNewClient() and the `clients` table in schema.sql. -->
+<div class="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center p-4" data-x-cloak="" data-x-show="clientForm">
+<div data-x-on:click.outside="closeClientForm()" class="bg-white rounded-2xl p-5 w-full max-w-sm space-y-3 shadow-lg">
+<h3 class="font-display text-lg font-bold text-brand-ink">
+<span>{{ i18n "static.facturen.facturen.new_client" }}</span>
+</h3>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_name_label" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientForm.name">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_email_label" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="email" data-x-model="clientForm.email">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_contact" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="tel" data-x-model="clientForm.phone">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_address" }}</span>
+</label>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientForm.address">
+</div>
+<div>
+<label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
+<span>{{ i18n "static.facturen.facturen.client_lang_label" }}</span>
+</label>
+<select class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" data-x-model="clientForm.preferred_lang">
+<option value="en">English</option>
+<option value="nl">Nederlands</option>
+<option value="pt">Português</option>
+</select>
+</div>
+<p class="text-red-600 text-xs" data-x-show="clientForm.error" data-x-text="clientForm.error"></p>
+<div class="flex gap-2 pt-1">
+<button data-x-on:click="closeClientForm()" class="flex-1 border border-brand-sand text-gray-600 hover:bg-brand-cream text-sm font-semibold py-2 rounded-xl transition">
+<span>{{ i18n "static.facturen.facturen.cancel" }}</span>
+</button>
+<button data-x-bind:disabled="clientForm.busy" data-x-on:click="saveNewClient()" class="flex-1 bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white text-sm font-semibold py-2 rounded-xl transition">
 <span>{{ i18n "static.facturen.facturen.save" }}</span>
 </button>
 </div>

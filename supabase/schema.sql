@@ -569,3 +569,102 @@ $$;
 
 revoke all on function public.ping_keepalive() from public;
 grant execute on function public.ping_keepalive() to anon;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- Client roster + invite-by-link sign-up (issue #173)
+--
+-- Lígia already knows the name/phone/address of her existing clients (from
+-- WhatsApp, word of mouth, etc.) before they ever create an account or place
+-- a booking through the site. This table lets her pre-register that info, one
+-- client at a time, from the facturen dashboard (js/facturen/facturen-app.js).
+-- After saving a row here, she generates a native Supabase invite link for
+-- that email (supabase/functions/client-invite, using auth.admin.generateLink
+-- with type 'invite' — no email is sent automatically) and pastes it into
+-- WhatsApp herself. There is deliberately NO custom token/expiry table here:
+-- Supabase's own invite link already carries a secure, single-use, expiring
+-- token, and clicking it logs the client straight into /account/ (which
+-- already has `detectSessionInUrl: true`).
+create table if not exists public.clients (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users(id),
+  name text not null,
+  email text not null unique,
+  phone text,
+  address text,
+  -- Which of the site's three languages the invite link/redirect should use
+  -- (/en/account/, /nl/account/ or /pt/account/) — Lígia picks it when she
+  -- registers the client, since she already knows which language they speak.
+  preferred_lang text not null default 'en' check (preferred_lang in ('en', 'nl', 'pt')),
+  user_id uuid references auth.users(id),
+  invited_at timestamptz,
+  accepted_at timestamptz
+);
+
+alter table public.clients enable row level security;
+
+-- Only staff manage the roster — clients never query this table directly
+-- (they interact only via their invite link and, once linked, their own
+-- bookings).
+drop policy if exists "staff can select clients" on public.clients;
+create policy "staff can select clients"
+  on public.clients for select
+  to authenticated
+  using (public.is_staff());
+
+drop policy if exists "staff can insert clients" on public.clients;
+create policy "staff can insert clients"
+  on public.clients for insert
+  to authenticated
+  with check (public.is_staff());
+
+drop policy if exists "staff can update clients" on public.clients;
+create policy "staff can update clients"
+  on public.clients for update
+  to authenticated
+  using (public.is_staff())
+  with check (public.is_staff());
+
+revoke all on public.clients from anon;
+grant select, insert, update on public.clients to authenticated;
+
+-- Called once by a client right after they land back from their invite link
+-- and set a password (static/js/account/account-app.js). Marks their roster
+-- row as accepted and links any pre-existing bookings that already carry
+-- their client_email but no user_id (e.g. legacy/manually-entered rows) to
+-- their new auth user, so nothing they already had gets orphaned. SECURITY
+-- DEFINER because writing another row's user_id would otherwise be blocked by
+-- the "staff can update bookings"/"staff can update clients" policies — this
+-- function deliberately only ever touches rows matching the CALLER's own
+-- verified email (auth.jwt() ->> 'email'), never an arbitrary row.
+create or replace function public.link_my_bookings()
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_email text := auth.jwt() ->> 'email';
+  v_count integer;
+begin
+  if v_email is null then
+    raise exception 'not authenticated';
+  end if;
+
+  update public.clients
+    set user_id = auth.uid(),
+        accepted_at = coalesce(accepted_at, now())
+    where email = v_email and user_id is null;
+
+  update public.bookings
+    set user_id = auth.uid()
+    where client_email = v_email and user_id is null;
+
+  get diagnostics v_count = row_count;
+
+  return v_count;
+end;
+$$;
+
+revoke all on function public.link_my_bookings() from public, anon;
+grant execute on function public.link_my_bookings() to authenticated;

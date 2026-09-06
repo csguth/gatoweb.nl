@@ -11,7 +11,15 @@
   },
   "auth": {
     "account_created_check_email_login": "Conta criada! Verifique seu e-mail e clique no link de confirmação; depois faça login aqui.",
-    "not_configured": "O serviço ainda não está configurado."
+    "not_configured": "O serviço ainda não está configurado.",
+    "linked_bookings_message": "Vinculamos {{count}} reserva(s) anterior(es) à sua conta."
+  },
+  "clients": {
+    "name_required": "Informe o nome do cliente.",
+    "email_required": "Informe um e-mail válido.",
+    "invite_error": "Não foi possível gerar o link de convite. Tente novamente.",
+    "invite_message": "Oi {{name}}! Aqui está o link da sua conta Gato Catsit — clique para definir sua senha: {{link}}",
+    "link_copied": "Link copiado para a área de transferência!"
   },
   "adjustment_note_required": "Informe um motivo para o ajuste do valor.",
   "client_edit_reason_required": "Informe um motivo para corrigir os dados do cliente.",
