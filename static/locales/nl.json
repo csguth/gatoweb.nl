@@ -11,7 +11,16 @@
   },
   "auth": {
     "account_created_check_email_login": "Account aangemaakt! Check je e-mail en klik op de bevestigingslink, log daarna hier in.",
-    "not_configured": "De dienst is nog niet geconfigureerd."
+    "not_configured": "De dienst is nog niet geconfigureerd.",
+    "linked_bookings_message": "We hebben {{count}} eerdere boeking(en) aan je account gekoppeld."
+  },
+  "clients": {
+    "name_required": "Vul de naam van de klant in.",
+    "email_required": "Vul een geldig e-mailadres in.",
+    "invite_error": "Kon de uitnodigingslink niet genereren. Probeer het opnieuw.",
+    "invite_message": "Hoi {{name}}! Hier is je Gato Catsit-accountlink — klik erop om je wachtwoord in te stellen: {{link}}",
+    "link_copied": "Link gekopieerd naar klembord!",
+    "page_indicator": "Pagina {{page}} van {{totalPages}}"
   },
   "adjustment_note_required": "Geef een reden op voor de correctie voordat je goedkeurt.",
   "client_edit_reason_required": "Geef een reden op voordat je de klantgegevens opslaat.",
