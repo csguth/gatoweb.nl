@@ -1,13 +1,14 @@
 // gcal-sync — Google Calendar sync for bookings (issues #6, #160)
 //
 // Thin I/O adapter ONLY: this file's job is to talk to Postgres/Supabase and
-// the Google Calendar API. Every actual business decision (what time slot does
-// each day get? one event per day? which days need creating/updating/deleting?)
-// lives in the pure, framework-agnostic ./logic.js module instead, which is
-// covered by the Gherkin scenarios in tests/bdd/features/gcal-sync-*.feature
-// and importable/testable without Deno, a browser or real network calls. If
-// you need to change *when* something syncs or *what* the events look like,
-// change logic.js (and its tests) — this file should rarely need to change.
+// the Google Calendar API. Every actual business decision (what time window
+// does each visit get? one event per visit occurrence? which occurrences need
+// creating/updating/deleting?) lives in the pure, framework-agnostic
+// ./logic.js module instead, which is covered by the Gherkin scenarios in
+// tests/bdd/features/gcal-sync-*.feature and importable/testable without
+// Deno, a browser or real network calls. If you need to change *when*
+// something syncs or *what* the events look like, change logic.js (and its
+// tests) — this file should rarely need to change.
 //
 // Called by the `notify_gcal_sync()` Postgres trigger (see supabase/schema.sql)
 // on INSERT/UPDATE/DELETE of a booking row.
@@ -37,11 +38,13 @@ interface BookingRecord {
   pets?: unknown;
   preference?: string | null;
   tikkie_sent?: boolean;
-  // Map of 'YYYY-MM-DD' -> Google Calendar event id, one entry per day that
-  // currently has an event (issue #160 — one event per day, not one event
-  // spanning the whole stay). Maintained ONLY by this Edge Function.
+  // Map of 'YYYY-MM-DD#slot' -> Google Calendar event id, one entry per visit
+  // occurrence that currently has an event (issue #160 — one event per visit,
+  // so a "both" day has two entries: '<date>#morning' and '<date>#evening').
+  // Maintained ONLY by this Edge Function.
   google_event_ids?: Record<string, string> | null;
 }
+
 
 interface WebhookPayload {
   type: "INSERT" | "UPDATE" | "DELETE";
@@ -218,18 +221,18 @@ Deno.serve(async (req: Request) => {
 
     const updatedEventIds: Record<string, string> = { ...(record.google_event_ids || {}) };
 
-    for (const { date, eventId } of plan.toDelete) {
+    for (const { key, eventId } of plan.toDelete) {
       await deleteEvent(accessToken!, calendarId, eventId);
-      delete updatedEventIds[date];
+      delete updatedEventIds[key];
     }
 
-    for (const { date, eventId, body } of plan.toUpdate) {
+    for (const { eventId, body } of plan.toUpdate) {
       await updateEvent(accessToken!, calendarId, eventId, body);
-      // eventId unchanged — no need to touch updatedEventIds for this date.
+      // eventId unchanged — no need to touch updatedEventIds for this occurrence.
     }
 
-    for (const { date, body } of plan.toCreate) {
-      updatedEventIds[date] = await createEvent(accessToken!, calendarId, body);
+    for (const { key, body } of plan.toCreate) {
+      updatedEventIds[key] = await createEvent(accessToken!, calendarId, body);
     }
 
     // For a genuine row DELETE there is no booking row left to PATCH.
