@@ -493,13 +493,20 @@ drop policy if exists "anon can select keepalive" on public.keepalive;
 -- and no direct grants on the table. This is an intentional, narrow exception
 -- to the "anon can execute SECURITY DEFINER function" security-advisor lint:
 -- the function only touches this non-sensitive heartbeat table.
+--
+-- `where id is not null` is required, not decorative: Supabase's Postgres
+-- images ship the pg_safeupdate extension, which rejects any UPDATE/DELETE
+-- lacking a WHERE clause with error 21000 ("UPDATE requires a WHERE clause"),
+-- even from inside a SECURITY DEFINER function. `id` is the primary key, so
+-- this still updates every row in the (single-row) table, matching the
+-- original unconditional UPDATE's behaviour.
 create or replace function public.ping_keepalive()
 returns void
 language sql
 security definer
 set search_path = public
 as $$
-  update public.keepalive set pinged_at = now();
+  update public.keepalive set pinged_at = now() where id is not null;
 $$;
 
 revoke all on function public.ping_keepalive() from public;
