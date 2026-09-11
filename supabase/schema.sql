@@ -633,20 +633,6 @@ create policy "staff can update clients"
   using (public.is_staff())
   with check (public.is_staff());
 
--- Issue #179: a client whose Account is linked to a Profile (via
--- account_profile_links) can read their OWN Profile — read-only, no
--- update/insert policy for them — to show it on /account/.
-drop policy if exists "linked account can select own profile" on public.clients;
-create policy "linked account can select own profile"
-  on public.clients for select
-  to authenticated
-  using (
-    exists (
-      select 1 from public.account_profile_links l
-      where l.client_id = clients.id and l.user_id = auth.uid()
-    )
-  );
-
 revoke all on public.clients from anon;
 grant select, insert, update on public.clients to authenticated;
 
@@ -705,6 +691,21 @@ create policy "account can select own link"
   using (user_id = auth.uid());
 
 revoke all on public.account_profile_links from anon, authenticated;
+
+-- Issue #179: a client whose Account is linked to a Profile (via
+-- account_profile_links) can read their OWN Profile — read-only, no
+-- update/insert policy for them — to show it on /account/. Declared here
+-- (after account_profile_links exists) since it references that table.
+drop policy if exists "linked account can select own profile" on public.clients;
+create policy "linked account can select own profile"
+  on public.clients for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.account_profile_links l
+      where l.client_id = clients.id and l.user_id = auth.uid()
+    )
+  );
 
 -- Mints a fresh invite token for a Profile. Staff only. Any previous,
 -- still-unused token for the same client keeps working (Lígia can generate
