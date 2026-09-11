@@ -29,6 +29,8 @@ Given('I land on my account page via an invite link for {string}', async ({ page
     const data = window.Alpine.$data(el);
     data.inviteToken = 'test-token';
     data.inviteClientName = name;
+    // Mirrors what loadInvitePreview() itself does on a real invite link.
+    data.mode = 'signup';
   }, name);
 });
 
@@ -67,6 +69,14 @@ When('I finish signing up and {int} previous bookings are linked', async ({ page
     data.loadingList = false;
     data.bookings = [];
   }, count);
+});
+
+Then('I do not see the login-or-signup toggle', async ({ page }) => {
+  await expect(app(page).getByRole('button', { name: 'Log in', exact: true })).toHaveCount(0);
+});
+
+Then('the submit button reads {string}', async ({ page }, text) => {
+  await expect(app(page).getByRole('button', { name: text, exact: true })).toBeVisible();
 });
 
 Then('I see the {string} greeting', async ({ page }, text) => {

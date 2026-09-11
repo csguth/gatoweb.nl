@@ -15,6 +15,12 @@ Feature: Client signs up via an invite link and sees their Profile (issue #179)
     And I do not see "No bookings yet."
 
   @auth-required
+  Scenario: The invite link shows a dedicated create-account form, not a login prompt
+    Given I land on my account page via an invite link for "Jane Doe"
+    Then I do not see the login-or-signup toggle
+    And the submit button reads "Create account"
+
+  @auth-required
   Scenario: An invalid or expired invite link shows an error instead
     Given I land on my account page via an expired invite link
     Then I see the "This invite link is invalid or has expired." message

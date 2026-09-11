@@ -99,6 +99,11 @@ window.accountApp = function () {
         return;
       }
       this.inviteClientName = row.client_name;
+      // Issue #179: an invite link is exclusively for creating a brand new
+      // account (the client never had one) — default straight into the
+      // dedicated signup form (layouts/account/list.html hides the
+      // login/signup toggle whenever inviteClientName is set).
+      this.mode = 'signup';
     },
 
     // Runs once, right after a session is available (fresh login/signup, or

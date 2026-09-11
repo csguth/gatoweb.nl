@@ -29,6 +29,12 @@
 <template data-x-if="inviteError">
 <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-xs" data-x-text="inviteError"></div>
 </template>
+<!-- Issue #179: arriving via a valid invite link is a dedicated "create your
+     account" form — no login/signup toggle, since the whole point is that
+     this client doesn't have an account yet. A small fallback link below
+     lets them switch to login instead, in case they already finished this
+     before (e.g. they revisited an old invite link). -->
+<template data-x-if="!inviteClientName">
 <div class="flex gap-2 text-sm font-semibold">
 <button data-x-bind:class="mode === 'login' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand'" data-x-on:click="mode = 'login'" class="flex-1 border rounded-lg py-2 transition" type="button">
 <span>{{ i18n "static.account.account.log_in" }}</span>
@@ -37,6 +43,7 @@
 <span>{{ i18n "static.account.account.create_account" }}</span>
 </button>
 </div>
+</template>
 <form data-x-on:submit.prevent="mode === 'login' ? login() : signup()" class="space-y-4">
 <div>
 <label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
@@ -58,6 +65,11 @@
 <template data-x-if="loading"><span><span>{{ i18n "static.account.account.working" }}</span></span></template>
 </button>
 </form>
+<template data-x-if="inviteClientName">
+<button data-x-on:click="mode = 'login'" class="w-full text-center text-xs text-brand-ink/60 hover:text-brand-ink underline" type="button">
+<span>{{ i18n "static.account.account.already_have_an_account" }}</span>
+</button>
+</template>
 </div>
 </template>
 <template data-x-if="configured &amp;&amp; session">

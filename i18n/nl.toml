@@ -18,6 +18,7 @@
 "social.cta" = "Volg me op social media voor kattenzorg en foto's van katten!"
 "social.instagram" = "Volg @__INSTAGRAM_HANDLE__ op Instagram"
 
+"static.account.account.already_have_an_account" = "Heeft u al een account? Inloggen"
 "static.account.account.amount" = "Bedrag:"
 "static.account.account.awaiting_confirmation" = "Wacht op bevestiging"
 "static.account.account.cancelled" = "Geannuleerd"
