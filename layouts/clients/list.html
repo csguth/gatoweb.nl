@@ -79,8 +79,8 @@
 <th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('name')">
 <span>{{ i18n "static.facturen.clients.column_name" }}</span> <span data-x-text="sortIndicator('name')"></span>
 </th>
-<th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('email')">
-<span>{{ i18n "static.facturen.clients.column_email" }}</span> <span data-x-text="sortIndicator('email')"></span>
+<th class="py-2 pr-3">
+<span>{{ i18n "static.facturen.clients.column_pets" }}</span>
 </th>
 <th class="py-2 pr-3 cursor-pointer select-none" data-x-on:click="setSort('status')">
 <span>{{ i18n "static.facturen.clients.column_status" }}</span> <span data-x-text="sortIndicator('status')"></span>
@@ -95,7 +95,7 @@
 <template data-x-bind:key="c.id" data-x-for="c in pagedResult.items">
 <tr class="border-b border-brand-sand/60 align-top">
 <td class="py-3 pr-3 font-semibold text-gray-700" data-x-text="c.name"></td>
-<td class="py-3 pr-3 text-brand-ink/70" data-x-text="c.email"></td>
+<td class="py-3 pr-3 text-brand-ink/70" data-x-text="petsSummary(c.pets)"></td>
 <td class="py-3 pr-3">
 <span data-x-bind:class="c.accepted_at ? 'bg-green-100 text-green-700' : (c.invited_at ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-brand-ink/70')" class="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
 <template data-x-if="c.accepted_at"><span><span>{{ i18n "static.facturen.facturen.invite_accepted" }}</span></span></template>
@@ -153,11 +153,29 @@
 </label>
 <input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="text" data-x-model="clientForm.name">
 </div>
-<div>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
 <label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">
-<span>{{ i18n "static.facturen.facturen.client_email_label" }}</span>
+<span>{{ i18n "static.facturen.clients.pets_label" }}</span>
 </label>
-<input class="w-full border border-brand-sand rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" type="email" data-x-model="clientForm.email">
+<button data-x-on:click="addPet()" class="text-xs text-brand-ink hover:text-brand-ink font-semibold" type="button">
+<span>+ {{ i18n "static.index.booking.add_pet" }}</span>
+</button>
+</div>
+<template data-x-bind:key="i" data-x-for="(pet, i) in clientForm.pets">
+<div class="bg-brand-cream/60 rounded-lg border border-brand-sand p-2 space-y-1.5">
+<div class="flex gap-2 items-center">
+<input class="flex-1 border border-brand-sand rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red min-w-0" placeholder="Name / Naam" type="text" data-x-model="pet.name">
+<select class="border border-brand-sand rounded-lg px-1.5 py-1 text-xs" data-x-model="pet.type">
+<option value="cat">{{ i18n "static.index.booking.pets" }}: Cat</option>
+<option value="dog">Dog</option>
+<option value="other">{{ i18n "static.index.booking.other" }}</option>
+</select>
+<button data-x-on:click="removePet(i)" class="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-red-400 transition flex-shrink-0 text-lg leading-none" type="button" data-x-show="clientForm.pets.length &gt; 1">×</button>
+</div>
+<input class="w-full border border-brand-sand rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red" placeholder="e.g. rabbit, bird" type="text" data-x-model="pet.otherType" data-x-show="pet.type === 'other'">
+</div>
+</template>
 </div>
 <div>
 <label class="block text-[10px] font-semibold text-brand-ink/70 uppercase tracking-wide">

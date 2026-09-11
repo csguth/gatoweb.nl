@@ -2,6 +2,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 import { formatDateDDMMYYYY } from '../shared/format-date.js';
+import { petsSummary } from '../shared/pets-summary.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -26,8 +27,7 @@ const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 }) : null;
 
 function petsText(pets) {
-  if (!Array.isArray(pets)) return '-';
-  return pets.map(p => (p.name ? p.name + ' (' + (p.otherType || p.type) + ')' : (p.otherType || p.type))).join(', ');
+  return petsSummary(pets);
 }
 
 function factuurNumberLabel(n, referenceDate) {
@@ -63,54 +63,70 @@ window.accountApp = function () {
     loadingList: false,
     bookings: [],
 
-    // Issue #173 (client invite, MVP): true when the client landed here via
-    // Lígia's invite link rather than a normal login/signup — Supabase's
-    // redirect fragment includes `type=invite` in that case. They must pick a
-    // password before seeing their bookings.
-    needsPassword: false,
-    newPassword: '',
-    settingPassword: false,
-    passwordError: '',
+    // Issue #179: a client landing here via Lígia's invite link
+    // (/account/?invite=<token>) is greeted by name (from get_invite_preview())
+    // and signs up themselves (own email + password) instead of "just set a
+    // password" — the token carries no email, unlike the old Supabase-native
+    // invite link it replaces. Once they have a session, claim_client_invite()
+    // links their brand new Account to the pre-registered Profile.
+    inviteToken: null,
+    inviteClientName: '',
+    inviteError: '',
     linkedBookingsCount: null,
+    profile: null,
 
     async init() {
       if (!configured) return;
-      // detectSessionInUrl (below) consumes the URL hash to build the
-      // session, so read `type` out of it first, before it's gone.
-      // 'recovery' happens when the client's email was already registered
-      // (e.g. they signed up themselves before Lígia invited them) — the
-      // client-invite Edge Function falls back to a recovery link in that
-      // case, but from here it's the same "please set a password" prompt.
-      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-      const linkType = hashParams.get('type');
-      if (linkType === 'invite' || linkType === 'recovery') {
-        this.needsPassword = true;
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('invite');
+      if (token) {
+        this.inviteToken = token;
+        await this.loadInvitePreview();
       }
 
       const { data } = await supabase.auth.getSession();
       this.session = data.session;
       supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
-      if (this.session && !this.needsPassword) this.loadBookings();
+      if (this.session) await this.afterLogin();
     },
 
-    // Sets the password the client picked, then links any pre-existing
-    // roster/booking rows that already carried their email but no user_id
-    // yet (see link_my_bookings() in supabase/schema.sql) before finally
-    // showing them their bookings.
-    async setPassword() {
-      this.settingPassword = true;
-      this.passwordError = '';
-      const { error } = await supabase.auth.updateUser({ password: this.newPassword });
-      if (error) { this.settingPassword = false; this.passwordError = error.message; return; }
-
-      const { data: linkedCount } = await supabase.rpc('link_my_bookings');
-      this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
-
-      this.settingPassword = false;
-      this.needsPassword = false;
-      this.newPassword = '';
-      this.loadBookings();
+    async loadInvitePreview() {
+      const { data, error } = await supabase.rpc('get_invite_preview', { p_token: this.inviteToken });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (error || !row || !row.client_name) {
+        this.inviteError = t('auth.invite_invalid_or_expired');
+        this.inviteToken = null;
+        return;
+      }
+      this.inviteClientName = row.client_name;
     },
+
+    // Runs once, right after a session is available (fresh login/signup, or
+    // one already restored on page load). If we landed here via a still
+    // unclaimed invite token, claim it first — this both links the Profile
+    // and (as before) links any pre-existing bookings by email — before
+    // loading the profile card + bookings list.
+    async afterLogin() {
+      if (this.inviteToken) {
+        const { data: linkedCount, error } = await supabase.rpc('claim_client_invite', { p_token: this.inviteToken });
+        if (!error) {
+          this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
+        }
+        this.inviteToken = null;
+      }
+      await this.loadProfile();
+      await this.loadBookings();
+    },
+
+    // Reads the client's own Profile, if their Account is linked to one —
+    // RLS ("linked account can select own profile" in schema.sql) means this
+    // simply returns nothing for a client who signed up without ever being
+    // invited, no special-casing needed here.
+    async loadProfile() {
+      const { data, error } = await supabase.from('clients').select('*').maybeSingle();
+      if (!error) this.profile = data || null;
+    },
+
 
     async login() {
       this.loading = true;
@@ -121,7 +137,7 @@ window.accountApp = function () {
       if (error) { this.errorMsg = error.message; return; }
       this.session = data.session;
       this.password = '';
-      this.loadBookings();
+      await this.afterLogin();
     },
 
     async signup() {
@@ -131,10 +147,15 @@ window.accountApp = function () {
       // Without emailRedirectTo the confirmation link's redirect_to falls back to the
       // Supabase project's "Site URL" (often localhost); pin it to the live origin the
       // client actually signed up on so the link returns to gatoweb.nl (or staging).
+      // Issue #179: the invite token (if any) is appended as a query param so it
+      // survives the email-confirmation round trip and afterLogin() can still
+      // claim it once the client comes back with a session.
+      let redirectTo = window.location.origin + window.location.pathname;
+      if (this.inviteToken) redirectTo += '?invite=' + encodeURIComponent(this.inviteToken);
       const { data, error } = await supabase.auth.signUp({
         email: this.email,
         password: this.password,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+        options: { emailRedirectTo: redirectTo }
       });
       this.loading = false;
       if (error) { this.errorMsg = error.message; return; }
@@ -145,13 +166,14 @@ window.accountApp = function () {
         return;
       }
       this.session = data.session;
-      this.loadBookings();
+      await this.afterLogin();
     },
 
     async logout() {
       await supabase.auth.signOut();
       this.session = null;
       this.bookings = [];
+      this.profile = null;
     },
 
     async loadBookings() {

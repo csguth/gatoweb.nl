@@ -3,7 +3,7 @@
 // DOM, no browser), same style as booking-sort.steps.mjs.
 import { createBdd } from 'playwright-bdd';
 import { world } from '../support/world.mjs';
-import { clientStatus, filterClients, sortClients, paginate } from '../../../static/js/facturen/client-list.js';
+import { clientStatus, filterClients, sortClients, paginate, deriveClientRoster } from '../../../static/js/facturen/client-list.js';
 
 const { Given, When, Then } = createBdd();
 
@@ -11,7 +11,6 @@ function makeClient(overrides) {
   return {
     id: overrides.name,
     name: '',
-    email: '',
     phone: null,
     invited_at: null,
     accepted_at: null,
@@ -40,7 +39,7 @@ Given('a roster of clients:', async ({}, dataTable) => {
 
 Given('a roster of {int} clients', async ({}, count) => {
   world.roster = Array.from({ length: count }, (_, i) =>
-    makeClient({ name: 'Client ' + i, email: `client${i}@example.com` })
+    makeClient({ name: 'Client ' + i })
   );
 });
 
@@ -85,5 +84,39 @@ Then('the page number is {int}', async ({}, expected) => {
 Then('there are {int} total pages', async ({}, expected) => {
   if (world.paginated.totalPages !== expected) {
     throw new Error(`Expected ${expected} total pages but got ${world.paginated.totalPages}`);
+  }
+});
+
+Given('a Profile {string} with id {string}', async ({}, name, id) => {
+  world.rawClients = world.rawClients || [];
+  world.rawClients.push({ id, name, created_at: '2025-01-01T00:00:00Z' });
+});
+
+Given('an invite for client {string} created at {string}', async ({}, clientId, createdAt) => {
+  world.rawInvites = world.rawInvites || [];
+  world.rawInvites.push({ client_id: clientId, created_at: createdAt });
+});
+
+Given('a later invite for client {string} created at {string}', async ({}, clientId, createdAt) => {
+  world.rawInvites = world.rawInvites || [];
+  world.rawInvites.push({ client_id: clientId, created_at: createdAt });
+});
+
+Given('an account link for client {string} linked at {string}', async ({}, clientId, linkedAt) => {
+  world.rawLinks = world.rawLinks || [];
+  world.rawLinks.push({ client_id: clientId, linked_at: linkedAt });
+});
+
+When('the roster is derived from those rows', async () => {
+  world.derivedRoster = deriveClientRoster(world.rawClients, world.rawInvites, world.rawLinks);
+});
+
+Then('client {string} has invited_at {string} and accepted_at {string}', async ({}, clientId, invitedAt, acceptedAt) => {
+  const client = world.derivedRoster.find((c) => c.id === clientId);
+  if (!client) throw new Error(`Client ${clientId} not found in derived roster`);
+  const actualInvited = client.invited_at || '';
+  const actualAccepted = client.accepted_at || '';
+  if (actualInvited !== invitedAt || actualAccepted !== acceptedAt) {
+    throw new Error(`Expected invited_at="${invitedAt}" accepted_at="${acceptedAt}" but got invited_at="${actualInvited}" accepted_at="${actualAccepted}"`);
   }
 });

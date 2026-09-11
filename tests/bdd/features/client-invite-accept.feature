@@ -1,24 +1,34 @@
-Feature: Client sets a password after following an invite link (issue #173, MVP)
-  When a client lands on /account/ via Lígia's invite link, Supabase's redirect
-  fragment includes `type=invite` and they're already authenticated — but must
-  set a password before seeing their bookings. See js/account/account-app.js
-  init()/setPassword() and layouts/account/list.html.
+Feature: Client signs up via an invite link and sees their Profile (issue #179)
+  Unlike the old flow (issue #173, MVP), a client landing on
+  /account/?invite=<token> is NOT already authenticated — the token carries no
+  email. They're greeted by name (get_invite_preview() RPC) and sign up with
+  their own email + password like any other client, then
+  claim_client_invite() links their new Account to the pre-registered
+  Profile and they see it (name/pets/address, read-only) above their
+  bookings. See js/account/account-app.js init()/loadInvitePreview()/
+  afterLogin() and layouts/account/list.html.
 
   @auth-required
-  Scenario: An invited client is prompted to set a password instead of seeing bookings
-    Given I am logged in on my bookings page via an invite link
-    Then I see the "Welcome! Set your password" prompt
+  Scenario: A valid invite link greets the client by name before they sign up
+    Given I land on my account page via an invite link for "Jane Doe"
+    Then I see the "Welcome, Jane Doe!" greeting
     And I do not see "No bookings yet."
 
   @auth-required
-  Scenario: Setting a password reveals the bookings list
-    Given I am logged in on my bookings page via an invite link
-    When I finish setting my password
-    Then I see "No bookings yet."
-    And I do not see the "Welcome! Set your password" prompt
+  Scenario: An invalid or expired invite link shows an error instead
+    Given I land on my account page via an expired invite link
+    Then I see the "This invite link is invalid or has expired." message
+
+  @auth-required
+  Scenario: Finishing sign-up shows the linked Profile and bookings
+    Given I land on my account page via an invite link for "Jane Doe"
+    When I finish signing up and my Profile "Jane Doe" with pets "Mimi (cat)" is linked
+    Then I see "Jane Doe"
+    And I see "Mimi (cat)"
+    And I see "No bookings yet."
 
   @auth-required
   Scenario: Linked previous bookings are announced
-    Given I am logged in on my bookings page via an invite link
-    When I finish setting my password and 2 previous bookings are linked
+    Given I land on my account page via an invite link for "Jane Doe"
+    When I finish signing up and 2 previous bookings are linked
     Then I see a message that 2 previous bookings were linked

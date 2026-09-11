@@ -16,6 +16,19 @@
 </template>
 <template data-x-if="configured &amp;&amp; !session">
 <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-sand space-y-5">
+<!-- Invite greeting (issue #179): shown when the client landed here via
+     Lígia's invite link (/account/?invite=<token>) — see
+     js/account/account-app.js init()/loadInvitePreview(). They sign up with
+     their OWN email + password (the token carries no email), which
+     claim_client_invite() then links to the pre-registered Profile. -->
+<template data-x-if="inviteClientName">
+<div class="bg-brand-cream rounded-xl p-3 text-sm text-brand-ink">
+<span data-x-text="t('auth.invite_greeting', { name: inviteClientName })"></span>
+</div>
+</template>
+<template data-x-if="inviteError">
+<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-xs" data-x-text="inviteError"></div>
+</template>
 <div class="flex gap-2 text-sm font-semibold">
 <button data-x-bind:class="mode === 'login' ? 'bg-brand-ink text-white border-brand-ink' : 'bg-brand-cream text-brand-ink border-brand-sand'" data-x-on:click="mode = 'login'" class="flex-1 border rounded-lg py-2 transition" type="button">
 <span>{{ i18n "static.account.account.log_in" }}</span>
@@ -47,33 +60,7 @@
 </form>
 </div>
 </template>
-<!-- Set-password step (issue #173, MVP): shown only when the client landed
-     here via Lígia's invite link (window.location.hash had type=invite) —
-     see js/account/account-app.js init()/setPassword(). -->
-<template data-x-if="configured &amp;&amp; session &amp;&amp; needsPassword">
-<div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-sand space-y-4">
-<h2 class="font-display text-lg font-bold text-brand-ink">
-<span>{{ i18n "static.account.account.set_password_title" }}</span>
-</h2>
-<p class="text-xs text-brand-ink/70">
-<span>{{ i18n "static.account.account.set_password_help" }}</span>
-</p>
-<form data-x-on:submit.prevent="setPassword()" class="space-y-4">
-<div>
-<label class="block text-xs font-semibold text-brand-ink/70 uppercase tracking-wide mb-1.5">
-<span>{{ i18n "static.account.account.new_password_label" }}</span>
-</label>
-<input autocomplete="new-password" class="w-full border border-brand-sand rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-red" required="" type="password" data-x-model="newPassword">
-</div>
-<p class="text-red-600 text-xs" data-x-show="passwordError" data-x-text="passwordError"></p>
-<button data-x-bind:disabled="settingPassword" class="w-full bg-brand-ink hover:bg-brand-wine disabled:opacity-50 text-white font-semibold py-3 rounded-xl text-sm transition" type="submit">
-<template data-x-if="!settingPassword"><span><span>{{ i18n "static.account.account.set_password_button" }}</span></span></template>
-<template data-x-if="settingPassword"><span><span>{{ i18n "static.account.account.working" }}</span></span></template>
-</button>
-</form>
-</div>
-</template>
-<template data-x-if="configured &amp;&amp; session &amp;&amp; !needsPassword">
+<template data-x-if="configured &amp;&amp; session">
 <div class="space-y-4">
 <div class="flex justify-between items-center bg-white rounded-2xl p-4 shadow-sm border border-brand-sand">
 <p class="text-xs text-brand-ink/70" data-x-text="session.user.email"></p>
@@ -86,6 +73,18 @@
 </button>
 </div>
 </div>
+<!-- Profile card (issue #179): read-only, shown only when this Account is
+     linked to a Profile (account_profile_links) — see loadProfile() in
+     js/account/account-app.js. There is deliberately no edit UI here yet. -->
+<template data-x-if="profile">
+<div class="bg-white rounded-2xl p-4 shadow-sm border border-brand-sand space-y-1 text-sm text-gray-600">
+<p class="font-display text-base font-bold text-brand-ink" data-x-text="profile.name"></p>
+<p><span>{{ i18n "static.account.account.pets" }}</span> <span data-x-text="petsSummary(profile.pets)"></span></p>
+<template data-x-if="profile.address">
+<p data-x-text="profile.address"></p>
+</template>
+</div>
+</template>
 <p class="text-sm text-brand-ink/70 text-center bg-white rounded-2xl p-3 shadow-sm border border-brand-sand" data-x-show="linkedBookingsCount">
 <span data-x-text="t('auth.linked_bookings_message', { count: linkedBookingsCount })"></span>
 </p>
