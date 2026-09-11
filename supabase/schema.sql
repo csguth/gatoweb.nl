@@ -664,6 +664,7 @@ create policy "staff can select client_invites"
   using (public.is_staff());
 
 revoke all on public.client_invites from anon, authenticated;
+grant select on public.client_invites to authenticated;
 
 -- Issue #179: the Account -> Profile link. One row per linked Account
 -- (user_id is the primary key, so an Account can never link to more than one
@@ -691,6 +692,7 @@ create policy "account can select own link"
   using (user_id = auth.uid());
 
 revoke all on public.account_profile_links from anon, authenticated;
+grant select on public.account_profile_links to authenticated;
 
 -- Issue #179: a client whose Account is linked to a Profile (via
 -- account_profile_links) can read their OWN Profile — read-only, no
