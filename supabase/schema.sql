@@ -729,7 +729,7 @@ begin
     raise exception 'client not found';
   end if;
 
-  v_token := encode(gen_random_bytes(24), 'base64');
+  v_token := encode(extensions.gen_random_bytes(24), 'base64');
   v_token := replace(replace(replace(v_token, '/', '_'), '+', '-'), '=', '');
 
   insert into public.client_invites (client_id, created_by, token)
