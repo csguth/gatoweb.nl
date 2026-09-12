@@ -245,6 +245,19 @@ docker run --rm --ipc=host -v "$PWD:/work" -w /work mcr.microsoft.com/playwright
 The image tag (`v1.62.0-noble`) must match the `@playwright/test` version in `package.json` — bump both
 together when upgrading Playwright.
 
+### Running from VS Code's Test Explorer
+
+The suite uses `playwright-bdd`, which compiles every `.feature` file into a plain `.spec.js` file
+under `tests/bdd/.features-gen/` (git-ignored) *before* Playwright can see it — the official
+[Playwright extension](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
+(recommended in `.vscode/extensions.json`) only discovers those generated files, not the `.feature`
+sources directly. Opening this repo's folder in VS Code runs a one-time `folderOpen` task
+(`.vscode/tasks.json`) that builds the Hugo fixtures and runs `bddgen` automatically, so all 3
+projects (`production`/`staging`/`production-auth`) show up in the Test Explorer a few seconds after
+the window opens — no manual `npm test` needed first. If you add/edit a `.feature` file afterwards,
+re-run the "BDD: Generate tests for Test Explorer" task (Command Palette → *Tasks: Run Task*) to
+refresh what the explorer sees, since generation isn't currently watched inside the editor.
+
 ### Validating `supabase/schema.sql` changes before pushing
 
 The BDD suite above never touches a real Postgres instance — it only exercises pure JS logic or
