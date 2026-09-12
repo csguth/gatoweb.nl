@@ -24,15 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    # Gate the preview deploy on the BDD test suite passing, in the same
-    # workflow run. Runs on `pull_request` (not `pull_request_target`), so
-    # this inherits the same no-secrets-for-forks posture as the rest of this
-    # workflow; test.yml itself needs no secrets either way.
-    uses: ./.github/workflows/test.yml
-
-  build-and-deploy:
-    needs: test
+  build:
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -104,6 +96,33 @@ jobs:
         with:
           supabase-url: ${{ vars.SUPABASE_URL }}
           access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Upload built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+          retention-days: 1
+
+  test:
+    # Only run once the site has built successfully; gates the preview deploy
+    # on the BDD test suite passing, in the same workflow run. Runs on
+    # `pull_request` (not `pull_request_target`), so this inherits the same
+    # no-secrets-for-forks posture as the rest of this workflow; test.yml
+    # itself needs no secrets either way.
+    needs: build
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Download built site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
 
       - name: Deploy to Cloudflare Pages (staging project, PR preview)
         id: deploy
