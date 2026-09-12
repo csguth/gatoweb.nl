@@ -245,6 +245,21 @@ docker run --rm --ipc=host -v "$PWD:/work" -w /work mcr.microsoft.com/playwright
 The image tag (`v1.62.0-noble`) must match the `@playwright/test` version in `package.json` — bump both
 together when upgrading Playwright.
 
+### Validating `supabase/schema.sql` changes before pushing
+
+The BDD suite above never touches a real Postgres instance — it only exercises pure JS logic or
+seeded DOM state. RLS policy ordering, missing `grant`s, and schema-qualification bugs (e.g.
+`pgcrypto` living in the `extensions` schema, not `public`) are invisible to it and, historically,
+only surfaced after a push, inside the PR preview's real Supabase project (a slow push → CI →
+preview → fail loop). To catch those offline instead, `supabase/tests/client_account_flow_smoke.sql`
+exercises the client Profile/Account RLS policies and RPCs (invite → claim → linked-account lookup)
+directly against a real Supabase Postgres — self-contained and self-cleaning (it always ends by
+raising an exception that rolls back everything it inserted, carrying every assertion's result as
+JSON in the error message). Run it by pasting the whole file into a single SQL execution against any
+project that already has `schema.sql` applied — the Supabase MCP `execute_sql` tool or `psql` both
+work — *before* pushing a `schema.sql` change, and confirm every key in the resulting JSON is `true`
+(or matches the expected value noted in its comment).
+
 ---
 
 ## Deploy updates
