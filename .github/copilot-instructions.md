@@ -37,9 +37,12 @@ for agent sessions.
 A Playwright + playwright-bdd (Gherkin) suite lives in `tests/bdd/` (`npm test`). It builds real
 Hugo fixtures (`tests/bdd/support/build-fixtures.mjs` runs `hugo --gc --minify` with fake values)
 so **Hugo must be installed locally** to run it. `.github/workflows/test.yml` runs the same suite
-in CI on every push/PR to `staging`/`main`. When changing user-facing behavior (booking form,
-i18n routing, invoice calc, staging banner), add or update the matching `.feature`/`.steps.mjs`
-pair instead of only eyeballing the change — these are the project's regression safety net.
+as a reusable workflow (`workflow_call`) invoked by each deploy workflow (GitHub Pages, Cloudflare
+staging, Cloudflare PR previews) so a deploy only proceeds once tests pass — not on its own
+push/PR trigger anymore, to avoid a redundant duplicate run. When changing user-facing behavior
+(booking form, i18n routing, invoice calc, staging banner), add or update the matching
+`.feature`/`.steps.mjs` pair instead of only eyeballing the change — these are the project's
+regression safety net.
 `.github/workflows/w3c-compliance.yml` also validates every generated page; don't introduce
 invalid HTML to work around a layout issue.
 

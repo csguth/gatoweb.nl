@@ -155,9 +155,13 @@ Rules enforced on GitHub:
 - Both `main` and `staging` require a Pull Request to merge (no direct pushes) and block force-pushes/deletions.
 - `.github/workflows/guard-main-merges.yml` fails any PR targeting `main` whose source branch isn't
   `staging`, unless the PR is labeled `hotfix` (emergency bypass for urgent production fixes).
-- `.github/workflows/test.yml` runs the BDD test suite (see [Automated tests](#automated-tests)) on
-  every push/PR to `staging` and `main`. It is not yet marked as a required status check — do that
-  in `staging`'s branch protection settings once you've seen it pass reliably a few times.
+- `.github/workflows/test.yml` runs the BDD test suite (see [Automated tests](#automated-tests)).
+  It's a reusable workflow (`workflow_call`) invoked by each deploy workflow
+  (`deploy-pages.yml`, `deploy-staging-cloudflare.yml`,
+  `deploy-preview-cloudflare.yml`) so a deploy only proceeds once the tests
+  pass, plus `workflow_dispatch` for manual runs. It is not yet marked as a
+  required status check — do that in `staging`'s branch protection settings
+  once you've seen it pass reliably a few times.
 - `.github/workflows/w3c-compliance.yml` validates every generated page with the W3C Nu Html
   Checker on PRs into `staging` and `main`. This should also be set as a **required status check**
   in both branches' protection rules once it has passed reliably a few times.
@@ -253,10 +257,12 @@ npm run test:bdd:headed                       # UI suite, but with a visible bro
 npm run test:bdd:report                       # opens the last Playwright HTML report
 ```
 
-CI runs both suites (`.github/workflows/test.yml`) as separate parallel jobs on every push/PR to
-`staging` and `main`: `test-unit` runs the cucumber-js suite on a plain `ubuntu-latest` runner (fast,
-no Playwright image), and `test-ui` runs the Playwright suite inside the official Playwright Docker
-image (`mcr.microsoft.com/playwright:v1.62.0-noble`) so the exact same browser/OS/dependency versions
+CI runs both suites (`.github/workflows/test.yml`) as separate parallel jobs, as a reusable
+workflow (`workflow_call`) invoked by every deploy workflow (GitHub Pages, Cloudflare staging, and
+Cloudflare PR previews) so a deploy is only allowed once both jobs pass: `test-unit` runs the
+cucumber-js suite on a plain `ubuntu-latest` runner (fast, no Playwright image), and `test-ui` runs
+the Playwright suite inside the official Playwright Docker image
+(`mcr.microsoft.com/playwright:v1.62.0-noble`) so the exact same browser/OS/dependency versions
 are used every run. To get that same guarantee locally for the UI suite (instead of whatever Chromium
 build is installed on your machine) and avoid "works on my machine" drift, run the
 suite inside the same image with Docker:
