@@ -1,12 +1,11 @@
 // Step definitions for tests/bdd/features/gcal-sync-daily-plan.feature.
 // Pure logic test: imports supabase/functions/gcal-sync/logic.js directly (no
 // DOM, no browser, no Deno runtime, no real Google/Supabase calls needed) —
-// same pattern as gcal-sync-event.steps.mjs / invoice-calc.steps.mjs.
-import { createBdd } from 'playwright-bdd';
-import { world } from '../support/world.mjs';
+// same pattern as gcal-sync-event.steps.mjs / invoice-calc.steps.mjs. Runs
+// under cucumber-js puro instead of playwright-bdd — see tests/unit/cucumber.cjs.
+import { Given, When, Then } from '@cucumber/cucumber';
+import { world } from '../../bdd/support/world.mjs';
 import { planDailySync, occurrenceKey } from '../../../supabase/functions/gcal-sync/logic.js';
-
-const { Given, When, Then } = createBdd();
 
 function makeRecord(overrides) {
   return {
@@ -36,7 +35,7 @@ function eventIdsFor(occurrencesText) {
 
 Given(
   'a booking from {string} to {string} with {string} preference, status {string} and no existing calendar events',
-  async ({}, from, to, preference, status) => {
+  async (from, to, preference, status) => {
     world.type = 'UPDATE';
     world.record = makeRecord({ date_from: from, date_to: to, preference, status, google_event_ids: {} });
   }
@@ -44,7 +43,7 @@ Given(
 
 Given(
   'a booking from {string} to {string} with {string} preference, status {string} and existing calendar events for {string}',
-  async ({}, from, to, preference, status, occurrencesText) => {
+  async (from, to, preference, status, occurrencesText) => {
     world.type = 'UPDATE';
     world.record = makeRecord({
       date_from: from,
@@ -56,11 +55,11 @@ Given(
   }
 );
 
-Given("the booking's date_to is changed to {string}", async ({}, newDateTo) => {
+Given("the booking's date_to is changed to {string}", async (newDateTo) => {
   world.record.date_to = newDateTo;
 });
 
-Given("the booking's preference is changed to {string}", async ({}, preference) => {
+Given("the booking's preference is changed to {string}", async (preference) => {
   world.record.preference = preference;
 });
 
@@ -83,7 +82,7 @@ function parseOccurrenceTexts(expected) {
     .sort();
 }
 
-Then('the plan creates events for {string}', async ({}, expected) => {
+Then('the plan creates events for {string}', async (expected) => {
   expectDeepEqual(occurrenceTextsOf(world.plan.toCreate), parseOccurrenceTexts(expected), 'toCreate occurrences');
 });
 
@@ -91,7 +90,7 @@ Then('the plan creates no events', async () => {
   expectDeepEqual(world.plan.toCreate, [], 'toCreate');
 });
 
-Then('the plan updates events for {string}', async ({}, expected) => {
+Then('the plan updates events for {string}', async (expected) => {
   expectDeepEqual(occurrenceTextsOf(world.plan.toUpdate), parseOccurrenceTexts(expected), 'toUpdate occurrences');
 });
 
@@ -99,7 +98,7 @@ Then('the plan updates no events', async () => {
   expectDeepEqual(world.plan.toUpdate, [], 'toUpdate');
 });
 
-Then('the plan deletes events for {string}', async ({}, expected) => {
+Then('the plan deletes events for {string}', async (expected) => {
   // toDelete items only carry {key, eventId} (the occurrence was already
   // removed from the desired set, so we don't have a fresh date/slot to
   // rebuild from) — recover date/slot by splitting the "date#slot" key.

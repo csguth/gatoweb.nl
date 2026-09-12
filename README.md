@@ -166,42 +166,67 @@ Rules enforced on GitHub:
 
 ## Automated tests
 
-A [Playwright](https://playwright.dev/) + [playwright-bdd](https://vitalets.github.io/playwright-bdd/)
-(Gherkin) test suite lives in `tests/bdd/` and covers the main user-facing requirements:
+Two suites cover this project, split by whether a scenario needs a real browser/DOM:
+
+- **UI suite** — [Playwright](https://playwright.dev/) +
+  [playwright-bdd](https://vitalets.github.io/playwright-bdd/) (Gherkin), living in `tests/bdd/`.
+  Covers browser-facing behavior: the booking form, per-language URLs, the staging banner, and so on.
+- **Unit suite** — [cucumber-js](https://github.com/cucumber/cucumber-js) puro, living in
+  `tests/unit/`. Covers pure business-logic scenarios (invoice calculation, booking sort order, the
+  Google Calendar sync decisions, Tikkie link validation) that never touch a DOM or browser — see
+  [Testing pure logic](#testing-pure-logic-no-browserdom-needed) below. Both suites read the exact
+  same `.feature` Gherkin files under `tests/bdd/features/`; only the step-definition module/runner
+  differs per scenario.
+
+The UI suite covers the main user-facing requirements:
 
 - **Booking form** (`tests/bdd/features/booking-form.feature`) — required-field validation, suggested
   price calculation, the WhatsApp confirmation message, and the login gate when Supabase auth is configured.
 - **Per-language URLs** (`tests/bdd/features/i18n.feature`) — that `/en/`, `/nl/` and `/pt/` each render
   their own language, that the selector links between them, and that `/` redirects using the saved
   preference or the browser language.
-- **Invoice calculation** (`tests/bdd/features/invoice-calc.feature`) — `static/js/facturen/invoice-calc.js`,
-  including the high-season surcharge split.
 - **Staging banner** (`tests/bdd/features/staging-banner.feature`) — visible on the staging build,
   hidden on production.
-- **Google Calendar sync** (`tests/bdd/features/gcal-sync-event.feature`,
-  `gcal-sync-sync-decision.feature`) — `supabase/functions/gcal-sync/logic.js`: the time slot derived
-  from a booking's visit preference, and the create/update/delete/skip decision for every
-  INSERT/UPDATE/DELETE of a booking row (issue #160).
 
-The tests run against the real thing: `tests/bdd/support/build-fixtures.mjs` invokes
+The unit suite covers:
+
+- **Invoice calculation** (`tests/bdd/features/invoice-calc.feature`) — `static/js/facturen/invoice-calc.js`,
+  including the high-season surcharge split.
+- **Google Calendar sync** (`tests/bdd/features/gcal-sync-event.feature`,
+  `gcal-sync-sync-decision.feature`, `gcal-sync-daily-plan.feature`, `gcal-sync-occurrences.feature`) —
+  `supabase/functions/gcal-sync/logic.js`: the time slot derived from a booking's visit preference,
+  the create/update/delete/skip decision for every INSERT/UPDATE/DELETE of a booking row (issue #160),
+  and the occurrence/daily-sync-plan math it's built on.
+- **Booking sort order** (`tests/bdd/features/booking-sort.feature`) and **Tikkie payment link
+  validation** (`tests/bdd/features/payment-url.feature`) — `static/js/facturen/booking-sort.js` /
+  `payment-url.js`.
+- **Invoice document rendering** (`tests/bdd/features/invoice-document.feature`) —
+  `static/js/shared/invoice-document.js`, stubbing the two browser globals it reads (`window.GATOWEB_CONFIG`,
+  `window.i18next`) instead of needing a real page.
+
+The UI suite runs against the real thing: `tests/bdd/support/build-fixtures.mjs` invokes
 `hugo --gc --minify` three times (production / staging / production-with-auth) into a temp folder and
 then applies the same placeholder substitution and `js/config.js` generation the deploy workflows do,
 with fake test values — no real secrets or deployments involved. **Hugo must therefore be installed
-locally to run the suite.**
+locally to run it.** The unit suite needs no Hugo build and no browser — it just imports the pure JS
+modules directly under Node.
 
 ### Testing pure logic (no browser/DOM needed)
 
-Business logic that doesn't need a DOM — pricing math, or the Google Calendar sync decisions — is
-kept in a plain, framework-agnostic JS module with no imports from Alpine/i18next/Deno/etc
-(`static/js/facturen/invoice-calc.js`, `supabase/functions/gcal-sync/logic.js`). Any runtime-specific
+Business logic that doesn't need a DOM — pricing math, booking sort order, Tikkie link validation, or
+the Google Calendar sync decisions — is kept in a plain, framework-agnostic JS module with no imports
+from Alpine/i18next/Deno/etc (`static/js/facturen/invoice-calc.js`, `static/js/facturen/booking-sort.js`,
+`static/js/facturen/payment-url.js`, `supabase/functions/gcal-sync/logic.js`). Any runtime-specific
 code (the browser page, or the Deno Edge Function) is kept as a thin adapter that only wires that
 pure module up to real I/O (DOM events, `fetch` calls) — it should rarely need its own tests, since it
 contains no decisions of its own to get wrong.
 
-Because the module has no runtime-specific dependencies, its BDD steps
-(`tests/bdd/steps/invoice-calc.steps.mjs`, `tests/bdd/steps/gcal-sync-*.steps.mjs`) `import` it
+Because the module has no runtime-specific dependencies, its step definitions
+(`tests/unit/steps/invoice-calc.steps.mjs`, `tests/unit/steps/gcal-sync-*.steps.mjs`, etc.) `import` it
 directly and call it like a plain function — no browser page, no Deno, no real network/database calls.
-This is the preferred pattern for new backend/business-logic features going forward:
+These steps run under plain cucumber-js (`tests/unit/cucumber.cjs`) instead of playwright-bdd, since
+they don't need Playwright's browser/webServer infra at all. This is the preferred pattern for new
+backend/business-logic features going forward:
 
 1. Write the Gherkin scenarios first (`tests/bdd/features/*.feature`) in plain product language —
    they double as living, human-readable requirements documentation that survives independently of
@@ -209,6 +234,8 @@ This is the preferred pattern for new backend/business-logic features going forw
 2. Confirm they fail (the step file importing a not-yet-created module is enough to prove this).
 3. Implement the pure module to make them pass, then wire it into the thin adapter (Deno handler,
    Alpine component, etc.) — the adapter itself stays intentionally free of business rules.
+4. Add its step definitions under `tests/unit/steps/` (cucumber-js) if the scenario needs no
+   browser/DOM, or `tests/bdd/steps/` (playwright-bdd) if it exercises real UI.
 
 This keeps the code base's actual decisions concentrated in small, dependency-free modules that are
 easy for a human (or a different LLM) to pick up, verify and extend with confidence, independently of
@@ -219,15 +246,19 @@ whichever tool was used to write them.
 ```
 npm ci
 npx playwright install --with-deps chromium   # first time only
-npm test                                      # builds fixtures, generates specs, runs everything
-npm run test:bdd:headed                       # same, but with a visible browser
-npm run test:bdd:report                       # opens the last HTML report
+npm run test:unit                             # pure-logic suite (cucumber-js, no browser/Hugo needed)
+npm test                                      # UI suite: builds fixtures, generates specs, runs everything
+npm run test:all                              # both suites, one after the other
+npm run test:bdd:headed                       # UI suite, but with a visible browser
+npm run test:bdd:report                       # opens the last Playwright HTML report
 ```
 
-CI runs the same suite (`.github/workflows/test.yml`) on every push/PR to `staging` and `main`, inside
-the official Playwright Docker image (`mcr.microsoft.com/playwright:v1.62.0-noble`) so the exact same
-browser/OS/dependency versions are used every run. To get that same guarantee locally (instead of
-whatever Chromium build is installed on your machine) and avoid "works on my machine" drift, run the
+CI runs both suites (`.github/workflows/test.yml`) as separate parallel jobs on every push/PR to
+`staging` and `main`: `test-unit` runs the cucumber-js suite on a plain `ubuntu-latest` runner (fast,
+no Playwright image), and `test-ui` runs the Playwright suite inside the official Playwright Docker
+image (`mcr.microsoft.com/playwright:v1.62.0-noble`) so the exact same browser/OS/dependency versions
+are used every run. To get that same guarantee locally for the UI suite (instead of whatever Chromium
+build is installed on your machine) and avoid "works on my machine" drift, run the
 suite inside the same image with Docker:
 
 ```powershell

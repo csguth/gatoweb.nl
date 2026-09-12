@@ -4,14 +4,14 @@
 // pricing/business info and window.i18next for the always-Dutch translations, loaded
 // straight from locales/nl.json so the assertions use the real strings). No DOM or
 // browser needed — this covers the proforma-vs-final branch added in issue #62.
+// Runs under cucumber-js puro instead of playwright-bdd — see tests/unit/cucumber.cjs
+// (global.window is reset after each scenario by tests/unit/support/hooks.mjs).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { createBdd } from 'playwright-bdd';
-import { world } from '../support/world.mjs';
+import { Given, When, Then } from '@cucumber/cucumber';
+import { world } from '../../bdd/support/world.mjs';
 import { buildInvoiceDocumentHtml } from '../../../static/js/shared/invoice-document.js';
-
-const { Given, When, Then } = createBdd();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const nl = JSON.parse(readFileSync(join(here, '../../../static/locales/nl.json'), 'utf8'));
@@ -50,7 +50,7 @@ Given('the Dutch invoice translations and business config are loaded', async () 
   };
 });
 
-Given('the booking is paid as factuur number {int} on {string}', async ({}, number, paidOn) => {
+Given('the booking is paid as factuur number {int} on {string}', async (number, paidOn) => {
   world.booking = { ...world.booking, factuur_number: number, approved_at: paidOn, paid_at: paidOn };
 });
 
@@ -58,7 +58,7 @@ When('the invoice document is built', async () => {
   world.document = buildInvoiceDocumentHtml(world.booking);
 });
 
-Then('the document title is {string}', async ({}, title) => {
+Then('the document title is {string}', async (title) => {
   assertIncludes(world.document, '<title>' + title + '</title>', 'document <title>');
   assertIncludes(world.document, '<h1>' + title + '</h1>', 'document <h1>');
 });
@@ -73,15 +73,15 @@ Then('the document does not show the proforma notice', async () => {
   }
 });
 
-Then('the document total is €{float}', async ({}, total) => {
+Then('the document total is €{float}', async (total) => {
   assertIncludes(world.document, '€ ' + total.toFixed(2) + '</td></tr>', 'invoice total row');
 });
 
-Then('the document shows the invoice date {string}', async ({}, date) => {
+Then('the document shows the invoice date {string}', async (date) => {
   assertIncludes(world.document, 'Datum: ' + date, 'invoice date label');
 });
 
-Then('the document shows the line item date range {string}', async ({}, range) => {
+Then('the document shows the line item date range {string}', async (range) => {
   assertIncludes(world.document, range, 'line item date range');
 });
 
