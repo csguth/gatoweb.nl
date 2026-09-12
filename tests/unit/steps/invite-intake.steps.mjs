@@ -1,12 +1,10 @@
 // Step definitions for tests/bdd/features/invite-intake.feature.
 // Pure logic test: imports js/account/invite-intake.js directly, no DOM/no
 // Supabase client — same pattern as client-invite-actions.steps.mjs.
-import { createBdd } from 'playwright-bdd';
-import { expect } from '@playwright/test';
-import { world } from '../support/world.mjs';
+import { Given, When, Then } from '@cucumber/cucumber';
+import { world } from '../../bdd/support/world.mjs';
 import { decideInviteIntake } from '../../../static/js/account/invite-intake.js';
 
-const { Given, When, Then } = createBdd();
 
 function resetIntakeState() {
   world.intake = {
@@ -47,6 +45,8 @@ When('the invite intake decision is made', async () => {
   world.intakeDecision = decideInviteIntake(world.intake);
 });
 
-Then('the decision is {string}', async ({}, expected) => {
-  expect(world.intakeDecision).toBe(expected);
+Then('the decision is {string}', async (expected) => {
+  if (world.intakeDecision !== expected) {
+    throw new Error(`Expected decision "${expected}" but got "${world.intakeDecision}"`);
+  }
 });

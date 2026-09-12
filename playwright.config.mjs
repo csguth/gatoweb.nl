@@ -2,15 +2,20 @@ import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
 import { fixturesRoot, FIXTURE_PORTS } from './tests/bdd/support/paths.mjs';
 
-// The 8 "pure logic" .feature files (no `page`, no DOM) migrated to cucumber-js
+// The "pure logic" .feature files (no `page`, no DOM) migrated to cucumber-js
 // puro (see tests/unit/) — excluded here so Playwright only builds/runs the UI
 // specs that actually need a browser + fixture webServer.
 const pureLogicFeatures = [
   '!tests/bdd/features/booking-sort.feature',
+  '!tests/bdd/features/client-invite-actions.feature',
+  '!tests/bdd/features/client-invite-link.feature',
+  '!tests/bdd/features/client-list.feature',
+  '!tests/bdd/features/format-date.feature',
   '!tests/bdd/features/gcal-sync-daily-plan.feature',
   '!tests/bdd/features/gcal-sync-event.feature',
   '!tests/bdd/features/gcal-sync-occurrences.feature',
   '!tests/bdd/features/gcal-sync-sync-decision.feature',
+  '!tests/bdd/features/invite-intake.feature',
   '!tests/bdd/features/invoice-calc.feature',
   '!tests/bdd/features/invoice-document.feature',
   '!tests/bdd/features/payment-url.feature'
