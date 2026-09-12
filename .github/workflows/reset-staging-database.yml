@@ -1,0 +1,44 @@
+name: Reset staging database
+
+# Manually resets the STAGING Supabase project's data to a clean slate,
+# keeping only the `staging-test@gatocatsit.dev` staff account — see
+# supabase/scripts/reset-staging-database.sql for exactly what this deletes
+# and the safety guard it runs before touching anything.
+#
+# This workflow is workflow_dispatch-only (never scheduled, never runs on
+# push) and its job is hardcoded to the `staging` GitHub Environment — it can
+# never target production, since it only ever reads `staging`'s
+# SUPABASE_URL/SUPABASE_ACCESS_TOKEN. As an extra guard against an accidental
+# click, it also requires typing the exact confirmation phrase below.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "RESET STAGING" to confirm (this permanently deletes staging data)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Check confirmation phrase
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.confirm }}" != "RESET STAGING" ]; then
+            echo "::error::Confirmation phrase did not match. Re-run and type exactly: RESET STAGING"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reset staging Supabase database
+        uses: ./.github/actions/apply-db-migration
+        with:
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          schema-file: supabase/scripts/reset-staging-database.sql
