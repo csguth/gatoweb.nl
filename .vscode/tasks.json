@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "BDD: Build fixtures",
+      "type": "shell",
+      "command": "npm run test:build-fixtures",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "BDD: Generate tests for Test Explorer",
+      "type": "shell",
+      "command": "npx bddgen",
+      "dependsOn": ["BDD: Build fixtures"],
+      "dependsOrder": "sequence",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen" }
+    }
+  ]
+}

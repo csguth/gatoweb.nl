@@ -6,10 +6,6 @@
 # stay in locales/nl.json instead.
 
 # ── account ─────────────────────────────────────────────
-# ── activate ─────────────────────────────────────────────
-"static.activate.activate.button" = "Mijn account activeren"
-"static.activate.activate.help" = "Je bent uitgenodigd voor een Gato Catsit-account. Klik hieronder om het te activeren en je wachtwoord in te stellen."
-"static.activate.activate.title" = "Activeer je account"
 # ── shared (site chrome) ─────────────────────────────────────
 "staging_banner.message" = "testomgeving, niet de live site"
 "form.email_placeholder" = "E-mail"
@@ -22,6 +18,7 @@
 "social.cta" = "Volg me op social media voor kattenzorg en foto's van katten!"
 "social.instagram" = "Volg @__INSTAGRAM_HANDLE__ op Instagram"
 
+"static.account.account.already_have_an_account" = "Heeft u al een account? Inloggen"
 "static.account.account.amount" = "Bedrag:"
 "static.account.account.awaiting_confirmation" = "Wacht op bevestiging"
 "static.account.account.cancelled" = "Geannuleerd"
@@ -42,9 +39,6 @@
 "static.account.account.pay_with_tikkie" = "💳 Betaal met Tikkie"
 "static.account.account.pets" = "Huisdieren:"
 "static.account.account.refresh" = "↻ Vernieuwen"
-"static.account.account.set_password_button" = "Wachtwoord instellen & doorgaan"
-"static.account.account.set_password_help" = "Je bent uitgenodigd door Lígia — kies een wachtwoord om je account af te ronden en je boekingen te zien."
-"static.account.account.set_password_title" = "Welkom! Stel je wachtwoord in"
 "static.account.account.this_page_isn_t_configured" = "Deze pagina is nog niet geconfigureerd. Probeer het later opnieuw."
 "static.account.account.view_invoice" = "🖨️ Factuur bekijken / afdrukken"
 "static.account.account.view_proforma" = "🖨️ Proforma bekijken / afdrukken"
@@ -63,7 +57,6 @@
 "static.facturen.facturen.client_address" = "Adres"
 "static.facturen.facturen.client_contact" = "WhatsApp / telefoon"
 "static.facturen.facturen.client_edit_reason" = "Reden (verplicht)"
-"static.facturen.facturen.client_email_label" = "E-mail"
 "static.facturen.facturen.client_lang_label" = "Voorkeurstaal"
 "static.facturen.facturen.client_name_label" = "Naam"
 "static.facturen.facturen.clients_section_title" = "👥 Klanten"
@@ -104,24 +97,27 @@
 "static.facturen.facturen.refresh" = "↻ Vernieuwen"
 "static.facturen.facturen.restore_to_inbox" = "↩️ Terugzetten naar postvak in"
 "static.facturen.facturen.save" = "Opslaan"
+"static.facturen.facturen.send_password_reset" = "🔑 Wachtwoordherstel e-mail versturen"
 "static.facturen.facturen.send_tikkie" = "Tikkie versturen"
 "static.facturen.facturen.send_via_whatsapp" = "💬 Versturen via WhatsApp"
 "static.facturen.facturen.supabase_is_not_configured_yet" = "Supabase is nog niet geconfigureerd. Voeg de repository variables <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw."
 "static.facturen.facturen.tikkie_sent" = "✓ Tikkie verstuurd"
 "static.facturen.facturen.tikkie_url_label" = "Tikkie-betaallink"
+"static.facturen.facturen.unlink_account" = "Account ontkoppelen"
 "static.facturen.facturen.whatsapp_client" = "WhatsApp klant"
 "static.facturen.facturen.working" = "Bezig..."
 "static.facturen.facturen.working_2" = "Bezig..."
 # ── facturen clients ─────────────────────────────────────
 "static.facturen.clients.back_to_invoices" = "← Terug naar Facturen"
-"static.facturen.clients.column_email" = "E-mail"
 "static.facturen.clients.column_name" = "Naam"
+"static.facturen.clients.column_pets" = "Huisdieren"
 "static.facturen.clients.column_registered" = "Geregistreerd"
 "static.facturen.clients.column_status" = "Status"
 "static.facturen.clients.filter_all" = "Alle statussen"
 "static.facturen.clients.next_page" = "Volgende →"
+"static.facturen.clients.pets_label" = "Huisdieren"
 "static.facturen.clients.previous_page" = "← Vorige"
-"static.facturen.clients.search_placeholder" = "Zoek op naam, e-mail, telefoon..."
+"static.facturen.clients.search_placeholder" = "Zoek op naam, telefoon..."
 "static.facturen.clients.title" = "Klanten"
 # ── index ─────────────────────────────────────────────
 "static.index.about.about_l_gia" = "Over Lígia"

@@ -245,6 +245,34 @@ docker run --rm --ipc=host -v "$PWD:/work" -w /work mcr.microsoft.com/playwright
 The image tag (`v1.62.0-noble`) must match the `@playwright/test` version in `package.json` — bump both
 together when upgrading Playwright.
 
+### Running from VS Code's Test Explorer
+
+The suite uses `playwright-bdd`, which compiles every `.feature` file into a plain `.spec.js` file
+under `tests/bdd/.features-gen/` (git-ignored) *before* Playwright can see it — the official
+[Playwright extension](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
+(recommended in `.vscode/extensions.json`) only discovers those generated files, not the `.feature`
+sources directly. Opening this repo's folder in VS Code runs a one-time `folderOpen` task
+(`.vscode/tasks.json`) that builds the Hugo fixtures and runs `bddgen` automatically, so all 3
+projects (`production`/`staging`/`production-auth`) show up in the Test Explorer a few seconds after
+the window opens — no manual `npm test` needed first. If you add/edit a `.feature` file afterwards,
+re-run the "BDD: Generate tests for Test Explorer" task (Command Palette → *Tasks: Run Task*) to
+refresh what the explorer sees, since generation isn't currently watched inside the editor.
+
+### Validating `supabase/schema.sql` changes before pushing
+
+The BDD suite above never touches a real Postgres instance — it only exercises pure JS logic or
+seeded DOM state. RLS policy ordering, missing `grant`s, and schema-qualification bugs (e.g.
+`pgcrypto` living in the `extensions` schema, not `public`) are invisible to it and, historically,
+only surfaced after a push, inside the PR preview's real Supabase project (a slow push → CI →
+preview → fail loop). To catch those offline instead, `supabase/tests/client_account_flow_smoke.sql`
+exercises the client Profile/Account RLS policies and RPCs (invite → claim → linked-account lookup)
+directly against a real Supabase Postgres — self-contained and self-cleaning (it always ends by
+raising an exception that rolls back everything it inserted, carrying every assertion's result as
+JSON in the error message). Run it by pasting the whole file into a single SQL execution against any
+project that already has `schema.sql` applied — the Supabase MCP `execute_sql` tool or `psql` both
+work — *before* pushing a `schema.sql` change, and confirm every key in the resulting JSON is `true`
+(or matches the expected value noted in its comment).
+
 ---
 
 ## Deploy updates

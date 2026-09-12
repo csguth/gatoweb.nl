@@ -19,7 +19,7 @@ function makeClient(overrides) {
   return {
     id: overrides.name || 'test-client',
     name: 'Jane Doe',
-    email: 'jane@example.com',
+    pets: [],
     phone: null,
     address: null,
     preferred_lang: 'en',
@@ -97,14 +97,14 @@ When('a fresh invite link {string} is generated', async ({ page }, link) => {
 
 Given('my client roster includes clients named {string} and {string}', async ({ page }, name1, name2) => {
   await seedClients(page, [
-    makeClient({ name: name1, email: name1.toLowerCase().replace(/\s+/g, '') + '@example.com' }),
-    makeClient({ name: name2, email: name2.toLowerCase().replace(/\s+/g, '') + '@example.com' })
+    makeClient({ name: name1 }),
+    makeClient({ name: name2 })
   ]);
 });
 
 Given('my client roster has {int} clients', async ({ page }, count) => {
   const clients = Array.from({ length: count }, (_, i) =>
-    makeClient({ name: 'Client ' + i, email: `client${i}@example.com`, created_at: `2025-01-${String(i + 1).padStart(2, '0')}T00:00:00Z` })
+    makeClient({ name: 'Client ' + i, created_at: `2025-01-${String(i + 1).padStart(2, '0')}T00:00:00Z` })
   );
   await seedClients(page, clients);
 });

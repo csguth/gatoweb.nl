@@ -1,11 +1,10 @@
 // Step definitions for tests/bdd/features/client-invite-accept.feature
-// (layouts/account/list.html + js/account/account-app.js, issue #173, MVP).
+// (layouts/account/list.html + js/account/account-app.js, issue #179).
 // Runs against the "production-auth" fixture via @auth-required, same
-// approach as account-tikkie.steps.mjs: no real backend — session/needsPassword
-// state is seeded straight into accountApp()'s Alpine state via the
-// Alpine.$data() bridge, and the "finish setting my password" steps simulate
-// setPassword()'s successful outcome (updateUser + link_my_bookings both
-// succeeded) without a real network round-trip.
+// approach as account-tikkie.steps.mjs: no real backend — invite/session/
+// profile state is seeded straight into accountApp()'s Alpine state via the
+// Alpine.$data() bridge, simulating loadInvitePreview()/afterLogin()'s
+// outcomes without a real network round-trip.
 import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 
@@ -15,47 +14,92 @@ function app(page) {
   return page.locator('[data-x-data="accountApp()"]');
 }
 
-Given('I am logged in on my bookings page via an invite link', async ({ page }) => {
+async function goToAccountPage(page) {
   await page.goto('/en/account/');
   await page.waitForFunction(() => window.i18next && window.i18next.isInitialized);
   await page.waitForFunction(
     () => window.Alpine && document.querySelector('[data-x-data="accountApp()"]')
   );
+}
+
+Given('I land on my account page via an invite link for {string}', async ({ page }, name) => {
+  await goToAccountPage(page);
+  await page.evaluate((name) => {
+    const el = document.querySelector('[data-x-data="accountApp()"]');
+    const data = window.Alpine.$data(el);
+    data.inviteToken = 'test-token';
+    data.inviteClientName = name;
+    // Mirrors what loadInvitePreview() itself does on a real invite link.
+    data.mode = 'signup';
+  }, name);
+});
+
+Given('I land on my account page via an expired invite link', async ({ page }) => {
+  await goToAccountPage(page);
   await page.evaluate(() => {
     const el = document.querySelector('[data-x-data="accountApp()"]');
     const data = window.Alpine.$data(el);
-    data.session = { user: { email: 'client@example.com' } };
-    data.needsPassword = true;
+    data.inviteToken = null;
+    data.inviteError = window.t('auth.invite_invalid_or_expired');
   });
 });
 
-When('I finish setting my password', async ({ page }) => {
-  await page.evaluate(() => {
-    const el = document.querySelector('[data-x-data="accountApp()"]');
-    const data = window.Alpine.$data(el);
-    data.needsPassword = false;
-    data.loadingList = false;
-    data.bookings = [];
-  });
-});
+When(
+  'I finish signing up and my Profile {string} with pets {string} is linked',
+  async ({ page }, name, pets) => {
+    await page.evaluate(({ name, pets }) => {
+      const el = document.querySelector('[data-x-data="accountApp()"]');
+      const data = window.Alpine.$data(el);
+      data.inviteToken = null;
+      data.session = { user: { email: 'client@example.com' } };
+      data.profile = { name, pets: [{ name: pets.split(' (')[0], type: pets.split('(')[1].replace(')', '') }] };
+      data.loadingList = false;
+      data.bookings = [];
+    }, { name, pets });
+  }
+);
 
-When('I finish setting my password and {int} previous bookings are linked', async ({ page }, count) => {
+When('I finish signing up and {int} previous bookings are linked', async ({ page }, count) => {
   await page.evaluate((count) => {
     const el = document.querySelector('[data-x-data="accountApp()"]');
     const data = window.Alpine.$data(el);
-    data.needsPassword = false;
+    data.inviteToken = null;
+    data.session = { user: { email: 'client@example.com' } };
     data.linkedBookingsCount = count;
     data.loadingList = false;
     data.bookings = [];
   }, count);
 });
 
-Then('I see the {string} prompt', async ({ page }, text) => {
+When('I finish signing up but the invite could not be claimed', async ({ page }) => {
+  await page.evaluate(() => {
+    const el = document.querySelector('[data-x-data="accountApp()"]');
+    const data = window.Alpine.$data(el);
+    data.inviteToken = null;
+    data.session = { user: { email: 'client@example.com' } };
+    // Mirrors what afterLogin() itself sets when claim_client_invite() errors
+    // (e.g. the token was claimed/expired between the preview and finishing
+    // signup) — the Account/session exist fine, only the link failed.
+    data.claimError = window.t('auth.invite_claim_failed');
+    data.loadingList = false;
+    data.bookings = [];
+  });
+});
+
+Then('I do not see the login-or-signup toggle', async ({ page }) => {
+  await expect(app(page).getByRole('button', { name: 'Log in', exact: true })).toHaveCount(0);
+});
+
+Then('the submit button reads {string}', async ({ page }, text) => {
+  await expect(app(page).getByRole('button', { name: text, exact: true })).toBeVisible();
+});
+
+Then('I see the {string} greeting', async ({ page }, text) => {
   await expect(app(page).getByText(text)).toBeVisible();
 });
 
-Then('I do not see the {string} prompt', async ({ page }, text) => {
-  await expect(app(page).getByText(text)).toHaveCount(0);
+Then('I see the {string} message', async ({ page }, text) => {
+  await expect(app(page).getByText(text)).toBeVisible();
 });
 
 Then('I do not see {string}', async ({ page }, text) => {

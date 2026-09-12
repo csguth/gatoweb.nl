@@ -571,41 +571,49 @@ revoke all on function public.ping_keepalive() from public;
 grant execute on function public.ping_keepalive() to anon;
 
 -- ─────────────────────────────────────────────────────────────────────────
--- Client roster + invite-by-link sign-up (issue #173)
+-- Client roster + invite-by-link sign-up (issue #173, redesigned in #179)
 --
--- Lígia already knows the name/phone/address of her existing clients (from
--- WhatsApp, word of mouth, etc.) before they ever create an account or place
--- a booking through the site. This table lets her pre-register that info, one
--- client at a time, from the facturen dashboard (js/facturen/facturen-app.js).
--- After saving a row here, she generates a native Supabase invite link for
--- that email (supabase/functions/client-invite, using auth.admin.generateLink
--- with type 'invite' — no email is sent automatically) and pastes it into
--- WhatsApp herself. There is deliberately NO custom token/expiry table here:
--- Supabase's own invite link already carries a secure, single-use, expiring
--- token, and clicking it logs the client straight into /account/ (which
--- already has `detectSessionInUrl: true`).
+-- Lígia already knows the name/pets/address of her existing clients (from
+-- WhatsApp, word of mouth, etc.) before they ever have an account. This
+-- table ("Profile") lets her pre-register that info, one client at a time,
+-- from the standalone /clients/ page (js/facturen/clients-app.js).
+--
+-- Issue #179 redesign: a Profile is a fully independent entity — it never
+-- knows whether it has an Account. It is the ACCOUNT (a real Supabase Auth
+-- user) that optionally links to a Profile, via the `account_profile_links`
+-- table below, never the other way around. This also drops the old
+-- requirement that Lígia already know a client's email just to register
+-- their Profile: `clients.email` no longer exists here (an Account already
+-- has its own real email in auth.users; a Profile only needs a name).
 create table if not exists public.clients (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   created_by uuid references auth.users(id),
   name text not null,
-  email text not null unique,
   phone text,
   address text,
-  -- Which of the site's three languages the invite link/redirect should use
+  -- Which of the site's three languages the invite link should redirect to
   -- (/en/account/, /nl/account/ or /pt/account/) — Lígia picks it when she
   -- registers the client, since she already knows which language they speak.
-  preferred_lang text not null default 'en' check (preferred_lang in ('en', 'nl', 'pt')),
-  user_id uuid references auth.users(id),
-  invited_at timestamptz,
-  accepted_at timestamptz
+  preferred_lang text not null default 'en' check (preferred_lang in ('en', 'nl', 'pt'))
 );
+
+-- Idempotent cleanup for existing tables created before issue #179 (which
+-- had `clients.email`/`user_id`/`invited_at`/`accepted_at`, all superseded
+-- by `client_invites`/`account_profile_links` below).
+alter table public.clients drop column if exists email;
+alter table public.clients drop column if exists user_id;
+alter table public.clients drop column if exists invited_at;
+alter table public.clients drop column if exists accepted_at;
+
+-- Issue #179: pets now live on the Profile itself (same shape as
+-- bookings.pets — an array of { name, type, otherType }), since a Profile
+-- exists independently of any booking.
+alter table public.clients add column if not exists pets jsonb not null default '[]'::jsonb;
 
 alter table public.clients enable row level security;
 
--- Only staff manage the roster — clients never query this table directly
--- (they interact only via their invite link and, once linked, their own
--- bookings).
+-- Staff manage the whole roster.
 drop policy if exists "staff can select clients" on public.clients;
 create policy "staff can select clients"
   on public.clients for select
@@ -628,43 +636,240 @@ create policy "staff can update clients"
 revoke all on public.clients from anon;
 grant select, insert, update on public.clients to authenticated;
 
--- Called once by a client right after they land back from their invite link
--- and set a password (static/js/account/account-app.js). Marks their roster
--- row as accepted and links any pre-existing bookings that already carry
--- their client_email but no user_id (e.g. legacy/manually-entered rows) to
--- their new auth user, so nothing they already had gets orphaned. SECURITY
--- DEFINER because writing another row's user_id would otherwise be blocked by
--- the "staff can update bookings"/"staff can update clients" policies — this
--- function deliberately only ever touches rows matching the CALLER's own
--- verified email (auth.jwt() ->> 'email'), never an arbitrary row.
-create or replace function public.link_my_bookings()
-returns integer
+-- Issue #179: a generic, single-use invite token for a Profile — deliberately
+-- NOT tied to any known email (unlike the old Supabase-native invite link it
+-- replaces). Lígia mints one from /clients/ (create_client_invite() below)
+-- and pastes `${SITE_URL}/{lang}/account/?invite=<token>` into WhatsApp
+-- herself. Loading that URL is a pure read (get_invite_preview() below), so
+-- — unlike the old GoTrue verify link — it is never silently consumed by a
+-- link-preview crawler; only actually finishing sign-up does (via
+-- claim_client_invite()). This removes the need for the old /activate/
+-- bridge page entirely.
+create table if not exists public.client_invites (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references public.clients(id) on delete cascade,
+  created_by uuid references auth.users(id),
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default (now() + interval '7 days'),
+  used_at timestamptz,
+  token text not null unique
+);
+
+alter table public.client_invites enable row level security;
+
+drop policy if exists "staff can select client_invites" on public.client_invites;
+create policy "staff can select client_invites"
+  on public.client_invites for select
+  to authenticated
+  using (public.is_staff());
+
+revoke all on public.client_invites from anon, authenticated;
+grant select on public.client_invites to authenticated;
+
+-- Issue #179: the Account -> Profile link. One row per linked Account
+-- (user_id is the primary key, so an Account can never link to more than one
+-- Profile), and a Profile can never be claimed by more than one Account
+-- (client_id is unique). Rows are only ever written by claim_client_invite()
+-- (security definer) — there is no direct insert policy for anyone.
+create table if not exists public.account_profile_links (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  client_id uuid not null unique references public.clients(id) on delete cascade,
+  linked_at timestamptz not null default now()
+);
+
+alter table public.account_profile_links enable row level security;
+
+drop policy if exists "staff can select account_profile_links" on public.account_profile_links;
+create policy "staff can select account_profile_links"
+  on public.account_profile_links for select
+  to authenticated
+  using (public.is_staff());
+
+drop policy if exists "account can select own link" on public.account_profile_links;
+create policy "account can select own link"
+  on public.account_profile_links for select
+  to authenticated
+  using (user_id = auth.uid());
+
+revoke all on public.account_profile_links from anon, authenticated;
+grant select on public.account_profile_links to authenticated;
+
+-- Issue #179: a client whose Account is linked to a Profile (via
+-- account_profile_links) can read their OWN Profile — read-only, no
+-- update/insert policy for them — to show it on /account/. Declared here
+-- (after account_profile_links exists) since it references that table.
+drop policy if exists "linked account can select own profile" on public.clients;
+create policy "linked account can select own profile"
+  on public.clients for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.account_profile_links l
+      where l.client_id = clients.id and l.user_id = auth.uid()
+    )
+  );
+
+-- Mints a fresh invite token for a Profile. Staff only. Any previous,
+-- still-unused token for the same client keeps working (Lígia can generate
+-- more than one if the client lost the link) — this simply adds a new row.
+create or replace function public.create_client_invite(p_client_id uuid)
+returns text
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_email text := auth.jwt() ->> 'email';
-  v_count integer;
+  v_token text;
 begin
-  if v_email is null then
-    raise exception 'not authenticated';
+  if not public.is_staff() then
+    raise exception 'not authorized';
   end if;
 
-  update public.clients
-    set user_id = auth.uid(),
-        accepted_at = coalesce(accepted_at, now())
-    where email = v_email and user_id is null;
+  if not exists (select 1 from public.clients where id = p_client_id) then
+    raise exception 'client not found';
+  end if;
 
-  update public.bookings
-    set user_id = auth.uid()
-    where client_email = v_email and user_id is null;
+  -- Defense in depth: the Clients page already hides this button once
+  -- c.accepted_at is set (offering "send password reset email" instead),
+  -- but guard the RPC itself too so a stray/direct call can't mint a
+  -- confusing second invite for a Profile that already has an Account.
+  if exists (select 1 from public.account_profile_links where client_id = p_client_id) then
+    raise exception 'client already has a linked account';
+  end if;
 
-  get diagnostics v_count = row_count;
+  v_token := encode(extensions.gen_random_bytes(24), 'base64');
+  v_token := replace(replace(replace(v_token, '/', '_'), '+', '-'), '=', '');
 
-  return v_count;
+  insert into public.client_invites (client_id, created_by, token)
+    values (p_client_id, auth.uid(), v_token);
+
+  return v_token;
 end;
 $$;
 
-revoke all on function public.link_my_bookings() from public, anon;
-grant execute on function public.link_my_bookings() to authenticated;
+revoke all on function public.create_client_invite(uuid) from public, anon;
+grant execute on function public.create_client_invite(uuid) to authenticated;
+
+-- Public (anon-callable) preview so /account/?invite=<token> can greet the
+-- client by name before they've signed up — deliberately returns only the
+-- Profile's name, nothing else, and only for a token that's still valid.
+create or replace function public.get_invite_preview(p_token text)
+returns table (client_name text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select c.name
+  from public.client_invites i
+  join public.clients c on c.id = i.client_id
+  where i.token = p_token
+    and i.used_at is null
+    and i.expires_at > now();
+$$;
+
+revoke all on function public.get_invite_preview(text) from public;
+grant execute on function public.get_invite_preview(text) to anon, authenticated;
+
+-- Called once, right after a client finishes signing up (email + password
+-- they chose themselves) on /account/?invite=<token> — links their brand new
+-- Account to the pre-registered Profile the token points to, and (as
+-- before) links any pre-existing bookings that already carry their
+-- client_email but no user_id. SECURITY DEFINER because writing
+-- account_profile_links/bookings rows would otherwise be blocked by their
+-- staff-only policies — this function only ever touches the token's own
+-- client_id and the CALLER's own auth uid/email, never an arbitrary row.
+create or replace function public.claim_client_invite(p_token text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_client_id uuid;
+  v_email text := auth.jwt() ->> 'email';
+begin
+  if auth.uid() is null then
+    raise exception 'not authenticated';
+  end if;
+
+  select client_id into v_client_id
+    from public.client_invites
+    where token = p_token and used_at is null and expires_at > now()
+    for update;
+
+  if v_client_id is null then
+    raise exception 'invite not found or already used';
+  end if;
+
+  if exists (select 1 from public.account_profile_links where client_id = v_client_id) then
+    raise exception 'invite already claimed';
+  end if;
+
+  insert into public.account_profile_links (user_id, client_id)
+    values (auth.uid(), v_client_id);
+
+  update public.client_invites set used_at = now() where token = p_token;
+
+  if v_email is not null then
+    update public.bookings
+      set user_id = auth.uid()
+      where client_email = v_email and user_id is null;
+  end if;
+
+  return v_client_id;
+end;
+$$;
+
+revoke all on function public.claim_client_invite(text) from public, anon;
+grant execute on function public.claim_client_invite(text) to authenticated;
+
+-- Issue #179 follow-up: once a Profile's Account is linked, "Generate invite
+-- link" no longer makes sense (the client already has an account) — the
+-- Clients page instead offers "Send password reset email". That flow is
+-- initiated client-side via supabase.auth.resetPasswordForEmail(email), for
+-- which Lígia needs the linked Account's real email — which only lives in
+-- auth.users, never in public.clients (see the top of this section). This
+-- read-only lookup is staff-only and returns null for a client with no
+-- linked Account, so the caller can't use it to enumerate arbitrary emails.
+create or replace function public.get_linked_account_email(p_client_id uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select u.email
+  from public.account_profile_links l
+  join auth.users u on u.id = l.user_id
+  where l.client_id = p_client_id and public.is_staff();
+$$;
+
+revoke all on function public.get_linked_account_email(uuid) from public, anon;
+grant execute on function public.get_linked_account_email(uuid) to authenticated;
+
+-- Issue #179 follow-up: lets staff undo a wrong/unwanted link (e.g. a client
+-- accidentally claimed the wrong Profile's invite, or wants to switch to a
+-- new email). Only removes the account_profile_links row — the Account
+-- itself (auth.users) and the Profile are both untouched, so the Profile
+-- reverts to its pre-invite state and Lígia can mint a fresh invite for it.
+-- Returns whether a link actually existed to remove, so the caller can show
+-- an accurate message either way.
+create or replace function public.unlink_client_account(p_client_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_staff() then
+    raise exception 'not authorized';
+  end if;
+
+  delete from public.account_profile_links where client_id = p_client_id;
+  return found;
+end;
+$$;
+
+revoke all on function public.unlink_client_account(uuid) from public, anon;
+grant execute on function public.unlink_client_account(uuid) to authenticated;

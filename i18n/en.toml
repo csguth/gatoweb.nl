@@ -6,10 +6,6 @@
 # stay in locales/en.json instead.
 
 # ── account ─────────────────────────────────────────────
-# ── activate ─────────────────────────────────────────────
-"static.activate.activate.button" = "Activate my account"
-"static.activate.activate.help" = "You were invited to a Gato Catsit account. Click below to activate it and set your password."
-"static.activate.activate.title" = "Activate your account"
 # ── shared (site chrome) ─────────────────────────────────────
 "staging_banner.message" = "test environment, not the live site"
 "form.email_placeholder" = "Email"
@@ -22,6 +18,7 @@
 "social.cta" = "Find me on social media for cat care content and pics of cats!"
 "social.instagram" = "Follow @__INSTAGRAM_HANDLE__ on Instagram"
 
+"static.account.account.already_have_an_account" = "Already have an account? Log in"
 "static.account.account.amount" = "Amount:"
 "static.account.account.awaiting_confirmation" = "Awaiting confirmation"
 "static.account.account.cancelled" = "Cancelled"
@@ -42,9 +39,6 @@
 "static.account.account.pay_with_tikkie" = "💳 Pay with Tikkie"
 "static.account.account.pets" = "Pets:"
 "static.account.account.refresh" = "↻ Refresh"
-"static.account.account.set_password_button" = "Set password & continue"
-"static.account.account.set_password_help" = "You were invited by Lígia — choose a password to finish setting up your account and see your bookings."
-"static.account.account.set_password_title" = "Welcome! Set your password"
 "static.account.account.this_page_isn_t_configured" = "This page isn't configured yet. Please try again later."
 "static.account.account.view_invoice" = "🖨️ View / print invoice"
 "static.account.account.view_proforma" = "🖨️ View / print proforma"
@@ -63,7 +57,6 @@
 "static.facturen.facturen.client_address" = "Address"
 "static.facturen.facturen.client_contact" = "WhatsApp / phone"
 "static.facturen.facturen.client_edit_reason" = "Reason (required)"
-"static.facturen.facturen.client_email_label" = "Email"
 "static.facturen.facturen.client_lang_label" = "Preferred language"
 "static.facturen.facturen.client_name_label" = "Name"
 "static.facturen.facturen.clients_section_title" = "👥 Clients"
@@ -104,24 +97,27 @@
 "static.facturen.facturen.refresh" = "↻ Refresh"
 "static.facturen.facturen.restore_to_inbox" = "↩️ Restore to inbox"
 "static.facturen.facturen.save" = "Save"
+"static.facturen.facturen.send_password_reset" = "🔑 Send password reset email"
 "static.facturen.facturen.send_tikkie" = "Send Tikkie"
 "static.facturen.facturen.send_via_whatsapp" = "💬 Send via WhatsApp"
 "static.facturen.facturen.supabase_is_not_configured_yet" = "Supabase is not configured yet. Add the repository variables <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> and redeploy."
 "static.facturen.facturen.tikkie_sent" = "✓ Tikkie sent"
 "static.facturen.facturen.tikkie_url_label" = "Tikkie payment link"
+"static.facturen.facturen.unlink_account" = "Unlink account"
 "static.facturen.facturen.whatsapp_client" = "WhatsApp client"
 "static.facturen.facturen.working" = "Working..."
 "static.facturen.facturen.working_2" = "Working..."
 # ── facturen clients ─────────────────────────────────────
 "static.facturen.clients.back_to_invoices" = "← Back to Invoices"
-"static.facturen.clients.column_email" = "Email"
 "static.facturen.clients.column_name" = "Name"
+"static.facturen.clients.column_pets" = "Pets"
 "static.facturen.clients.column_registered" = "Registered"
 "static.facturen.clients.column_status" = "Status"
 "static.facturen.clients.filter_all" = "All statuses"
 "static.facturen.clients.next_page" = "Next →"
+"static.facturen.clients.pets_label" = "Pets"
 "static.facturen.clients.previous_page" = "← Previous"
-"static.facturen.clients.search_placeholder" = "Search by name, email, phone..."
+"static.facturen.clients.search_placeholder" = "Search by name, phone..."
 "static.facturen.clients.title" = "Clients"
 # ── index ─────────────────────────────────────────────
 "static.index.about.about_l_gia" = "About Lígia"

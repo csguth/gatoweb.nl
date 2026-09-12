@@ -1,13 +1,16 @@
 // clientsApp() Alpine component for the standalone Clients page
-// (layouts/clients/list.html, issue #173 follow-up). Lígia
-// pre-registers an existing client's info here and mints a native Supabase
-// invite link for them on demand — see supabase/functions/client-invite and
-// the `clients` table in supabase/schema.sql. Sorting/filtering/pagination
-// decisions live in the pure ./client-list.js module (covered by
-// tests/bdd/features/client-list.feature) — this file only wires them to
-// Supabase + the page's reactive state.
+// (layouts/clients/list.html, issue #173, redesigned in #179). Lígia
+// pre-registers an existing client's Profile (name, pets, phone, address —
+// no email) here and mints a generic invite token for it on demand — see
+// the `clients`/`client_invites`/`account_profile_links` tables and the
+// create_client_invite()/claim_client_invite() RPCs in supabase/schema.sql.
+// Sorting/filtering/pagination/status-derivation decisions live in the pure
+// ./client-list.js module (covered by tests/bdd/features/client-list.feature)
+// — this file only wires them to Supabase + the page's reactive state.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { filterClients, sortClients, paginate } from './client-list.js';
+import { filterClients, sortClients, paginate, deriveClientRoster } from './client-list.js';
+import { buildInviteLink, buildAccountUrl } from './client-invite-link.js';
+import { petsSummary } from '../shared/pets-summary.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -103,15 +106,23 @@ window.clientsApp = function () {
       this.clients = [];
     },
 
+    // Issue #179: a Profile row no longer carries invited_at/accepted_at —
+    // those are derived client-side from the separate client_invites/
+    // account_profile_links tables via deriveClientRoster() (client-list.js)
+    // so the rest of this page (search/filter/sort/pagination, the roster
+    // table) keeps working exactly as before.
     async loadClients() {
       this.loadingClients = true;
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [clientsRes, invitesRes, linksRes] = await Promise.all([
+        supabase.from('clients').select('*').order('created_at', { ascending: false }),
+        supabase.from('client_invites').select('client_id, created_at'),
+        supabase.from('account_profile_links').select('client_id, linked_at')
+      ]);
       this.loadingClients = false;
+      const error = clientsRes.error || invitesRes.error || linksRes.error;
       if (error) { alert(error.message); return; }
-      this.clients = (data || []).map(c => ({ ...c, _inviteLink: '', _inviteBusy: false }));
+      const roster = deriveClientRoster(clientsRes.data || [], invitesRes.data || [], linksRes.data || []);
+      this.clients = roster.map(c => ({ ...c, _inviteLink: '', _inviteBusy: false }));
     },
 
     // Sorting/pagination interplay: changing the sort column keeps the
@@ -145,21 +156,43 @@ window.clientsApp = function () {
       if (this.page > 1) this.page -= 1;
     },
 
+    // Issue #179: no email field here anymore — a Profile only needs a
+    // name (pets/phone/address optional) to be registered. Email now only
+    // ever exists on the linked Account (auth.users), chosen by the client
+    // themselves when they follow the invite link.
     openClientForm() {
-      this.clientForm = { name: '', email: '', phone: '', address: '', preferred_lang: 'en', error: '', busy: false };
+      this.clientForm = {
+        name: '',
+        phone: '',
+        address: '',
+        preferred_lang: 'en',
+        pets: [{ name: '', type: 'cat', otherType: '' }],
+        error: '',
+        busy: false
+      };
     },
 
     closeClientForm() {
       this.clientForm = null;
     },
 
+    addPet() {
+      this.clientForm.pets.push({ name: '', type: 'cat', otherType: '' });
+    },
+
+    removePet(i) {
+      this.clientForm.pets.splice(i, 1);
+    },
+
+    petsSummary(pets) {
+      return petsSummary(pets);
+    },
+
     async saveNewClient() {
       const form = this.clientForm;
       if (!form) return;
       const name = form.name.trim();
-      const email = form.email.trim().toLowerCase();
       if (!name) { form.error = t('clients.name_required'); return; }
-      if (!email) { form.error = t('clients.email_required'); return; }
 
       form.busy = true;
       form.error = '';
@@ -167,10 +200,10 @@ window.clientsApp = function () {
         .from('clients')
         .insert({
           name,
-          email,
           phone: form.phone.trim() || null,
           address: form.address.trim() || null,
           preferred_lang: form.preferred_lang,
+          pets: form.pets.filter(p => p.name.trim() || p.type !== 'cat' || p.otherType.trim()),
           created_by: this.session.user.id
         })
         .select()
@@ -178,46 +211,70 @@ window.clientsApp = function () {
       form.busy = false;
       if (error) { form.error = error.message; return; }
 
-      this.clients = [{ ...data, _inviteLink: '', _inviteBusy: false }, ...this.clients];
+      this.clients = [{ ...data, invited_at: null, accepted_at: null, _inviteLink: '', _inviteBusy: false }, ...this.clients];
       this.clientForm = null;
     },
 
-    // Calls the client-invite Edge Function to mint a fresh Supabase invite
-    // link (no email is ever sent — see index.ts) right before Lígia sends
-    // it, so it never sits around long enough to expire before being used.
+    // Issue #179: mints a fresh, generic invite token via create_client_invite()
+    // (no email involved, no Edge Function call) and builds the link Lígia
+    // copies/sends herself — see client-invite-link.js.
     async generateInviteLink(c) {
       c._inviteBusy = true;
       c._inviteLink = '';
       try {
-        const { data, error } = await supabase.functions.invoke('client-invite', {
-          body: { email: c.email, lang: c.preferred_lang }
-        });
+        const { data: token, error } = await supabase.rpc('create_client_invite', { p_client_id: c.id });
         if (error) throw error;
-        if (!data || !data.link) throw new Error(t('clients.invite_error'));
-        c._inviteLink = data.link;
-        await supabase.from('clients').update({ invited_at: new Date().toISOString() }).eq('id', c.id);
+        if (!token) throw new Error(t('clients.invite_error'));
+        c._inviteLink = buildInviteLink(window.location.origin, c.preferred_lang, token);
         c.invited_at = c.invited_at || new Date().toISOString();
       } catch (err) {
-        alert(await this.describeInviteError(err));
+        alert((err && err.message) || t('clients.invite_error'));
       } finally {
         c._inviteBusy = false;
       }
     },
 
-    // supabase-js's FunctionsHttpError only carries a generic "Edge Function
-    // returned a non-2xx status code" in err.message — the actual { error }
-    // body our Edge Function sent back (e.g. "A valid email is required")
-    // is on err.context, a Response object that must be read separately.
-    async describeInviteError(err) {
-      if (err && err.context && typeof err.context.json === 'function') {
-        try {
-          const body = await err.context.json();
-          if (body && body.error) return body.error;
-        } catch {
-          // context wasn't JSON — fall through to the generic message below.
-        }
+    // Issue #179 follow-up: once a client's Account is linked (c.accepted_at
+    // set), "Generate invite link" no longer applies — offer a standard
+    // "forgot password" email instead, via Supabase's own recovery flow.
+    // get_linked_account_email() (schema.sql) is the only place the linked
+    // Account's real email is ever read, since Profiles never store one.
+    async sendPasswordReset(c) {
+      c._inviteBusy = true;
+      try {
+        const { data: email, error } = await supabase.rpc('get_linked_account_email', { p_client_id: c.id });
+        if (error) throw error;
+        if (!email) throw new Error(t('clients.invite_error'));
+        const redirectTo = buildAccountUrl(window.location.origin, c.preferred_lang);
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+        if (resetError) throw resetError;
+        alert(t('clients.password_reset_sent'));
+      } catch (err) {
+        alert((err && err.message) || t('clients.invite_error'));
+      } finally {
+        c._inviteBusy = false;
       }
-      return (err && err.message) || t('clients.invite_error');
+    },
+
+    // Issue #179 follow-up: undoes a wrong/unwanted link (e.g. the client
+    // claimed the wrong invite, or wants to switch to a different email) —
+    // unlink_client_account() (schema.sql) only removes the link row, so the
+    // Profile reverts to its pre-invite state and a fresh invite can be
+    // minted for it. Destructive enough (the client loses access to their
+    // profile/bookings until re-invited) to warrant a confirm() prompt.
+    async unlinkAccount(c) {
+      if (!window.confirm(t('clients.unlink_confirm', { name: c.name }))) return;
+      c._inviteBusy = true;
+      try {
+        const { error } = await supabase.rpc('unlink_client_account', { p_client_id: c.id });
+        if (error) throw error;
+        c.accepted_at = null;
+        alert(t('clients.unlink_success'));
+      } catch (err) {
+        alert((err && err.message) || t('clients.invite_error'));
+      } finally {
+        c._inviteBusy = false;
+      }
     },
 
     async copyInviteLink(c) {
