@@ -5,7 +5,9 @@ description: >-
   deploy keeps the target database's schema in sync with the repo. Because
   schema.sql only uses idempotent statements (create ... if not exists,
   alter table ... add column if not exists, create or replace ...), it is safe
-  to re-apply on every deploy.
+  to re-apply on every deploy. The whole file is wrapped in an explicit
+  BEGIN/COMMIT transaction so a failure partway through leaves the schema
+  completely untouched (Postgres DDL is transactional) instead of half-applied.
 
 inputs:
   supabase-url:
@@ -58,7 +60,11 @@ runs:
         echo "Applying ${SCHEMA_FILE} to Supabase project ${ref}"
 
         # Build the JSON request body from the file safely (handles quotes, $$, newlines).
-        payload="$(jq -Rs '{query: .}' "${SCHEMA_FILE}")"
+        # Wrap the whole schema in an explicit transaction: if any statement fails,
+        # Postgres rolls back everything applied so far in this call, so a broken
+        # migration never leaves the schema half-updated.
+        sql="$(printf 'begin;\n%s\ncommit;\n' "$(cat "${SCHEMA_FILE}")")"
+        payload="$(jq -Rs '{query: .}' <<<"${sql}")"
 
         response="$(mktemp)"
         status="$(curl -sS -o "${response}" -w '%{http_code}' \
