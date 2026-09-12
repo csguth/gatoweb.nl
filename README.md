@@ -273,6 +273,22 @@ project that already has `schema.sql` applied — the Supabase MCP `execute_sql`
 work — *before* pushing a `schema.sql` change, and confirm every key in the resulting JSON is `true`
 (or matches the expected value noted in its comment).
 
+### Resetting the staging database
+
+`supabase/scripts/reset-staging-database.sql` wipes every client Profile, invite,
+account/profile link, booking and booking-edit row, plus every staff/auth account except
+`staging-test@gatocatsit.dev`, giving staging a clean slate on demand (e.g. after a round of manual
+testing). It refuses to run at all unless it finds `staging-test@gatocatsit.dev` already in
+`auth.users` first — a staging-only account that is never expected to exist on production — so a
+misconfigured run aborts immediately instead of touching any data.
+
+**This must never run against production.** The supported way to run it is the
+"Reset staging database" GitHub Actions workflow (`workflow_dispatch` only, hardcoded to the
+`staging` environment so it physically cannot see production's credentials): go to
+**Actions → Reset staging database → Run workflow**, type `RESET STAGING` in the confirmation
+field, and run it. It can also be pasted into the Supabase SQL editor by hand, but only while
+connected to `gato-catsit-staging` — never `gato-catsit`.
+
 ---
 
 ## Deploy updates
