@@ -82,12 +82,6 @@ jobs:
           seasonal-surcharge-percent: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }}
           price-extra-cat-per-day: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }}
 
-      - name: Apply DB migration (production)
-        uses: ./.github/actions/apply-db-migration
-        with:
-          supabase-url: ${{ vars.SUPABASE_URL }}
-          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -109,6 +103,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Only apply the DB migration once tests have passed, so a failing test
+      # run never mutates the production database schema.
+      - name: Apply DB migration (production)
+        uses: ./.github/actions/apply-db-migration
+        with:
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

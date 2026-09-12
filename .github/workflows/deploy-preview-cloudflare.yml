@@ -91,12 +91,6 @@ jobs:
           seasonal-surcharge-percent: ${{ vars.SEASONAL_SURCHARGE_PERCENT || 0 }}
           price-extra-cat-per-day: ${{ vars.PRICE_EXTRA_CAT_PER_DAY || 0 }}
 
-      - name: Apply DB migration (staging project, shared by previews)
-        uses: ./.github/actions/apply-db-migration
-        with:
-          supabase-url: ${{ vars.SUPABASE_URL }}
-          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
       - name: Upload built site
         uses: actions/upload-artifact@v4
         with:
@@ -118,11 +112,22 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download built site
         uses: actions/download-artifact@v4
         with:
           name: site
           path: site
+
+      # Only apply the DB migration once tests have passed, so a failing test
+      # run never mutates the shared staging database schema.
+      - name: Apply DB migration (staging project, shared by previews)
+        uses: ./.github/actions/apply-db-migration
+        with:
+          supabase-url: ${{ vars.SUPABASE_URL }}
+          access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy to Cloudflare Pages (staging project, PR preview)
         id: deploy
