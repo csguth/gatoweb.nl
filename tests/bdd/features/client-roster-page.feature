@@ -2,9 +2,9 @@ Feature: Standalone Clients page (issue #173 follow-up)
   Lígia manages her client roster from its own page (/clients/, linked from
   the Invoices dashboard), separate from the invoices kanban board. She can
   register a client, search/filter/sort the roster, page through it, and
-  mint a fresh Supabase invite link there to copy or send via WhatsApp
-  herself — no email is ever sent automatically. See
-  js/facturen/clients-app.js and layouts/clients/list.html.
+  mint a fresh Supabase invite link there to copy and share herself (e.g.
+  paste into WhatsApp manually) — no automatic send, no email is ever sent
+  automatically. See js/facturen/clients-app.js and layouts/clients/list.html.
 
   Background:
     Given I am logged in on the clients page
@@ -31,11 +31,11 @@ Feature: Standalone Clients page (issue #173 follow-up)
     And I do not see a "Generate invite link" button
 
   @auth-required
-  Scenario: A freshly generated invite link can be copied or sent via WhatsApp
+  Scenario: A freshly generated invite link can be copied
     Given my client roster includes "Jane Doe" with phone "+31611111111" who hasn't been invited yet
-    When a fresh invite link "https://gatoweb.nl/en/account/#token123" is generated
+    When a fresh invite link "https://gatoweb.nl/en/invite/#token123" is generated
     Then I see a "Copy link" button
-    And I see a "Send via WhatsApp" link pointing to WhatsApp number "31611111111"
+    And I do not see a "Send via WhatsApp" link
 
   @auth-required
   Scenario: Searching the roster narrows the visible rows

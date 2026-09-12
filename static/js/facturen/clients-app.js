@@ -281,17 +281,6 @@ window.clientsApp = function () {
       if (!c._inviteLink) return;
       await navigator.clipboard.writeText(c._inviteLink);
       alert(t('clients.link_copied'));
-    },
-
-    // Same wa.me pattern as facturen-app.js's whatsappLink(b), pre-filled
-    // with the freshly generated invite link instead of a booking
-    // confirmation message.
-    inviteWhatsappLink(c) {
-      if (!c._inviteLink || !c.phone) return '#';
-      const digits = String(c.phone).replace(/\D/g, '');
-      if (!digits) return '#';
-      const message = t('clients.invite_message', { name: c.name, link: c._inviteLink });
-      return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(message);
     }
   };
 };
