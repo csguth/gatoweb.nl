@@ -108,6 +108,13 @@
 <template data-x-if="claimError">
 <p class="text-sm text-red-700 text-center bg-red-50 border border-red-200 rounded-2xl p-3" data-x-text="claimError"></p>
 </template>
+<!-- Issue #180: a session already existed before the client did anything on
+     this page, so account-app.js's afterLogin() deliberately did not
+     auto-claim the invite token in the URL (see invite-intake.js) — telling
+     them why instead of silently linking the wrong Profile to their Account. -->
+<template data-x-if="claimBlockedMessage">
+<p class="text-sm text-amber-800 text-center bg-amber-50 border border-amber-200 rounded-2xl p-3" data-x-text="claimBlockedMessage"></p>
+</template>
 <p class="text-sm text-brand-ink/70 text-center py-10" data-x-show="loadingList">
 <span>{{ i18n "static.account.account.loading" }}</span>
 </p>

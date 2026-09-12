@@ -15,7 +15,8 @@
     "linked_bookings_message": "We linked {{count}} previous booking(s) to your account.",
     "invite_greeting": "Welcome, {{name}}! Create your account below to see your profile and bookings.",
     "invite_invalid_or_expired": "This invite link is invalid or has expired. Please ask Lígia for a new one.",
-    "invite_claim_failed": "Your account was created, but we couldn't link it to your profile automatically. Please contact Lígia so she can help."
+    "invite_claim_failed": "Your account was created, but we couldn't link it to your profile automatically. Please contact Lígia so she can help.",
+    "invite_blocked_existing_session": "This invite link is for {{name}}. You're already logged in as someone else here — log out first, then open the link again to accept it."
   },
   "clients": {
     "name_required": "Please enter the client's name.",

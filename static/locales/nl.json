@@ -15,7 +15,8 @@
     "linked_bookings_message": "We hebben {{count}} eerdere boeking(en) aan je account gekoppeld.",
     "invite_greeting": "Welkom, {{name}}! Maak hieronder je account aan om je profiel en boekingen te zien.",
     "invite_invalid_or_expired": "Deze uitnodigingslink is ongeldig of verlopen. Vraag Lígia om een nieuwe.",
-    "invite_claim_failed": "Je account is aangemaakt, maar we konden het niet aan je profiel koppelen. Neem contact op met Lígia voor hulp."
+    "invite_claim_failed": "Je account is aangemaakt, maar we konden het niet aan je profiel koppelen. Neem contact op met Lígia voor hulp.",
+    "invite_blocked_existing_session": "Deze uitnodigingslink is voor {{name}}. Je bent hier al ingelogd als iemand anders — log eerst uit en open de link daarna opnieuw om hem te accepteren."
   },
   "clients": {
     "name_required": "Vul de naam van de klant in.",

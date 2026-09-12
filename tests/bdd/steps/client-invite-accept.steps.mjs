@@ -44,6 +44,22 @@ Given('I land on my account page via an expired invite link', async ({ page }) =
   });
 });
 
+Given('I am already logged in when I open an invite link for {string}', async ({ page }, name) => {
+  await goToAccountPage(page);
+  await page.evaluate((name) => {
+    const el = document.querySelector('[data-x-data="accountApp()"]');
+    const data = window.Alpine.$data(el);
+    // Mirrors what init()/afterLogin() themselves compute when a session
+    // restored from a previous, unrelated visit already exists and the
+    // invite token could not be safely auto-claimed (invite-intake.js).
+    data.session = { user: { email: 'someone-else@example.com' } };
+    data.inviteToken = null;
+    data.claimBlockedMessage = window.t('auth.invite_blocked_existing_session', { name });
+    data.loadingList = false;
+    data.bookings = [];
+  }, name);
+});
+
 When(
   'I finish signing up and my Profile {string} with pets {string} is linked',
   async ({ page }, name, pets) => {

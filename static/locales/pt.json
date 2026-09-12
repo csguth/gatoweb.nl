@@ -15,7 +15,8 @@
     "linked_bookings_message": "Vinculamos {{count}} reserva(s) anterior(es) à sua conta.",
     "invite_greeting": "Bem-vindo(a), {{name}}! Crie sua conta abaixo para ver seu perfil e reservas.",
     "invite_invalid_or_expired": "Este link de convite é inválido ou expirou. Peça um novo à Lígia.",
-    "invite_claim_failed": "Sua conta foi criada, mas não conseguimos vinculá-la ao seu perfil automaticamente. Entre em contato com a Lígia para ajudar."
+    "invite_claim_failed": "Sua conta foi criada, mas não conseguimos vinculá-la ao seu perfil automaticamente. Entre em contato com a Lígia para ajudar.",
+    "invite_blocked_existing_session": "Este link de convite é para {{name}}. Você já está logado(a) aqui como outra pessoa — saia primeiro e abra o link novamente para aceitá-lo."
   },
   "clients": {
     "name_required": "Informe o nome do cliente.",

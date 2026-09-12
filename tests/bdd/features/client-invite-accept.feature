@@ -46,3 +46,9 @@ Feature: Client signs up via an invite link and sees their Profile (issue #179)
     Given I land on my account page via an invite link for "Jane Doe"
     When I finish signing up but the invite could not be claimed
     Then I see "Your account was created, but we couldn't link it to your profile automatically. Please contact Lígia so she can help."
+
+  @auth-required
+  Scenario: Opening someone else's invite link while already logged in does not silently link it (issue #180 bug fix)
+    Given I am already logged in when I open an invite link for "Jane Doe"
+    Then I see "This invite link is for Jane Doe. You're already logged in as someone else here — log out first, then open the link again to accept it."
+
