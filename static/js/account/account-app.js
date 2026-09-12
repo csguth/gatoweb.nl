@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { openInvoicePrintWindow } from '../shared/invoice-document.js';
 import { formatDateDDMMYYYY } from '../shared/format-date.js';
 import { petsSummary } from '../shared/pets-summary.js';
+import { decideInviteIntake } from './invite-intake.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.GATOWEB_CONFIG.SUPABASE_ANON_KEY;
@@ -81,6 +82,20 @@ window.accountApp = function () {
     // the Profile link failed, so this is a banner on the bookings view, not
     // a blocking form error.
     claimError: '',
+    // Issue #180: set when an invite token shows up in the URL while a
+    // session from *before* this page load already exists (e.g. Lígia
+    // testing on a shared browser, or a client re-opening a stale/forwarded
+    // invite link while already logged in as themselves). The claim is
+    // deliberately NOT attempted automatically in that case — see
+    // invite-intake.js — so this banner tells them what to do instead of
+    // silently linking the wrong Account to the wrong Profile.
+    claimBlockedMessage: '',
+    // Tracks whether `session` existed before the client did anything on
+    // this page themselves, vs. one they just established here (a fresh
+    // login()/signup() call, or completing email confirmation from a
+    // signup started here). Only decideInviteIntake() reads this — see
+    // invite-intake.js for the full rationale.
+    sessionRestoredAtLoad: false,
 
     async init() {
       if (!configured) return;
@@ -91,8 +106,17 @@ window.accountApp = function () {
         await this.loadInvitePreview();
       }
 
+      // detectSessionInUrl (see supabase client config above) means a
+      // session can already be sitting in `data.session` here for two very
+      // different reasons: (a) it was truly restored from localStorage from
+      // a previous, unrelated visit, or (b) the client just clicked their
+      // email-confirmation link and supabase-js parsed a brand new session
+      // out of the URL fragment during this very getSession() call. Only
+      // (a) is a "restored" session for invite-claiming purposes.
+      const sessionEstablishedByThisPageLoad = /access_token=/.test(window.location.hash || '');
       const { data } = await supabase.auth.getSession();
       this.session = data.session;
+      this.sessionRestoredAtLoad = Boolean(this.session) && !sessionEstablishedByThisPageLoad;
       supabase.auth.onAuthStateChange((_event, session) => { this.session = session; });
       if (this.session) await this.afterLogin();
     },
@@ -115,23 +139,34 @@ window.accountApp = function () {
 
     // Runs once, right after a session is available (fresh login/signup, or
     // one already restored on page load). If we landed here via a still
-    // unclaimed invite token, claim it first — this both links the Profile
-    // and (as before) links any pre-existing bookings by email — before
-    // loading the profile card + bookings list.
-    async afterLogin() {
+    // unclaimed invite token, decide first (invite-intake.js) whether it's
+    // safe to auto-claim it — see decideInviteIntake()'s docs for why a
+    // merely-restored pre-existing session blocks the claim instead of
+    // silently linking the wrong Account to the wrong Profile.
+    async afterLogin(justAuthenticatedOnThisPage = false) {
       if (this.inviteToken) {
-        const { data: linkedCount, error } = await supabase.rpc('claim_client_invite', { p_token: this.inviteToken });
-        if (error) {
-          // The Account was created/logged in fine — only the Profile link
-          // failed (e.g. someone else claimed this token in the meantime,
-          // or it expired between the preview and finishing signup). Don't
-          // fail silently: the client would otherwise land on an empty
-          // bookings page with no clue why their profile is missing.
-          this.claimError = t('auth.invite_claim_failed');
+        const action = decideInviteIntake({
+          hasInviteToken: true,
+          sessionAlreadyExistedAtLoad: this.sessionRestoredAtLoad,
+          justAuthenticatedOnThisPage
+        });
+        if (action === 'blocked_existing_session') {
+          this.claimBlockedMessage = t('auth.invite_blocked_existing_session', { name: this.inviteClientName });
+          this.inviteToken = null;
         } else {
-          this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
+          const { data: linkedCount, error } = await supabase.rpc('claim_client_invite', { p_token: this.inviteToken });
+          if (error) {
+            // The Account was created/logged in fine — only the Profile link
+            // failed (e.g. someone else claimed this token in the meantime,
+            // or it expired between the preview and finishing signup). Don't
+            // fail silently: the client would otherwise land on an empty
+            // bookings page with no clue why their profile is missing.
+            this.claimError = t('auth.invite_claim_failed');
+          } else {
+            this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
+          }
+          this.inviteToken = null;
         }
-        this.inviteToken = null;
       }
       await this.loadProfile();
       await this.loadBookings();
@@ -156,7 +191,7 @@ window.accountApp = function () {
       if (error) { this.errorMsg = error.message; return; }
       this.session = data.session;
       this.password = '';
-      await this.afterLogin();
+      await this.afterLogin(true);
     },
 
     async signup() {
@@ -185,12 +220,13 @@ window.accountApp = function () {
         return;
       }
       this.session = data.session;
-      await this.afterLogin();
+      await this.afterLogin(true);
     },
 
     async logout() {
       await supabase.auth.signOut();
       this.session = null;
+      this.sessionRestoredAtLoad = false;
       this.bookings = [];
       this.profile = null;
     },

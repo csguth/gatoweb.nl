@@ -9,7 +9,7 @@
 // — this file only wires them to Supabase + the page's reactive state.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { filterClients, sortClients, paginate, deriveClientRoster } from './client-list.js';
-import { buildInviteLink, buildAccountUrl } from './client-invite-link.js';
+import { generateInviteLink, sendPasswordReset, unlinkAccount } from './client-invite-actions.js';
 import { petsSummary } from '../shared/pets-summary.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
@@ -217,21 +217,23 @@ window.clientsApp = function () {
 
     // Issue #179: mints a fresh, generic invite token via create_client_invite()
     // (no email involved, no Edge Function call) and builds the link Lígia
-    // copies/sends herself — see client-invite-link.js.
+    // copies/sends herself — see client-invite-link.js. All the RPC/error
+    // decision logic lives in client-invite-actions.js (issue #180 follow-up)
+    // so it's independently BDD-testable without a real Supabase client.
     async generateInviteLink(c) {
       c._inviteBusy = true;
       c._inviteLink = '';
-      try {
-        const { data: token, error } = await supabase.rpc('create_client_invite', { p_client_id: c.id });
-        if (error) throw error;
-        if (!token) throw new Error(t('clients.invite_error'));
-        c._inviteLink = buildInviteLink(window.location.origin, c.preferred_lang, token);
-        c.invited_at = c.invited_at || new Date().toISOString();
-      } catch (err) {
-        alert((err && err.message) || t('clients.invite_error'));
-      } finally {
-        c._inviteBusy = false;
-      }
+      const result = await generateInviteLink({
+        rpc: (name, args) => supabase.rpc(name, args),
+        clientId: c.id,
+        origin: window.location.origin,
+        lang: c.preferred_lang,
+        genericErrorMessage: t('clients.invite_error')
+      });
+      c._inviteBusy = false;
+      if (!result.ok) { alert(result.message); return; }
+      c._inviteLink = result.link;
+      c.invited_at = c.invited_at || new Date().toISOString();
     },
 
     // Issue #179 follow-up: once a client's Account is linked (c.accepted_at
@@ -241,19 +243,17 @@ window.clientsApp = function () {
     // Account's real email is ever read, since Profiles never store one.
     async sendPasswordReset(c) {
       c._inviteBusy = true;
-      try {
-        const { data: email, error } = await supabase.rpc('get_linked_account_email', { p_client_id: c.id });
-        if (error) throw error;
-        if (!email) throw new Error(t('clients.invite_error'));
-        const redirectTo = buildAccountUrl(window.location.origin, c.preferred_lang);
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
-        if (resetError) throw resetError;
-        alert(t('clients.password_reset_sent'));
-      } catch (err) {
-        alert((err && err.message) || t('clients.invite_error'));
-      } finally {
-        c._inviteBusy = false;
-      }
+      const result = await sendPasswordReset({
+        rpc: (name, args) => supabase.rpc(name, args),
+        resetPasswordForEmail: (email, opts) => supabase.auth.resetPasswordForEmail(email, opts),
+        clientId: c.id,
+        origin: window.location.origin,
+        lang: c.preferred_lang,
+        genericErrorMessage: t('clients.invite_error')
+      });
+      c._inviteBusy = false;
+      if (!result.ok) { alert(result.message); return; }
+      alert(t('clients.password_reset_sent'));
     },
 
     // Issue #179 follow-up: undoes a wrong/unwanted link (e.g. the client
@@ -265,16 +265,11 @@ window.clientsApp = function () {
     async unlinkAccount(c) {
       if (!window.confirm(t('clients.unlink_confirm', { name: c.name }))) return;
       c._inviteBusy = true;
-      try {
-        const { error } = await supabase.rpc('unlink_client_account', { p_client_id: c.id });
-        if (error) throw error;
-        c.accepted_at = null;
-        alert(t('clients.unlink_success'));
-      } catch (err) {
-        alert((err && err.message) || t('clients.invite_error'));
-      } finally {
-        c._inviteBusy = false;
-      }
+      const result = await unlinkAccount({ rpc: (name, args) => supabase.rpc(name, args), clientId: c.id });
+      c._inviteBusy = false;
+      if (!result.ok) { alert(result.message); return; }
+      c.accepted_at = null;
+      alert(t('clients.unlink_success'));
     },
 
     async copyInviteLink(c) {
