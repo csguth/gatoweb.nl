@@ -13,12 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    # Gate the deploy on the BDD test suite passing, in the same workflow run.
-    uses: ./.github/workflows/test.yml
-
-  build-and-deploy:
-    needs: test
+  build:
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -90,6 +85,30 @@ jobs:
         with:
           supabase-url: ${{ vars.SUPABASE_URL }}
           access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Upload built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+          retention-days: 1
+
+  test:
+    # Only run once the site has built successfully; gates the deploy on the
+    # BDD test suite passing, in the same workflow run.
+    needs: build
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Download built site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
 
       - name: Deploy to Cloudflare Pages (staging project)
         uses: cloudflare/pages-action@v1
