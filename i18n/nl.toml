@@ -103,6 +103,7 @@
 "static.facturen.facturen.supabase_is_not_configured_yet" = "Supabase is nog niet geconfigureerd. Voeg de repository variables <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw."
 "static.facturen.facturen.tikkie_sent" = "✓ Tikkie verstuurd"
 "static.facturen.facturen.tikkie_url_label" = "Tikkie-betaallink"
+"static.facturen.facturen.unlink_account" = "Account ontkoppelen"
 "static.facturen.facturen.whatsapp_client" = "WhatsApp klant"
 "static.facturen.facturen.working" = "Bezig..."
 "static.facturen.facturen.working_2" = "Bezig..."

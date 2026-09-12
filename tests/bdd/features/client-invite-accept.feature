@@ -38,3 +38,9 @@ Feature: Client signs up via an invite link and sees their Profile (issue #179)
     Given I land on my account page via an invite link for "Jane Doe"
     When I finish signing up and 2 previous bookings are linked
     Then I see a message that 2 previous bookings were linked
+
+  @auth-required
+  Scenario: The account got created but claiming the invite failed
+    Given I land on my account page via an invite link for "Jane Doe"
+    When I finish signing up but the invite could not be claimed
+    Then I see "Your account was created, but we couldn't link it to your profile automatically. Please contact Lígia so she can help."

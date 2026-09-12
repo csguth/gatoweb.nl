@@ -256,6 +256,27 @@ window.clientsApp = function () {
       }
     },
 
+    // Issue #179 follow-up: undoes a wrong/unwanted link (e.g. the client
+    // claimed the wrong invite, or wants to switch to a different email) —
+    // unlink_client_account() (schema.sql) only removes the link row, so the
+    // Profile reverts to its pre-invite state and a fresh invite can be
+    // minted for it. Destructive enough (the client loses access to their
+    // profile/bookings until re-invited) to warrant a confirm() prompt.
+    async unlinkAccount(c) {
+      if (!window.confirm(t('clients.unlink_confirm', { name: c.name }))) return;
+      c._inviteBusy = true;
+      try {
+        const { error } = await supabase.rpc('unlink_client_account', { p_client_id: c.id });
+        if (error) throw error;
+        c.accepted_at = null;
+        alert(t('clients.unlink_success'));
+      } catch (err) {
+        alert((err && err.message) || t('clients.invite_error'));
+      } finally {
+        c._inviteBusy = false;
+      }
+    },
+
     async copyInviteLink(c) {
       if (!c._inviteLink) return;
       await navigator.clipboard.writeText(c._inviteLink);

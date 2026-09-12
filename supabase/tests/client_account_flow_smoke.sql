@@ -35,6 +35,8 @@ declare
   v_email text;
   v_email_as_client text;
   v_reclaim_error text;
+  v_reinvite_error text;
+  v_unlink_result boolean;
   v_staff_user_id uuid := '11111111-1111-1111-1111-111111111111';
   v_test_user_id uuid := '22222222-2222-2222-2222-222222222222';
   results jsonb := '{}'::jsonb;
@@ -106,6 +108,35 @@ begin
     v_reclaim_error := sqlerrm;
   end;
   results := results || jsonb_build_object('8_reclaim_blocked_message', v_reclaim_error); -- expect 'invite not found or already used'
+
+  -- 9) Staff can't mint a second invite for a Profile that's already
+  --    linked (defense in depth — the UI already hides the button).
+  perform set_config('request.jwt.claims', staff_claims, true);
+  begin
+    perform public.create_client_invite(v_client_id);
+    v_reinvite_error := 'NO ERROR RAISED (BUG)';
+  exception when others then
+    v_reinvite_error := sqlerrm;
+  end;
+  results := results || jsonb_build_object('9_reinvite_blocked_message', v_reinvite_error); -- expect 'client already has a linked account'
+
+  -- 10) Staff unlinks the account: the link disappears, the client can no
+  --     longer read the Profile, and a fresh invite can be minted again.
+  select public.unlink_client_account(v_client_id) into v_unlink_result;
+  results := results || jsonb_build_object('10_unlink_reported_a_link_existed', v_unlink_result);
+
+  perform set_config('request.jwt.claims', client_claims, true);
+  select count(*) into v_own_count from public.clients where id = v_client_id;
+  results := results || jsonb_build_object('11_client_loses_access_after_unlink', v_own_count = 0);
+
+  perform set_config('request.jwt.claims', staff_claims, true);
+  select public.create_client_invite(v_client_id) into v_token;
+  results := results || jsonb_build_object('12_can_reinvite_after_unlink', v_token is not null);
+
+  -- 11) Unlinking a Profile with no link at all is reported honestly, not
+  --     silently "succeeding".
+  select public.unlink_client_account(v_other_client_id) into v_unlink_result;
+  results := results || jsonb_build_object('13_unlink_reports_no_link_existed', v_unlink_result = false);
 
   execute 'reset role';
   raise exception 'SCHEMA_TEST_RESULTS: %', results;

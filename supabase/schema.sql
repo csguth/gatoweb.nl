@@ -729,6 +729,14 @@ begin
     raise exception 'client not found';
   end if;
 
+  -- Defense in depth: the Clients page already hides this button once
+  -- c.accepted_at is set (offering "send password reset email" instead),
+  -- but guard the RPC itself too so a stray/direct call can't mint a
+  -- confusing second invite for a Profile that already has an Account.
+  if exists (select 1 from public.account_profile_links where client_id = p_client_id) then
+    raise exception 'client already has a linked account';
+  end if;
+
   v_token := encode(extensions.gen_random_bytes(24), 'base64');
   v_token := replace(replace(replace(v_token, '/', '_'), '+', '-'), '=', '');
 
@@ -839,3 +847,29 @@ $$;
 
 revoke all on function public.get_linked_account_email(uuid) from public, anon;
 grant execute on function public.get_linked_account_email(uuid) to authenticated;
+
+-- Issue #179 follow-up: lets staff undo a wrong/unwanted link (e.g. a client
+-- accidentally claimed the wrong Profile's invite, or wants to switch to a
+-- new email). Only removes the account_profile_links row — the Account
+-- itself (auth.users) and the Profile are both untouched, so the Profile
+-- reverts to its pre-invite state and Lígia can mint a fresh invite for it.
+-- Returns whether a link actually existed to remove, so the caller can show
+-- an accurate message either way.
+create or replace function public.unlink_client_account(p_client_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_staff() then
+    raise exception 'not authorized';
+  end if;
+
+  delete from public.account_profile_links where client_id = p_client_id;
+  return found;
+end;
+$$;
+
+revoke all on function public.unlink_client_account(uuid) from public, anon;
+grant execute on function public.unlink_client_account(uuid) to authenticated;

@@ -14,7 +14,8 @@
     "not_configured": "Service is not configured yet.",
     "linked_bookings_message": "We linked {{count}} previous booking(s) to your account.",
     "invite_greeting": "Welcome, {{name}}! Create your account below to see your profile and bookings.",
-    "invite_invalid_or_expired": "This invite link is invalid or has expired. Please ask Lígia for a new one."
+    "invite_invalid_or_expired": "This invite link is invalid or has expired. Please ask Lígia for a new one.",
+    "invite_claim_failed": "Your account was created, but we couldn't link it to your profile automatically. Please contact Lígia so she can help."
   },
   "clients": {
     "name_required": "Please enter the client's name.",
@@ -22,6 +23,8 @@
     "invite_message": "Hi {{name}}! Here is your Gato Catsit account link — click it to create your account: {{link}}",
     "link_copied": "Link copied to clipboard!",
     "password_reset_sent": "Password reset email sent!",
+    "unlink_confirm": "Unlink {{name}}'s account? They will lose access to their profile and bookings until invited again.",
+    "unlink_success": "Account unlinked.",
     "page_indicator": "Page {{page}} of {{totalPages}}"
   },
   "adjustment_note_required": "Please provide a reason for the amount adjustment.",

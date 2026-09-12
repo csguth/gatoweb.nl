@@ -74,6 +74,13 @@ window.accountApp = function () {
     inviteError: '',
     linkedBookingsCount: null,
     profile: null,
+    // Set when claim_client_invite() fails during afterLogin() — e.g. the
+    // token got claimed or expired in the gap between the invite preview and
+    // finishing signup (a race, not something the preview check can catch).
+    // The Account itself is still created/logged in fine at this point; only
+    // the Profile link failed, so this is a banner on the bookings view, not
+    // a blocking form error.
+    claimError: '',
 
     async init() {
       if (!configured) return;
@@ -114,7 +121,14 @@ window.accountApp = function () {
     async afterLogin() {
       if (this.inviteToken) {
         const { data: linkedCount, error } = await supabase.rpc('claim_client_invite', { p_token: this.inviteToken });
-        if (!error) {
+        if (error) {
+          // The Account was created/logged in fine — only the Profile link
+          // failed (e.g. someone else claimed this token in the meantime,
+          // or it expired between the preview and finishing signup). Don't
+          // fail silently: the client would otherwise land on an empty
+          // bookings page with no clue why their profile is missing.
+          this.claimError = t('auth.invite_claim_failed');
+        } else {
           this.linkedBookingsCount = typeof linkedCount === 'number' ? linkedCount : null;
         }
         this.inviteToken = null;

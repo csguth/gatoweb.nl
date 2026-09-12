@@ -100,6 +100,14 @@
 <p class="text-sm text-brand-ink/70 text-center bg-white rounded-2xl p-3 shadow-sm border border-brand-sand" data-x-show="linkedBookingsCount">
 <span data-x-text="t('auth.linked_bookings_message', { count: linkedBookingsCount })"></span>
 </p>
+<!-- Issue #179 follow-up: claim_client_invite() can fail after the Account
+     itself was already created (a race with another claim, or the token
+     expiring mid-signup) — see account-app.js afterLogin(). This surfaces
+     that instead of silently leaving the client on an empty page with no
+     explanation. -->
+<template data-x-if="claimError">
+<p class="text-sm text-red-700 text-center bg-red-50 border border-red-200 rounded-2xl p-3" data-x-text="claimError"></p>
+</template>
 <p class="text-sm text-brand-ink/70 text-center py-10" data-x-show="loadingList">
 <span>{{ i18n "static.account.account.loading" }}</span>
 </p>

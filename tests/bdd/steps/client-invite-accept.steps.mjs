@@ -71,6 +71,21 @@ When('I finish signing up and {int} previous bookings are linked', async ({ page
   }, count);
 });
 
+When('I finish signing up but the invite could not be claimed', async ({ page }) => {
+  await page.evaluate(() => {
+    const el = document.querySelector('[data-x-data="accountApp()"]');
+    const data = window.Alpine.$data(el);
+    data.inviteToken = null;
+    data.session = { user: { email: 'client@example.com' } };
+    // Mirrors what afterLogin() itself sets when claim_client_invite() errors
+    // (e.g. the token was claimed/expired between the preview and finishing
+    // signup) — the Account/session exist fine, only the link failed.
+    data.claimError = window.t('auth.invite_claim_failed');
+    data.loadingList = false;
+    data.bookings = [];
+  });
+});
+
 Then('I do not see the login-or-signup toggle', async ({ page }) => {
   await expect(app(page).getByRole('button', { name: 'Log in', exact: true })).toHaveCount(0);
 });
