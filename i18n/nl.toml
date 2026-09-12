@@ -97,6 +97,7 @@
 "static.facturen.facturen.refresh" = "↻ Vernieuwen"
 "static.facturen.facturen.restore_to_inbox" = "↩️ Terugzetten naar postvak in"
 "static.facturen.facturen.save" = "Opslaan"
+"static.facturen.facturen.send_password_reset" = "🔑 Wachtwoordherstel e-mail versturen"
 "static.facturen.facturen.send_tikkie" = "Tikkie versturen"
 "static.facturen.facturen.send_via_whatsapp" = "💬 Versturen via WhatsApp"
 "static.facturen.facturen.supabase_is_not_configured_yet" = "Supabase is nog niet geconfigureerd. Voeg de repository variables <code>SUPABASE_URL</code> en <code>SUPABASE_ANON_KEY</code> toe en deploy opnieuw."

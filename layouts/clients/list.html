@@ -105,12 +105,17 @@
 </td>
 <td class="py-3 pr-3 text-brand-ink/70 whitespace-nowrap" data-x-text="new Date(c.created_at).toLocaleDateString()"></td>
 <td class="py-3 pr-0">
-<template data-x-if="!c._inviteLink">
+<template data-x-if="c.accepted_at">
+<button data-x-bind:disabled="c._inviteBusy" data-x-on:click="sendPasswordReset(c)" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream disabled:opacity-50 transition whitespace-nowrap">
+<span>{{ i18n "static.facturen.facturen.send_password_reset" }}</span>
+</button>
+</template>
+<template data-x-if="!c.accepted_at &amp;&amp; !c._inviteLink">
 <button data-x-bind:disabled="c._inviteBusy" data-x-on:click="generateInviteLink(c)" class="text-xs font-semibold text-white bg-brand-ink hover:bg-brand-wine disabled:opacity-50 rounded-full px-3 py-1.5 transition whitespace-nowrap">
 <span>{{ i18n "static.facturen.facturen.generate_invite_link" }}</span>
 </button>
 </template>
-<template data-x-if="c._inviteLink">
+<template data-x-if="!c.accepted_at &amp;&amp; c._inviteLink">
 <div class="flex gap-1.5">
 <button data-x-on:click="copyInviteLink(c)" class="text-xs font-semibold text-brand-ink border border-brand-sand rounded-full px-3 py-1.5 hover:bg-brand-cream whitespace-nowrap">
 <span>{{ i18n "static.facturen.facturen.copy_link" }}</span>

@@ -9,7 +9,7 @@
 // — this file only wires them to Supabase + the page's reactive state.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { filterClients, sortClients, paginate, deriveClientRoster } from './client-list.js';
-import { buildInviteLink } from './client-invite-link.js';
+import { buildInviteLink, buildAccountUrl } from './client-invite-link.js';
 import { petsSummary } from '../shared/pets-summary.js';
 
 const SUPABASE_URL = window.GATOWEB_CONFIG.SUPABASE_URL;
@@ -227,6 +227,28 @@ window.clientsApp = function () {
         if (!token) throw new Error(t('clients.invite_error'));
         c._inviteLink = buildInviteLink(window.location.origin, c.preferred_lang, token);
         c.invited_at = c.invited_at || new Date().toISOString();
+      } catch (err) {
+        alert((err && err.message) || t('clients.invite_error'));
+      } finally {
+        c._inviteBusy = false;
+      }
+    },
+
+    // Issue #179 follow-up: once a client's Account is linked (c.accepted_at
+    // set), "Generate invite link" no longer applies — offer a standard
+    // "forgot password" email instead, via Supabase's own recovery flow.
+    // get_linked_account_email() (schema.sql) is the only place the linked
+    // Account's real email is ever read, since Profiles never store one.
+    async sendPasswordReset(c) {
+      c._inviteBusy = true;
+      try {
+        const { data: email, error } = await supabase.rpc('get_linked_account_email', { p_client_id: c.id });
+        if (error) throw error;
+        if (!email) throw new Error(t('clients.invite_error'));
+        const redirectTo = buildAccountUrl(window.location.origin, c.preferred_lang);
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+        if (resetError) throw resetError;
+        alert(t('clients.password_reset_sent'));
       } catch (err) {
         alert((err && err.message) || t('clients.invite_error'));
       } finally {

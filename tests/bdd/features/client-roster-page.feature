@@ -25,6 +25,8 @@ Feature: Standalone Clients page (issue #173 follow-up)
   Scenario: A client who already logged in
     When my client roster includes "Jane Doe" who already logged in
     Then I see the "Logged in" status
+    And I see a "Send password reset email" button
+    And I do not see a "Generate invite link" button
 
   @auth-required
   Scenario: A freshly generated invite link can be copied or sent via WhatsApp

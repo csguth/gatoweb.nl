@@ -19,3 +19,13 @@ export function buildInviteLink(siteUrl, lang, token) {
   const origin = String(siteUrl || '').replace(/\/+$/, '');
   return `${origin}/${normalizeLang(lang)}/account/?invite=${encodeURIComponent(token)}`;
 }
+
+// Issue #179 follow-up: the redirectTo for a password-reset email sent to an
+// already-linked client — same /{lang}/account/ page as the invite link,
+// just without the ?invite= token (resetPasswordForEmail's own recovery
+// tokens arrive as a URL fragment, handled by account-app.js's existing
+// detectSessionInUrl: true).
+export function buildAccountUrl(siteUrl, lang) {
+  const origin = String(siteUrl || '').replace(/\/+$/, '');
+  return `${origin}/${normalizeLang(lang)}/account/`;
+}

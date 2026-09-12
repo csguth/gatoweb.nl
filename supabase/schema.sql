@@ -815,3 +815,27 @@ $$;
 
 revoke all on function public.claim_client_invite(text) from public, anon;
 grant execute on function public.claim_client_invite(text) to authenticated;
+
+-- Issue #179 follow-up: once a Profile's Account is linked, "Generate invite
+-- link" no longer makes sense (the client already has an account) — the
+-- Clients page instead offers "Send password reset email". That flow is
+-- initiated client-side via supabase.auth.resetPasswordForEmail(email), for
+-- which Lígia needs the linked Account's real email — which only lives in
+-- auth.users, never in public.clients (see the top of this section). This
+-- read-only lookup is staff-only and returns null for a client with no
+-- linked Account, so the caller can't use it to enumerate arbitrary emails.
+create or replace function public.get_linked_account_email(p_client_id uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select u.email
+  from public.account_profile_links l
+  join auth.users u on u.id = l.user_id
+  where l.client_id = p_client_id and public.is_staff();
+$$;
+
+revoke all on function public.get_linked_account_email(uuid) from public, anon;
+grant execute on function public.get_linked_account_email(uuid) to authenticated;

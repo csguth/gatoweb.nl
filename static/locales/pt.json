@@ -21,6 +21,7 @@
     "invite_error": "Não foi possível gerar o link de convite. Tente novamente.",
     "invite_message": "Oi {{name}}! Aqui está o link da sua conta Gato Catsit — clique para criar sua conta: {{link}}",
     "link_copied": "Link copiado para a área de transferência!",
+    "password_reset_sent": "E-mail de redefinição de senha enviado!",
     "page_indicator": "Página {{page}} de {{totalPages}}"
   },
   "adjustment_note_required": "Informe um motivo para o ajuste do valor.",

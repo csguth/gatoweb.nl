@@ -21,6 +21,7 @@
     "invite_error": "Could not generate the invite link. Please try again.",
     "invite_message": "Hi {{name}}! Here is your Gato Catsit account link — click it to create your account: {{link}}",
     "link_copied": "Link copied to clipboard!",
+    "password_reset_sent": "Password reset email sent!",
     "page_indicator": "Page {{page}} of {{totalPages}}"
   },
   "adjustment_note_required": "Please provide a reason for the amount adjustment.",
