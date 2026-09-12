@@ -137,11 +137,8 @@ Then('I do not see a {string} button', async ({ page }, label) => {
   await expect(app(page).getByRole('button', { name: new RegExp(label) })).toHaveCount(0);
 });
 
-Then('I see a {string} link pointing to WhatsApp number {string}', async ({ page }, label, number) => {
-  const link = app(page).getByRole('link', { name: new RegExp(label) });
-  await expect(link).toBeVisible();
-  const href = await link.getAttribute('href');
-  expect(href).toContain('https://wa.me/' + number);
+Then('I do not see a {string} link', async ({ page }, label) => {
+  await expect(app(page).getByRole('link', { name: new RegExp(label) })).toHaveCount(0);
 });
 
 Then('I see the client row {string}', async ({ page }, name) => {

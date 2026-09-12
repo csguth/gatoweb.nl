@@ -20,7 +20,6 @@
   "clients": {
     "name_required": "Vul de naam van de klant in.",
     "invite_error": "Kon de uitnodigingslink niet genereren. Probeer het opnieuw.",
-    "invite_message": "Hoi {{name}}! Hier is je Gato Catsit-accountlink — klik erop om je account aan te maken: {{link}}",
     "link_copied": "Link gekopieerd naar klembord!",
     "password_reset_sent": "E-mail voor wachtwoordherstel verzonden!",
     "unlink_confirm": "Account van {{name}} ontkoppelen? Diegene verliest de toegang tot profiel en boekingen tot een nieuwe uitnodiging.",

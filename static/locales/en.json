@@ -20,7 +20,6 @@
   "clients": {
     "name_required": "Please enter the client's name.",
     "invite_error": "Could not generate the invite link. Please try again.",
-    "invite_message": "Hi {{name}}! Here is your Gato Catsit account link — click it to create your account: {{link}}",
     "link_copied": "Link copied to clipboard!",
     "password_reset_sent": "Password reset email sent!",
     "unlink_confirm": "Unlink {{name}}'s account? They will lose access to their profile and bookings until invited again.",

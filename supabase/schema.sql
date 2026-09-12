@@ -639,12 +639,12 @@ grant select, insert, update on public.clients to authenticated;
 -- Issue #179: a generic, single-use invite token for a Profile — deliberately
 -- NOT tied to any known email (unlike the old Supabase-native invite link it
 -- replaces). Lígia mints one from /clients/ (create_client_invite() below)
--- and pastes `${SITE_URL}/{lang}/account/?invite=<token>` into WhatsApp
--- herself. Loading that URL is a pure read (get_invite_preview() below), so
--- — unlike the old GoTrue verify link — it is never silently consumed by a
--- link-preview crawler; only actually finishing sign-up does (via
--- claim_client_invite()). This removes the need for the old /activate/
--- bridge page entirely.
+-- and pastes `${SITE_URL}/{lang}/invite/?invite=<token>` wherever she likes
+-- (WhatsApp, SMS, ...) herself. Loading that URL is a pure read
+-- (get_invite_preview() below), so — unlike the old GoTrue verify link — it
+-- is never silently consumed by a link-preview crawler; only actually
+-- finishing sign-up does (via claim_client_invite()). This removes the need
+-- for the old /activate/ bridge page entirely.
 create table if not exists public.client_invites (
   id uuid primary key default gen_random_uuid(),
   client_id uuid not null references public.clients(id) on delete cascade,
@@ -750,7 +750,7 @@ $$;
 revoke all on function public.create_client_invite(uuid) from public, anon;
 grant execute on function public.create_client_invite(uuid) to authenticated;
 
--- Public (anon-callable) preview so /account/?invite=<token> can greet the
+-- Public (anon-callable) preview so /invite/?invite=<token> can greet the
 -- client by name before they've signed up — deliberately returns only the
 -- Profile's name, nothing else, and only for a token that's still valid.
 create or replace function public.get_invite_preview(p_token text)
@@ -772,7 +772,7 @@ revoke all on function public.get_invite_preview(text) from public;
 grant execute on function public.get_invite_preview(text) to anon, authenticated;
 
 -- Called once, right after a client finishes signing up (email + password
--- they chose themselves) on /account/?invite=<token> — links their brand new
+-- they chose themselves) on /invite/?invite=<token> — links their brand new
 -- Account to the pre-registered Profile the token points to, and (as
 -- before) links any pre-existing bookings that already carry their
 -- client_email but no user_id. SECURITY DEFINER because writing

@@ -20,7 +20,6 @@
   "clients": {
     "name_required": "Informe o nome do cliente.",
     "invite_error": "Não foi possível gerar o link de convite. Tente novamente.",
-    "invite_message": "Oi {{name}}! Aqui está o link da sua conta Gato Catsit — clique para criar sua conta: {{link}}",
     "link_copied": "Link copiado para a área de transferência!",
     "password_reset_sent": "E-mail de redefinição de senha enviado!",
     "unlink_confirm": "Desvincular a conta de {{name}}? A pessoa perderá acesso ao perfil e às reservas até ser convidada novamente.",

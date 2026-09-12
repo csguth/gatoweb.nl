@@ -4,10 +4,14 @@
 // Unlike the old GoTrue-native invite link this replaces, a client_invites
 // token has no email attached, so building the link is just string
 // concatenation — no redirect_to/email-exists fallback logic needed anymore.
-// Loading /account/?invite=<token> is a pure read (get_invite_preview() RPC in
-// schema.sql), so this link is safe to paste into WhatsApp: its own
-// link-preview crawler fetching it can't consume it, unlike the single-use
-// GoTrue verify link the old flow used — no /activate/ bridge page needed.
+// Loading /invite/?invite=<token> is a pure read (get_invite_preview() RPC in
+// schema.sql), so this link is safe to paste anywhere Lígia likes (WhatsApp,
+// SMS, ...): its own link-preview crawler fetching it can't consume it,
+// unlike the single-use GoTrue verify link the old flow used — no /activate/
+// bridge page needed. /invite/ is a dedicated content page (content/invite/,
+// reusing layouts/account/list.html via `type: account`) purely so link
+// previews (iMessage, WhatsApp, ...) show an invite-specific title instead of
+// the generic "My bookings" one that /account/ itself carries.
 
 const SUPPORTED_LANGS = ['en', 'nl', 'pt'];
 
@@ -17,7 +21,7 @@ export function normalizeLang(lang) {
 
 export function buildInviteLink(siteUrl, lang, token) {
   const origin = String(siteUrl || '').replace(/\/+$/, '');
-  return `${origin}/${normalizeLang(lang)}/account/?invite=${encodeURIComponent(token)}`;
+  return `${origin}/${normalizeLang(lang)}/invite/?invite=${encodeURIComponent(token)}`;
 }
 
 // Issue #179 follow-up: the redirectTo for a password-reset email sent to an

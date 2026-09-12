@@ -64,7 +64,7 @@ window.accountApp = function () {
     bookings: [],
 
     // Issue #179: a client landing here via Lígia's invite link
-    // (/account/?invite=<token>) is greeted by name (from get_invite_preview())
+    // (/invite/?invite=<token>) is greeted by name (from get_invite_preview())
     // and signs up themselves (own email + password) instead of "just set a
     // password" — the token carries no email, unlike the old Supabase-native
     // invite link it replaces. Once they have a session, claim_client_invite()

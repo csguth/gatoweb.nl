@@ -1,12 +1,14 @@
 Feature: Client signs up via an invite link and sees their Profile (issue #179)
   Unlike the old flow (issue #173, MVP), a client landing on
-  /account/?invite=<token> is NOT already authenticated — the token carries no
+  /invite/?invite=<token> is NOT already authenticated — the token carries no
   email. They're greeted by name (get_invite_preview() RPC) and sign up with
   their own email + password like any other client, then
   claim_client_invite() links their new Account to the pre-registered
   Profile and they see it (name/pets/address, read-only) above their
   bookings. See js/account/account-app.js init()/loadInvitePreview()/
-  afterLogin() and layouts/account/list.html.
+  afterLogin() and layouts/account/list.html (shared with /invite/ via
+  content/invite/'s `type: account` front matter, so link previews show an
+  invite-specific title).
 
   @auth-required
   Scenario: A valid invite link greets the client by name before they sign up
