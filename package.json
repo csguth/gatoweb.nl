@@ -9,7 +9,9 @@
     "test:bdd": "npm run test:build-fixtures && bddgen && playwright test",
     "test": "npm run test:bdd",
     "test:bdd:headed": "npm run test:build-fixtures && bddgen && playwright test --headed",
-    "test:bdd:report": "playwright show-report"
+    "test:bdd:report": "playwright show-report",
+    "test:unit": "cucumber-js --config tests/unit/cucumber.cjs",
+    "test:all": "npm run test:unit && npm test"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,7 @@
   },
   "homepage": "https://github.com/csguth/gatoweb.nl#readme",
   "devDependencies": {
+    "@cucumber/cucumber": "^12.8.3",
     "@playwright/test": "^1.62.0",
     "http-server": "^14.1.1",
     "playwright-bdd": "^9.2.0"

@@ -1,12 +1,11 @@
 // Step definitions for tests/bdd/features/gcal-sync-sync-decision.feature.
 // Pure logic test: imports supabase/functions/gcal-sync/logic.js directly (no
 // DOM, no browser, no Deno runtime, no real Google/Supabase calls needed) —
-// same pattern as gcal-sync-event.steps.mjs / invoice-calc.steps.mjs.
-import { createBdd } from 'playwright-bdd';
-import { world } from '../support/world.mjs';
+// same pattern as gcal-sync-event.steps.mjs / invoice-calc.steps.mjs. Runs
+// under cucumber-js puro instead of playwright-bdd — see tests/unit/cucumber.cjs.
+import { Given, When, Then } from '@cucumber/cucumber';
+import { world } from '../../bdd/support/world.mjs';
 import { decideSyncAction } from '../../../supabase/functions/gcal-sync/logic.js';
-
-const { Given, When, Then } = createBdd();
 
 function makeRecord(overrides) {
   return {
@@ -24,11 +23,11 @@ function makeRecord(overrides) {
   };
 }
 
-Given('a booking with status {string} and no calendar events', async ({}, status) => {
+Given('a booking with status {string} and no calendar events', async (status) => {
   world.record = makeRecord({ status, google_event_ids: {} });
 });
 
-Given('a booking with status {string} and calendar events for {string}', async ({}, status, dates) => {
+Given('a booking with status {string} and calendar events for {string}', async (status, dates) => {
   const google_event_ids = {};
   dates.split(',').forEach((d, i) => {
     google_event_ids[d.trim()] = `evt-${i + 1}`;
@@ -36,11 +35,11 @@ Given('a booking with status {string} and calendar events for {string}', async (
   world.record = makeRecord({ status, google_event_ids });
 });
 
-Given('the booking previously had status {string}', async ({}, status) => {
+Given('the booking previously had status {string}', async (status) => {
   world.oldRecord = { ...world.record, status };
 });
 
-Given("the booking's {word} changed from {string} to {string}", async ({}, field, from, to) => {
+Given("the booking's {word} changed from {string} to {string}", async (field, from, to) => {
   world.oldRecord[field] = from;
   world.record[field] = to;
 });
@@ -62,7 +61,7 @@ When('the booking row is deleted', async () => {
   world.result = decideSyncAction({ type: 'DELETE', record: world.record });
 });
 
-Then('the sync action is {string}', async ({}, action) => {
+Then('the sync action is {string}', async (action) => {
   if (world.result.action !== action) {
     throw new Error(
       `Expected sync action "${action}" but got "${world.result.action}" (reason: ${world.result.reason})`

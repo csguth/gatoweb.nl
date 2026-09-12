@@ -15,7 +15,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  # Pure-logic scenarios (no DOM/browser, see tests/unit/) run under cucumber-js
+  # puro on a plain Node runner — no Playwright image, no Hugo fixtures needed,
+  # so this job is fast and runs in parallel with test-ui below.
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit test suite
+        run: npm run test:unit
+
+  test-ui:
     runs-on: ubuntu-latest
     # Run inside the official Playwright image so CI uses the exact same
     # browser/OS/dependency versions as anyone running tests locally via
