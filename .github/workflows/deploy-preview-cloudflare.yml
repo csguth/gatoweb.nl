@@ -24,7 +24,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    # Gate the preview deploy on the BDD test suite passing, in the same
+    # workflow run. Runs on `pull_request` (not `pull_request_target`), so
+    # this inherits the same no-secrets-for-forks posture as the rest of this
+    # workflow; test.yml itself needs no secrets either way.
+    uses: ./.github/workflows/test.yml
+
   build-and-deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment: staging
     steps:

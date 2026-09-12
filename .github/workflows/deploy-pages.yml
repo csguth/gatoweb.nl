@@ -15,7 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    # Gate the deploy on the BDD test suite passing, in the same workflow run.
+    uses: ./.github/workflows/test.yml
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     environment: github-pages
     steps:

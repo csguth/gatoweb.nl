@@ -3,9 +3,14 @@ name: BDD Tests
 on:
   pull_request:
     branches: [staging, main]
-  push:
-    branches: [staging, main]
   workflow_dispatch:
+  # Reusable: called by the deploy workflows (deploy-pages.yml,
+  # deploy-staging-cloudflare.yml, deploy-preview-cloudflare.yml) so a deploy
+  # only proceeds once these tests pass, in the same workflow run. `push` was
+  # removed to avoid running the suite twice per push (once standalone, once
+  # via the deploy workflow's `workflow_call`); `pull_request` is kept so this
+  # still runs as a required status check on PRs.
+  workflow_call:
 
 permissions:
   contents: read
